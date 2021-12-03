@@ -1,4 +1,4 @@
-package com.yong.parse.data;
+package prj.yong.parser;
 
 public class ExcelToInsertQuery {
 

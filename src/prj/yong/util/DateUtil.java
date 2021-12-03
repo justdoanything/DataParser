@@ -1,4 +1,4 @@
-package com.yong.util;
+package prj.yong.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

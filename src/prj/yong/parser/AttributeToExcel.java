@@ -1,4 +1,4 @@
-package com.yong.parse.data;
+package prj.yong.parser;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.yong.common.MsgCode;
-import com.yong.util.DateUtil;
+import prj.yong.common.MsgCode;
+import prj.yong.util.DateUtil;
 
 public class AttributeToExcel {
 

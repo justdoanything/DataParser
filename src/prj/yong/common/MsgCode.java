@@ -1,4 +1,4 @@
-package com.yong.common;
+package prj.yong.common;
 
 public class MsgCode {
 
