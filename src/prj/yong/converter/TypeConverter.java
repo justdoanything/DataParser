@@ -12,7 +12,7 @@ public class TypeConverter {
 	/*
 	 * VO -> Map
 	 */
-	public static Map<String, Object> convertVoToMap(Object obj) throws Exception {
+	public static Map<String, Object> convertObjectToMap(Object obj) throws Exception {
 		if(obj == null) {
 			return Collections.emptyMap();
 		}
@@ -29,7 +29,7 @@ public class TypeConverter {
 	/*
 	 * Map -> VO
 	 */
-	public static <T> T convertMapToVo(Map<String, Object> map, Class<T> type) throws Exception {
+	public static <T> T convertMapToObject(Map<String, Object> map, Class<T> type) throws Exception {
 		if(type == null || map == null || map.isEmpty()) {
 			throw new NullPointerException("Parameter must be not null");
 		}
@@ -66,7 +66,7 @@ public class TypeConverter {
 		List<Map<String, Object>> convertList = new ArrayList<>();
 		
 		for(Object obj : list) {
-			convertList.add(convertVoToMap(obj));
+			convertList.add(convertObjectToMap(obj));
 		}
 		return convertList;
 	}
@@ -82,7 +82,7 @@ public class TypeConverter {
 		List<T> convertList = new ArrayList<>();
 		
 		for(Map<String, Object> map : list) {
-			convertList.add(convertMapToVo(map, type));
+			convertList.add(convertMapToObject(map, type));
 		}
 		return convertList;
 	}
