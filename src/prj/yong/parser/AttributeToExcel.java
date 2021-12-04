@@ -51,7 +51,9 @@ public class AttributeToExcel {
 	 * Initial Values
 	 */
 	private final int arraySize = 200000000;
-	private String filePath = MsgCode.MSG_CODE_FILE_PATH;
+	private int startWithLine = 0;
+	private String readfilePath = MsgCode.MSG_CODE_FILE_PATH;
+	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
 	private String spliter = MsgCode.MSG_CODE_FILE_SPLITER;
 	private String fileExtension = MsgCode.MSG_CODE_FILE_EXTENSION_TEXT;
 	private boolean isFileOpen = false;
@@ -63,17 +65,32 @@ public class AttributeToExcel {
 	public AttributeToExcel() {
 	}
 	
-	public AttributeToExcel(String filePath) {
-		this.filePath = filePath;
+	public AttributeToExcel(int startWithLine) {
+		this.startWithLine = startWithLine;
 	}
 	
-	public AttributeToExcel(String filePath, String spliter) {
-		this.filePath = filePath;
+	public AttributeToExcel(int startWithLine, String readfilePath) {
+		this.startWithLine = startWithLine;
+		this.readfilePath = readfilePath;
+	}
+	
+	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath) {
+		this.startWithLine = startWithLine;
+		this.readfilePath = readfilePath;
+		this.writeFilePath = writeFilePath;
+	}
+	
+	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter) {
+		this.startWithLine = startWithLine;
+		this.readfilePath = readfilePath;
+		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
 	}
 	
-	public AttributeToExcel(String filePath, String spliter, boolean isFileOpen) {
-		this.filePath = filePath;
+	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen) {
+		this.startWithLine = startWithLine;
+		this.readfilePath = readfilePath;
+		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
 		this.isFileOpen = isFileOpen;
 	}
@@ -95,24 +112,32 @@ public class AttributeToExcel {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		
 		try {
+			//if do not set writeFilePath, this should be readFilePath_{dateformat}
 			SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
 			sdf.format(new Date());
-			String writeFilePath = filePath.replace(MsgCode.MSG_CODE_FILE_EXTENSION_TEXT, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + MsgCode.MSG_CODE_FILE_EXTENSION_TEXT;
+			if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+				this.writeFilePath = readfilePath.replace(MsgCode.MSG_CODE_FILE_EXTENSION_TEXT, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + MsgCode.MSG_CODE_FILE_EXTENSION_TEXT;
+			}
 			
-			br = new BufferedReader(new FileReader(filePath));
+			// Set Reader and Writer
+			br = new BufferedReader(new FileReader(readfilePath));
 			bw = new BufferedWriter(new FileWriter(writeFilePath));
-			System.out.println(filePath);
-			System.out.println(writeFilePath);
-			String line;
 			
-			// 
+			// Put line to resultMap from file
+			String line;
 			while((line = br.readLine()) != null) {
-				String[] lineArray = line.split(this.spliter);
+				// Checking startWithLine
+				if(this.startWithLine != 0) {
+					this.startWithLine -= 1;
+					continue;
+				}
 				
+				String[] lineArray = line.split(this.spliter);
 				if(!resultMap.containsKey(lineArray[0])) {
 					resultMap.put(lineArray[0], new HashMap<String, String>());
 				}
 
+				// Change value if there is code in codeMap
 				if(lineArray[2] != null && codeMap.containsKey(lineArray[1])) 
 					this.changeCodeValue(lineArray);
 				// Put blank " " if the attribute value is empty.
@@ -135,10 +160,12 @@ public class AttributeToExcel {
 						attributeList.add(attribute);
 						bw.write(attribute);
 						bw.write(this.spliter);
+						bw.flush();
 					}
 				}
 			}
 			bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			bw.flush();
 			
 			// Write Attribute value as attribute and name
 			for(String name : nameList) {
@@ -153,8 +180,10 @@ public class AttributeToExcel {
 						bw.write(MsgCode.MSG_CODE_STRING_BLANK);
 						bw.write(this.spliter);
 					}
+					bw.flush();
 				}
 				bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
+				bw.flush();
 			}
 			
 		}catch (Exception e) {
@@ -169,68 +198,12 @@ public class AttributeToExcel {
 		String attributeName = lineArray[1];
 		String attributeValue = lineArray[2];
 		
-//		lineArray[2] = codeMap.get(attributeName).get(attributeValue) == null ? MsgCode.MSG_CODE_STRING_NULL : codeMap.get(attributeName).get(attributeValue);
-		lineArray[2] = codeMap.get(attributeName).containsValue(attributeValue) ? MsgCode.MSG_CODE_STRING_NULL : codeMap.get(attributeName).get(attributeValue);
-		
-//		if(lineArr[1].equals("Model Type")) {
-//    		switch(lineArr[2]) {
-//        		case "54" : lineArr[2] = "G"; break;
-//        		case "57" : lineArr[2] = "A"; break;
-//        		case "60" : lineArr[2] = "C"; break;
-//        		case "63" : lineArr[2] = "D"; break;
-//        		default :   lineArr[2] = "null";
-//    		}
-//    	} else if (lineArr[1].equals("Required Visit")) {
-//    		switch(lineArr[2]) {
-//        		case "66" : lineArr[2] = "N"; break;
-//        		case "69" : lineArr[2] = "M"; break;
-//        		case "72" : lineArr[2] = "O"; break;
-//        		default :   lineArr[2] = "null";
-//    		}
-//    	} else if (lineArr[1].equals("FO Update Status")){
-//    		if(lineArr[2].equals("1")) lineArr[2] = "Enable";
-//    		else lineArr[2] = "disable";
-//    	} else if (lineArr[1].equals("Is SET")){
-//    		if(lineArr[2].equals("1")) lineArr[2] = "Enable";
-//    		else lineArr[2] = "disable";
-//    	} else if (lineArr[1].equals("Is Salable")){
-//    		switch(lineArr[2]) {
-//        		case "75" : lineArr[2] = "N"; break;
-//        		case "78" : lineArr[2] = "Y"; break;
-//        		default :   lineArr[2] = "null";
-//    		}
-//    	} else if (lineArr[1].equals("Is Update")){
-//    		if(lineArr[2].equals("1")) lineArr[2] = "Enable";
-//    		else lineArr[2] = "disable";
-//    	} else if (lineArr[1].equals("Delivery Type")){
-//    		switch(lineArr[2]) {
-//        		case "39" : lineArr[2] = "H"; break;
-//        		case "42" : lineArr[2] = "P"; break;
-//        		default :   lineArr[2] = "null";
-//    		}
-//    	} else if (lineArr[1].equals("Enable RMA")){
-//    		if(lineArr[2].equals("1")) lineArr[2] = "Enable";
-//    		else lineArr[2] = "disable";
-//    	} else if (lineArr[1].equals("Display Status")){
-//    		switch(lineArr[2]) {
-//        		case "45" : lineArr[2] = "ACTIVE"; break;
-//        		case "48" : lineArr[2] = "SUSPENED"; break;
-//        		case "51" : lineArr[2] = "DISCONTINUED"; break;
-//        		default :   lineArr[2] = "null";
-//    		}
-//    	} else if (lineArr[1].equals("Install Type")){
-//    		switch(lineArr[2]) {
-//	    		case "81" : lineArr[2] = "A"; break;
-//	    		case "84" : lineArr[2] = "R"; break;
-//	    		case "87" : lineArr[2] = "Z"; break;
-//	    		case "90" : lineArr[2] = "Y"; break;
-//	    		default :   lineArr[2] = "null";
-//			}
-//    	}
+		lineArray[2] = codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : MsgCode.MSG_CODE_STRING_NULL;
 	}
 	
 	public static void main(String[] args) {
-		AttributeToExcel ate = new AttributeToExcel("C:\\Users\\82736\\Desktop\\attr.txt");
+		AttributeToExcel ate = new AttributeToExcel(1, "C:\\Users\\82736\\Desktop\\attr.txt");
+		ate.setStartWithLine(1);
 		try {
 			ate.addCodeValue("Model Type", "54", "G");
 			ate.addCodeValue("Model Type", "57", "A");
@@ -241,17 +214,33 @@ public class AttributeToExcel {
 			ate.addCodeValue("Required Visit", "66", "N");
 			ate.addCodeValue("Required Visit", "69", "M");
 			ate.addCodeValue("Required Visit", "72", "O");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
-			ate.addCodeValue("Model Type", "54", "G");
+			
+			ate.addCodeValue("FO Update Status", "1", "Enable");
+			ate.addCodeValue("FO Update Status", "0", "Disable");
+			
+			ate.addCodeValue("Is SET", "1", "Enable");
+			ate.addCodeValue("Is SET", "0", "Disable");
+			
+			ate.addCodeValue("Is Salable", "75", "N");
+			ate.addCodeValue("Is Salable", "78", "Y");
+			
+			ate.addCodeValue("Is Update", "1", "Enable");
+			ate.addCodeValue("Is Update", "0", "Disable");
+			
+			ate.addCodeValue("Delivery Type", "39", "H");
+			ate.addCodeValue("Delivery Type", "42", "P");
+			
+			ate.addCodeValue("Enable RMA", "1", "Enable");
+			ate.addCodeValue("Enable RMA", "0", "Disable");
+			
+			ate.addCodeValue("Display Status", "45", "ACTIVE");
+			ate.addCodeValue("Display Status", "48", "SUSPENED");
+			ate.addCodeValue("Display Status", "51", "DISCONTINUED");
+			
+			ate.addCodeValue("Install Type", "81", "A");
+			ate.addCodeValue("Install Type", "84", "R");
+			ate.addCodeValue("Install Type", "87", "Z");
+			ate.addCodeValue("Install Type", "90", "Y");
 			
 			ate.execute();
 		} catch (Exception e) {
