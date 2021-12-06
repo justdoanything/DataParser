@@ -3,51 +3,38 @@ https://github.com/justdoanything/WatchDB
 https://github.com/justdoanything/dataparser
 https://github.com/justdoanything/EnglishWordExam
 
-AttributeToExcel
-	/******************************************************
-	 * 
-	 * This class makes Excel Chart format like below.
-	 * 
-	 * [ Input ]
-	 * Name  | Attribute Name | Attribute Value
-	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-	 * TV	 | Size			  | 65 inch
-	 * TV	 | Company		  | LG
-	 * TV	 | Quality		  | HIGH
-	 * Audio | Size			  | 32
-	 * Audio | Company		  | Apple
-	 * Audio | Channel		  | Dual
-	 * 
-	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	 * 
-	 * [ Output]
-	 * Name	 | Size		| Company	| Quality	| Channel
-	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-	 * TV	 | 65 inch	| LG		| HIGH		|
-	 * Autio | 32		| Apple		|			| Dual
-	 *
-	 ******************************************************/
+1. AttributeToExcel
+/******************************************************
+ * 
+ * This class makes Excel Chart format like below.
+ * 
+ * [ Input ]
+ * Name  | Attribute Name | Attribute Value
+ * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+ * TV	 | Size			  | 65 inch
+ * TV	 | Company		  | LG
+ * TV	 | Quality		  | HIGH
+ * Audio | Size			  | 32
+ * Audio | Company		  | Apple
+ * Audio | Channel		  | Dual
+ * 
+ * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+ * 
+ * [ Output]
+ * Name	 | Size		| Company	| Quality	| Channel
+ * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+ * TV	 | 65 inch	| LG		| HIGH		|
+ * Autio | 32		| Apple		|			| Dual
+ *
+ ******************************************************/
 
-ExcelToInsertQuery
-	bulk insert 유무 확인(default N), null 기본값 설정 (default  null)
+2.TypeConverter
+  (1) Map → Object (VO)
+  (2) Object (VO) → Map
+2.ExcelToInsertQuery
 
-JsonToExcel
-	JSON Array or JSON 체크, null 기본값 설정(default null)
+3.JsonToExcel
 
-ExcelToJson
+4.ExcelToJson
 
-
-OpenSshTunneling
-	1개를 구동시키고 runable을 해서 쓰레드로 동작할 수 있게. 즉 1개 프로그램에서 3~5개 run 가능하도록.
-
-CheckingJson
-	JSON에서 특정 데이터가 있는지 체크
-
-Checking JSON
-
-
-build.xml (ant build)
-run.sh(conf folder)
-추가 설명
-
-
+5.CheckingJson
