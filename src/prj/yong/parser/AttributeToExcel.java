@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.print.DocFlavor.STRING;
-
 import lombok.Getter;
 import lombok.Setter;
 import msg.MsgCode;
