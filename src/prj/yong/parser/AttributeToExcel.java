@@ -19,6 +19,7 @@ import prj.yong.util.DateUtil;
 
 @Getter
 @Setter
+@SuppressWarnings("resource")
 public class AttributeToExcel {
 
 	/******************************************************
@@ -60,8 +61,7 @@ public class AttributeToExcel {
 	/**
 	 * Class Constructor
 	 */
-	public AttributeToExcel() {
-	}
+	public AttributeToExcel() {	}
 	
 	public AttributeToExcel(int startWithLine) {
 		this.startWithLine = startWithLine;
@@ -93,11 +93,28 @@ public class AttributeToExcel {
 		this.isFileOpen = isFileOpen;
 	}
 	
+	/**
+	 * Add code value to codeMap
+	 * @param name
+	 * @param code
+	 * @param value
+	 */
 	public void addCodeValue(String name, String code, String value) {
 		if(!codeMap.containsKey(name)) {
 			codeMap.put(name, new HashMap<String, String>());
 		}
 		codeMap.get(name).put(code, value);
+	}
+	
+	/**
+	 * Change valoue to code
+	 * @param lineArray
+	 */
+	private void changeCodeValue(String[] lineArray) {
+		String attributeName = lineArray[1];
+		String attributeValue = lineArray[2];
+		
+		lineArray[2] = codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : MsgCode.MSG_CODE_STRING_NULL;
 	}
 	
 	/**
@@ -186,16 +203,10 @@ public class AttributeToExcel {
 			
 		}catch (Exception e) {
 			e.printStackTrace();
+			throw new Exception(e);
 		}finally {
 			if(br != null) try { br.close(); } catch(IOException e) {}
 			if(bw != null) try { br.close(); } catch(IOException e) {}
 		}
-	}
-	
-	private void changeCodeValue(String[] lineArray) {
-		String attributeName = lineArray[1];
-		String attributeValue = lineArray[2];
-		
-		lineArray[2] = codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : MsgCode.MSG_CODE_STRING_NULL;
 	}
 }
