@@ -118,21 +118,12 @@ public class AttributeToExcel {
 		lineArray[2] = codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : MsgCode.MSG_CODE_STRING_NULL;
 	}
 	
-	/**
-	 * Text File
-	 * @throws Exception
-	 */
-	public void parse() throws Exception {
-		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length() - 1);
-		System.out.println(readFileExtension);
+	
+	private void parseExcelType(String readFileExtension) throws Exception {
 		
-		if(!this.readFilePath.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
-			&& !this.readFilePath.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
-			&& !this.readFilePath.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)
-			&& !this.readFilePath.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)) {
-			throw new FilerException("A extension of file you read must be .csv, .xls, .xlsx and .txt");
-		}		
-		
+	}
+	
+	private void parseTextType(String readFileExtension) throws Exception {
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
@@ -142,8 +133,12 @@ public class AttributeToExcel {
 			SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
 			sdf.format(new Date());
 			if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-				this.writeFilePath = readFilePath.replace(MsgCode.MSG_CODE_FILE_EXTENSION_TXT, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + MsgCode.MSG_CODE_FILE_EXTENSION_TXT;
+				this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
 			}
+			
+			// spliter of csv should be ,
+			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
+				this.spliter = ",";
 			
 			// Set Reader and Writer
 			br = new BufferedReader(new FileReader(readFilePath));
@@ -219,5 +214,29 @@ public class AttributeToExcel {
 			if(br != null) try { br.close(); } catch(IOException e) {}
 			if(bw != null) try { br.close(); } catch(IOException e) {}
 		}
+	}
+	
+	/**
+	 * Text File
+	 * @throws Exception
+	 */
+	public void parse() throws Exception {
+		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length());
+		
+		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
+				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)){
+			this.parseTextType(readFileExtension);
+		} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
+				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
+			this.parseExcelType(readFileExtension);
+		} else {
+			throw new FilerException("A extension of file you read must be .csv, .xls, .xlsx and .txt");
+		}
+	}
+	
+	public static void main(String[] args) throws Exception {
+		AttributeToExcel ate = new AttributeToExcel();
+		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.csv");
+		ate.parse();
 	}
 }
