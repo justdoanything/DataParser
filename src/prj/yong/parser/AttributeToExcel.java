@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.processing.FilerException;
+
 import lombok.Getter;
 import lombok.Setter;
 import msg.MsgCode;
@@ -51,10 +53,9 @@ public class AttributeToExcel {
 	 */
 	private final int arraySize = 200000000;
 	private int startWithLine = 0;
-	private String readfilePath = MsgCode.MSG_CODE_FILE_PATH;
+	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
 	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
 	private String spliter = MsgCode.MSG_CODE_FILE_SPLITER;
-	private String fileExtension = MsgCode.MSG_CODE_FILE_EXTENSION_TEXT;
 	private boolean isFileOpen = false;
 	private Map<String, Map<String, String>> codeMap = new HashMap<>();
 	
@@ -69,25 +70,25 @@ public class AttributeToExcel {
 	
 	public AttributeToExcel(int startWithLine, String readfilePath) {
 		this.startWithLine = startWithLine;
-		this.readfilePath = readfilePath;
+		this.readFilePath = readfilePath;
 	}
 	
 	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath) {
 		this.startWithLine = startWithLine;
-		this.readfilePath = readfilePath;
+		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 	}
 	
 	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter) {
 		this.startWithLine = startWithLine;
-		this.readfilePath = readfilePath;
+		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
 	}
 	
 	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen) {
 		this.startWithLine = startWithLine;
-		this.readfilePath = readfilePath;
+		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
 		this.isFileOpen = isFileOpen;
@@ -121,7 +122,17 @@ public class AttributeToExcel {
 	 * Text File
 	 * @throws Exception
 	 */
-	public void execute() throws Exception {
+	public void parse() throws Exception {
+		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length() - 1);
+		System.out.println(readFileExtension);
+		
+		if(!this.readFilePath.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
+			&& !this.readFilePath.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
+			&& !this.readFilePath.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)
+			&& !this.readFilePath.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)) {
+			throw new FilerException("A extension of file you read must be .csv, .xls, .xlsx and .txt");
+		}		
+		
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
@@ -131,11 +142,11 @@ public class AttributeToExcel {
 			SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
 			sdf.format(new Date());
 			if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-				this.writeFilePath = readfilePath.replace(MsgCode.MSG_CODE_FILE_EXTENSION_TEXT, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + MsgCode.MSG_CODE_FILE_EXTENSION_TEXT;
+				this.writeFilePath = readFilePath.replace(MsgCode.MSG_CODE_FILE_EXTENSION_TXT, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + MsgCode.MSG_CODE_FILE_EXTENSION_TXT;
 			}
 			
 			// Set Reader and Writer
-			br = new BufferedReader(new FileReader(readfilePath));
+			br = new BufferedReader(new FileReader(readFilePath));
 			bw = new BufferedWriter(new FileWriter(writeFilePath));
 			
 			// Put line to resultMap from file
