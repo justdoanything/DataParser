@@ -2,6 +2,10 @@ package prj.yong.parser;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,7 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.processing.FilerException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -51,7 +57,6 @@ public class AttributeToExcel {
 	/**
 	 * Initial Values
 	 */
-	private final int arraySize = 200000000;
 	private int startWithLine = 0;
 	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
 	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
@@ -108,44 +113,189 @@ public class AttributeToExcel {
 	}
 	
 	/**
-	 * Change valoue to code
-	 * @param lineArray
+	 * 
+	 * @param readFileExtension
+	 * @throws IOException
 	 */
-	private void changeCodeValue(String[] lineArray) {
-		String attributeName = lineArray[1];
-		String attributeValue = lineArray[2];
-		
-		lineArray[2] = codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : MsgCode.MSG_CODE_STRING_NULL;
+	private void checkingFileExist(String readFileExtension) throws IOException {
+		// Checking a file is existed
+		File file = new File(this.readFilePath);
+		if(!file.exists()) {
+			// throw FileNotFoundException if there is no file
+			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
+		}
+
+		//if do not set writeFilePath, this should be readFilePath_{dateformat}
+		SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
+		sdf.format(new Date());
+		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
+		}
 	}
 	
-	
-	private void parseExcelType(String readFileExtension) throws Exception {
-		
+	/**
+	 * 
+	 * @param resultMap
+	 * @param name
+	 * @param attributeName
+	 * @param attributeValue
+	 */
+	private void createResultMap(Map<String, Map<String, String>> resultMap, String name, String attributeName, String attributeValue) {
+		if(!resultMap.containsKey(name)) {
+			resultMap.put(name, new HashMap<String, String>());
+		}
+
+		// Change value if there is code in codeMap
+		if(attributeValue != null && codeMap.containsKey(attributeValue)) 
+			this.changeCodeValue(attributeName, attributeValue);
+		// Put blank " " if the attribute value is empty.
+		resultMap.get(name).put(attributeName,  attributeValue.equals(MsgCode.MSG_CODE_STRING_SPACE) ? MsgCode.MSG_CODE_STRING_SPACE : attributeValue);
 	}
 	
-	private void parseTextType(String readFileExtension) throws Exception {
+
+	/**
+	 * 
+	 * @param attributeName
+	 * @param attributeValue
+	 * @return
+	 */
+	private String changeCodeValue(String attributeName, String attributeValue) {
+		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : MsgCode.MSG_CODE_STRING_NULL;
+	}
+	
+	/**
+	 * 
+	 * @param sheet
+	 * @param size
+	 * @return
+	 */
+	private int findEmptyRowNo(Sheet sheet, int size) {
+		int rowNo = 0;
+		for(int rowNum = 0; rowNum < size; rowNum++) {
+			Row row = sheet.getRow(rowNum);
+			if(row == null || row.getLastCellNum() <= 0) { 
+				rowNo = rowNum;
+				break;
+			}
+		}
+		return rowNo;
+	}
+	
+	/**
+	 * 
+	 * @param readFileExtension
+	 * @throws IOException
+	 */
+	private void parseExcelType(String readFileExtension) throws IOException {
+		Map<String, Map<String, String>> resultMap = new HashMap<>();
+		XSSFWorkbook workbook = null;
+
+		// Checking file is existed and Set writeFilePath
+		this.checkingFileExist(readFileExtension);
+
+		// Set FileInputStream and Open file
+	   	FileInputStream fis = new FileInputStream(this.readFilePath);
+	   	workbook = new XSSFWorkbook(fis);
+	   	fis.close();
+	    
+	   	// Select first sheet
+	    Sheet sheet = workbook.getSheetAt(0);
+	    if(sheet == null)
+	    	throw new IOException("There is no sheet in file");
+
+	    // Put line to resultMap from file
+	    Row row = null;
+	    int index = this.startWithLine;
+	    String entityName, attributeName, attributeValue;
+	    while(row == null || row.getLastCellNum() <= 0) {
+	    	row = sheet.getRow(index++);
+	    	
+	    	// Throw IOException if startWithLine over than the row there is in file
+	    	if(row == null)
+	    		throw new IOException("startWithLine over than the row there is in file");
+	    	
+	    	entityName = row.getCell(0).getStringCellValue() == null ? MsgCode.MSG_CODE_STRING_SPACE : row.getCell(0).getStringCellValue();
+	    	attributeName = row.getCell(1).getStringCellValue() == null ? MsgCode.MSG_CODE_STRING_SPACE : row.getCell(1).getStringCellValue();
+	    	attributeValue = row.getCell(2).getStringCellValue() == null ? MsgCode.MSG_CODE_STRING_SPACE : row.getCell(2).getStringCellValue();
+	    	
+	    	this.createResultMap(resultMap, entityName, attributeName, attributeValue);
+	    }
+	    
+	    // Add name to namelist
+	 	List<String> nameList = new ArrayList<>();
+	 	for(String key : resultMap.keySet()) {
+	 		if(!nameList.contains(key))
+	 			nameList.add(key);
+	 	}
+	 			
+	 	// Write attribute in first line
+	 	workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
+	 	Sheet resultSheet = workbook.createSheet();
+	 	int cellIndex = 0;
+	 	int rowIndex = 0;
+	 	row = resultSheet.createRow(rowIndex++);
+	 	row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_FIELD_NAME);;
+	 	List<String> attributeList = new ArrayList<>();
+	 	for(String name : nameList) {
+	 		for(String attribute : (resultMap.get(name)).keySet()) {
+	 			if(!attributeList.contains(attribute)) {
+	 				attributeList.add(attribute);
+	 				row.createCell(cellIndex++).setCellValue(attribute);
+	 			}
+	 		}
+	 	}
+
+	 	// Write Attribute value as attribute and name
+	 	cellIndex = 0;
+	 	for(String name : nameList) {
+	 		row = resultSheet.createRow(rowIndex++);
+	 		row.createCell(cellIndex++).setCellValue(name);
+	 		
+	 		for(String attribute : attributeList) {
+	 			if((resultMap.get(name)).containsKey(attribute)) {
+	 				row.createCell(cellIndex++).setCellValue(resultMap.get(name).get(attribute));
+	 			} else {
+	 				row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
+	 			}
+	 		}
+	 	}
+	 	
+	 	FileOutputStream fos = new FileOutputStream(this.writeFilePath, false);
+	    workbook.write(fos);
+	    fos.flush();
+	    
+	    // I/O Close
+	 	workbook.close();
+	 	fos.close();
+	}
+	
+	/**
+	 * 
+	 * @param readFileExtension
+	 * @throws IOException
+	 */
+	private void parseTextType(String readFileExtension) throws IOException {
+		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		BufferedReader br = null;
 		BufferedWriter bw = null;
-		Map<String, Map<String, String>> resultMap = new HashMap<>();
+		
+		// Checking file is existed and set writeFilePath
+		this.checkingFileExist(readFileExtension);
 		
 		try {
-			//if do not set writeFilePath, this should be readFilePath_{dateformat}
-			SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
-			sdf.format(new Date());
-			if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-				this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
-			}
-			
 			// spliter of csv should be ,
 			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
 				this.spliter = ",";
 			
-			// Set Reader and Writer
+			// Set Reader and Writer and Open file
 			br = new BufferedReader(new FileReader(readFilePath));
 			bw = new BufferedWriter(new FileWriter(writeFilePath));
 			
 			// Put line to resultMap from file
 			String line;
+			String[] lineArray;
+			int index = 0;
+			String entityName, attributeName, attributeValue;
 			while((line = br.readLine()) != null) {
 				// Checking startWithLine
 				if(this.startWithLine != 0) {
@@ -153,17 +303,15 @@ public class AttributeToExcel {
 					continue;
 				}
 				
-				String[] lineArray = line.split(this.spliter);
-				if(!resultMap.containsKey(lineArray[0])) {
-					resultMap.put(lineArray[0], new HashMap<String, String>());
-				}
-
-				// Change value if there is code in codeMap
-				if(lineArray[2] != null && codeMap.containsKey(lineArray[1])) 
-					this.changeCodeValue(lineArray);
-				// Put blank " " if the attribute value is empty.
-				resultMap.get(lineArray[0]).put(lineArray[1],  lineArray.length == 2 ? " " : lineArray[2]);
+				lineArray = line.split(this.spliter);
+				entityName = lineArray[0] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[0];
+				attributeName = lineArray[1] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[1];
+				attributeValue = lineArray[2] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[2];
+				this.createResultMap(resultMap, entityName, attributeName, attributeValue);
+				index = 1;
 			}
+			if(index == 0)
+				throw new IOException("startWithLine over than the row there is in file");
 			
 			// Add name to namelist
 			List<String> nameList = new ArrayList<>();
@@ -209,7 +357,7 @@ public class AttributeToExcel {
 			
 		}catch (Exception e) {
 			e.printStackTrace();
-			throw new Exception(e);
+			throw new IOException(e);
 		}finally {
 			if(br != null) try { br.close(); } catch(IOException e) {}
 			if(bw != null) try { br.close(); } catch(IOException e) {}
@@ -218,9 +366,10 @@ public class AttributeToExcel {
 	
 	/**
 	 * Text File
+	 * @throws FileNotFoundException 
 	 * @throws Exception
 	 */
-	public void parse() throws Exception {
+	public void parse() throws IOException {
 		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length());
 		
 		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
@@ -230,13 +379,13 @@ public class AttributeToExcel {
 				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
 			this.parseExcelType(readFileExtension);
 		} else {
-			throw new FilerException("A extension of file you read must be .csv, .xls, .xlsx and .txt");
+			throw new FileNotFoundException("A extension of file you read must be .csv, .xls, .xlsx and .txt");
 		}
 	}
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException {
 		AttributeToExcel ate = new AttributeToExcel();
-		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.csv");
+		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.xlsx");
 		ate.parse();
 	}
 }
