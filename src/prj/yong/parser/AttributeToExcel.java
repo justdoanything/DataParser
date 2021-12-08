@@ -16,8 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import lombok.Getter;
@@ -181,6 +185,36 @@ public class AttributeToExcel {
 		return rowNo;
 	}
 	
+	private String getCellValue(Cell cell) {
+		String msg = "";
+		if (cell != null) {
+			switch (cell.getCellType()) {
+			case FORMULA:
+				msg = cell.getCellFormula();
+				break;
+			case NUMERIC:
+				msg = String.valueOf(cell.getNumericCellValue());
+				break;
+			case STRING:
+				msg = cell.getStringCellValue().trim();
+				break;
+			case BLANK:
+				msg = cell.toString();
+				break;
+			case BOOLEAN:
+				msg = String.valueOf(cell.getBooleanCellValue());
+				break;
+			case ERROR:
+				msg = String.valueOf(cell.getErrorCellValue());
+				break;
+			default:
+				msg = "";
+				break;
+			}
+		}
+		return msg;
+	}
+	
 	/**
 	 * 
 	 * @param readFileExtension
@@ -205,22 +239,21 @@ public class AttributeToExcel {
 
 	    // Put line to resultMap from file
 	    Row row = null;
-	    int index = this.startWithLine;
 	    String entityName, attributeName, attributeValue;
-	    while(row == null || row.getLastCellNum() <= 0) {
-	    	row = sheet.getRow(index++);
-	    	
-	    	// Throw IOException if startWithLine over than the row there is in file
-	    	if(row == null)
-	    		throw new IOException("startWithLine over than the row there is in file");
-	    	
-	    	entityName = row.getCell(0).getStringCellValue() == null ? MsgCode.MSG_CODE_STRING_SPACE : row.getCell(0).getStringCellValue();
-	    	attributeName = row.getCell(1).getStringCellValue() == null ? MsgCode.MSG_CODE_STRING_SPACE : row.getCell(1).getStringCellValue();
-	    	attributeValue = row.getCell(2).getStringCellValue() == null ? MsgCode.MSG_CODE_STRING_SPACE : row.getCell(2).getStringCellValue();
+	    
+	    // Throw IOException if startWithLine over than the row there is in file
+    	if(sheet.getRow(this.startWithLine - 1) == null)
+    		throw new IOException("startWithLine over than the row there is in file");
+
+    	for(int index = this.startWithLine; index < sheet.getPhysicalNumberOfRows(); index++) {
+    		row = sheet.getRow(index++);
+	    	entityName = this.getCellValue(row.getCell(0));
+	    	attributeName = this.getCellValue(row.getCell(1));
+	    	attributeValue = this.getCellValue(row.getCell(2));
 	    	
 	    	this.createResultMap(resultMap, entityName, attributeName, attributeValue);
-	    }
-	    
+    	}
+    	
 	    // Add name to namelist
 	 	List<String> nameList = new ArrayList<>();
 	 	for(String key : resultMap.keySet()) {
@@ -229,8 +262,7 @@ public class AttributeToExcel {
 	 	}
 	 			
 	 	// Write attribute in first line
-	 	workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
-	 	Sheet resultSheet = workbook.createSheet();
+	 	Sheet resultSheet = workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
 	 	int cellIndex = 0;
 	 	int rowIndex = 0;
 	 	row = resultSheet.createRow(rowIndex++);
@@ -244,7 +276,7 @@ public class AttributeToExcel {
 	 			}
 	 		}
 	 	}
-
+	 	
 	 	// Write Attribute value as attribute and name
 	 	cellIndex = 0;
 	 	for(String name : nameList) {
@@ -260,6 +292,7 @@ public class AttributeToExcel {
 	 		}
 	 	}
 	 	
+	 	// Write result file
 	 	FileOutputStream fos = new FileOutputStream(this.writeFilePath, false);
 	    workbook.write(fos);
 	    fos.flush();
@@ -365,7 +398,7 @@ public class AttributeToExcel {
 	}
 	
 	/**
-	 * Text File
+	 * 
 	 * @throws FileNotFoundException 
 	 * @throws Exception
 	 */
@@ -386,6 +419,7 @@ public class AttributeToExcel {
 	public static void main(String[] args) throws IOException {
 		AttributeToExcel ate = new AttributeToExcel();
 		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.xlsx");
+		ate.setStartWithLine(143393);
 		ate.parse();
 	}
 }
