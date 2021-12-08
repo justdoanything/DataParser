@@ -16,12 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import lombok.Getter;
@@ -140,20 +137,19 @@ public class AttributeToExcel {
 	/**
 	 * 
 	 * @param resultMap
-	 * @param name
+	 * @param entityName
 	 * @param attributeName
 	 * @param attributeValue
 	 */
-	private void createResultMap(Map<String, Map<String, String>> resultMap, String name, String attributeName, String attributeValue) {
-		if(!resultMap.containsKey(name)) {
-			resultMap.put(name, new HashMap<String, String>());
-		}
+	private void createResultMap(Map<String, Map<String, String>> resultMap, String entityName, String attributeName, String attributeValue) {
+		if(!resultMap.containsKey(entityName)) 
+			resultMap.put(entityName, new HashMap<String, String>());
 
 		// Change value if there is code in codeMap
 		if(attributeValue != null && codeMap.containsKey(attributeValue)) 
 			this.changeCodeValue(attributeName, attributeValue);
 		// Put blank " " if the attribute value is empty.
-		resultMap.get(name).put(attributeName,  attributeValue.equals(MsgCode.MSG_CODE_STRING_SPACE) ? MsgCode.MSG_CODE_STRING_SPACE : attributeValue);
+		resultMap.get(entityName).put(attributeName,  attributeValue.equals(MsgCode.MSG_CODE_STRING_SPACE) ? MsgCode.MSG_CODE_STRING_SPACE : attributeValue);
 	}
 	
 
@@ -169,22 +165,9 @@ public class AttributeToExcel {
 	
 	/**
 	 * 
-	 * @param sheet
-	 * @param size
+	 * @param cell
 	 * @return
 	 */
-	private int findEmptyRowNo(Sheet sheet, int size) {
-		int rowNo = 0;
-		for(int rowNum = 0; rowNum < size; rowNum++) {
-			Row row = sheet.getRow(rowNum);
-			if(row == null || row.getLastCellNum() <= 0) { 
-				rowNo = rowNum;
-				break;
-			}
-		}
-		return rowNo;
-	}
-	
 	private String getCellValue(Cell cell) {
 		String msg = "";
 		if (cell != null) {
@@ -193,8 +176,8 @@ public class AttributeToExcel {
 				msg = cell.getCellFormula();
 				break;
 			case NUMERIC:
-				msg = String.valueOf(cell.getNumericCellValue());
-				break;
+				msg = cell.getNumericCellValue() == (int) cell.getNumericCellValue() ? 
+						String.valueOf((int) cell.getNumericCellValue()) : String.valueOf(cell.getNumericCellValue());   
 			case STRING:
 				msg = cell.getStringCellValue().trim();
 				break;
@@ -237,14 +220,13 @@ public class AttributeToExcel {
 	    if(sheet == null)
 	    	throw new IOException("There is no sheet in file");
 
-	    // Put line to resultMap from file
-	    Row row = null;
-	    String entityName, attributeName, attributeValue;
-	    
 	    // Throw IOException if startWithLine over than the row there is in file
-    	if(sheet.getRow(this.startWithLine - 1) == null)
+    	if(this.startWithLine != 0 && sheet.getRow(this.startWithLine - 1) == null)
     		throw new IOException("startWithLine over than the row there is in file");
 
+	    // Read Excel File and Put line to resultMap
+	    Row row = null;
+	    String entityName, attributeName, attributeValue; 
     	for(int index = this.startWithLine; index < sheet.getPhysicalNumberOfRows(); index++) {
     		row = sheet.getRow(index++);
 	    	entityName = this.getCellValue(row.getCell(0));
@@ -255,21 +237,21 @@ public class AttributeToExcel {
     	}
     	
 	    // Add name to namelist
-	 	List<String> nameList = new ArrayList<>();
-	 	for(String key : resultMap.keySet()) {
-	 		if(!nameList.contains(key))
-	 			nameList.add(key);
+	 	List<String> entityList = new ArrayList<>();
+	 	for(String entity : resultMap.keySet()) {
+	 		if(!entityList.contains(entity))
+	 			entityList.add(entity);
 	 	}
 	 			
 	 	// Write attribute in first line
-	 	Sheet resultSheet = workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
-	 	int cellIndex = 0;
+	 	List<String> attributeList = new ArrayList<>();
 	 	int rowIndex = 0;
+	 	int cellIndex = 0;
+	 	Sheet resultSheet = workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
 	 	row = resultSheet.createRow(rowIndex++);
 	 	row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_FIELD_NAME);;
-	 	List<String> attributeList = new ArrayList<>();
-	 	for(String name : nameList) {
-	 		for(String attribute : (resultMap.get(name)).keySet()) {
+	 	for(String entity : entityList) {
+	 		for(String attribute : (resultMap.get(entity)).keySet()) {
 	 			if(!attributeList.contains(attribute)) {
 	 				attributeList.add(attribute);
 	 				row.createCell(cellIndex++).setCellValue(attribute);
@@ -278,17 +260,18 @@ public class AttributeToExcel {
 	 	}
 	 	
 	 	// Write Attribute value as attribute and name
-	 	cellIndex = 0;
-	 	for(String name : nameList) {
+	 	for(String entity : entityList) {
+	 		cellIndex = 0;
 	 		row = resultSheet.createRow(rowIndex++);
-	 		row.createCell(cellIndex++).setCellValue(name);
+	 		row.createCell(cellIndex++).setCellValue(entity);
 	 		
 	 		for(String attribute : attributeList) {
-	 			if((resultMap.get(name)).containsKey(attribute)) {
-	 				row.createCell(cellIndex++).setCellValue(resultMap.get(name).get(attribute));
+	 			if((resultMap.get(entity)).containsKey(attribute)) {
+	 				row.createCell(cellIndex).setCellValue(resultMap.get(entity).get(attribute));
 	 			} else {
-	 				row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
+	 				row.createCell(cellIndex).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
 	 			}
+	 			cellIndex++;
 	 		}
 	 	}
 	 	
@@ -419,7 +402,9 @@ public class AttributeToExcel {
 	public static void main(String[] args) throws IOException {
 		AttributeToExcel ate = new AttributeToExcel();
 		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.xlsx");
-		ate.setStartWithLine(143393);
+		ate.setStartWithLine(1);
+		ate.addCodeValue("Model Type", "57", "A");
+		ate.addCodeValue("Model Type", "54", "B");
 		ate.parse();
 	}
 }
