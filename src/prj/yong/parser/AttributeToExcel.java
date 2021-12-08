@@ -16,9 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import lombok.Getter;
@@ -146,8 +148,8 @@ public class AttributeToExcel {
 			resultMap.put(entityName, new HashMap<String, String>());
 
 		// Change value if there is code in codeMap
-		if(attributeValue != null && codeMap.containsKey(attributeValue)) 
-			this.changeCodeValue(attributeName, attributeValue);
+		if(attributeValue != null && codeMap.containsKey(attributeName)) 
+			attributeValue = this.changeCodeValue(attributeName, attributeValue);
 		// Put blank " " if the attribute value is empty.
 		resultMap.get(entityName).put(attributeName,  attributeValue.equals(MsgCode.MSG_CODE_STRING_SPACE) ? MsgCode.MSG_CODE_STRING_SPACE : attributeValue);
 	}
@@ -160,7 +162,7 @@ public class AttributeToExcel {
 	 * @return
 	 */
 	private String changeCodeValue(String attributeName, String attributeValue) {
-		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : MsgCode.MSG_CODE_STRING_NULL;
+		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : attributeValue;
 	}
 	
 	/**
@@ -177,7 +179,8 @@ public class AttributeToExcel {
 				break;
 			case NUMERIC:
 				msg = cell.getNumericCellValue() == (int) cell.getNumericCellValue() ? 
-						String.valueOf((int) cell.getNumericCellValue()) : String.valueOf(cell.getNumericCellValue());   
+						String.valueOf((int) cell.getNumericCellValue()) : String.valueOf(cell.getNumericCellValue());
+				break;
 			case STRING:
 				msg = cell.getStringCellValue().trim();
 				break;
@@ -205,14 +208,18 @@ public class AttributeToExcel {
 	 */
 	private void parseExcelType(String readFileExtension) throws IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
-		XSSFWorkbook workbook = null;
+//		XSSFWorkbook workbook = null;
+		Workbook workbook = null;
 
 		// Checking file is existed and Set writeFilePath
 		this.checkingFileExist(readFileExtension);
 
 		// Set FileInputStream and Open file
 	   	FileInputStream fis = new FileInputStream(this.readFilePath);
-	   	workbook = new XSSFWorkbook(fis);
+	   	if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)) 
+	   		workbook = new HSSFWorkbook(fis);
+	   	else
+	   		workbook = new XSSFWorkbook(fis);
 	   	fis.close();
 	    
 	   	// Select first sheet
@@ -228,7 +235,7 @@ public class AttributeToExcel {
 	    Row row = null;
 	    String entityName, attributeName, attributeValue; 
     	for(int index = this.startWithLine; index < sheet.getPhysicalNumberOfRows(); index++) {
-    		row = sheet.getRow(index++);
+    		row = sheet.getRow(index);
 	    	entityName = this.getCellValue(row.getCell(0));
 	    	attributeName = this.getCellValue(row.getCell(1));
 	    	attributeValue = this.getCellValue(row.getCell(2));
@@ -401,8 +408,7 @@ public class AttributeToExcel {
 	
 	public static void main(String[] args) throws IOException {
 		AttributeToExcel ate = new AttributeToExcel();
-		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.xlsx");
-		ate.setStartWithLine(1);
+		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.xls");
 		ate.addCodeValue("Model Type", "57", "A");
 		ate.addCodeValue("Model Type", "54", "B");
 		ate.parse();
