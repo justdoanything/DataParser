@@ -208,7 +208,6 @@ public class AttributeToExcel {
 	 */
 	private void parseExcelType(String readFileExtension) throws IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
-//		XSSFWorkbook workbook = null;
 		Workbook workbook = null;
 
 		// Checking file is existed and Set writeFilePath
@@ -274,11 +273,10 @@ public class AttributeToExcel {
 	 		
 	 		for(String attribute : attributeList) {
 	 			if((resultMap.get(entity)).containsKey(attribute)) {
-	 				row.createCell(cellIndex).setCellValue(resultMap.get(entity).get(attribute));
+	 				row.createCell(cellIndex++).setCellValue(resultMap.get(entity).get(attribute));
 	 			} else {
-	 				row.createCell(cellIndex).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
+	 				row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
 	 			}
-	 			cellIndex++;
 	 		}
 	 	}
 	 	
@@ -336,18 +334,18 @@ public class AttributeToExcel {
 			if(index == 0)
 				throw new IOException("startWithLine over than the row there is in file");
 			
-			// Add name to namelist
-			List<String> nameList = new ArrayList<>();
-			for(String key : resultMap.keySet()) {
-				if(!nameList.contains(key))
-					nameList.add(key);
-			}
+		    // Add entity to entityList
+		 	List<String> entityList = new ArrayList<>();
+		 	for(String entity : resultMap.keySet()) {
+		 		if(!entityList.contains(entity))
+		 			entityList.add(entity);
+		 	}
 			
 			// Write attribute in first line
 			bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
 			List<String> attributeList = new ArrayList<>();
-			for(String name : nameList) {
-				for(String attribute : (resultMap.get(name)).keySet()) {
+			for(String entity : entityList) {
+				for(String attribute : (resultMap.get(entity)).keySet()) {
 					if(!attributeList.contains(attribute)) {
 						attributeList.add(attribute);
 						bw.write(attribute);
@@ -360,13 +358,13 @@ public class AttributeToExcel {
 			bw.flush();
 			
 			// Write Attribute value as attribute and name
-			for(String name : nameList) {
-				bw.write(name);
+			for(String entity : entityList) {
+				bw.write(entity);
 				bw.write(this.spliter);
 				
 				for(String attribute : attributeList) {
-					if((resultMap.get(name)).containsKey(attribute)) {
-						bw.write(resultMap.get(name).get(attribute));
+					if((resultMap.get(entity)).containsKey(attribute)) {
+						bw.write(resultMap.get(entity).get(attribute));
 						bw.write(this.spliter);
 					} else {
 						bw.write(MsgCode.MSG_CODE_STRING_BLANK);
@@ -408,7 +406,7 @@ public class AttributeToExcel {
 	
 	public static void main(String[] args) throws IOException {
 		AttributeToExcel ate = new AttributeToExcel();
-		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.xls");
+		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.xlsx");
 		ate.addCodeValue("Model Type", "57", "A");
 		ate.addCodeValue("Model Type", "54", "B");
 		ate.parse();
