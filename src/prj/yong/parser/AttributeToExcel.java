@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -27,6 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 import msg.MsgCode;
 import prj.yong.util.DateUtil;
+import prj.yong.util.ExcelUtil;
 
 @Getter
 @Setter
@@ -116,93 +116,26 @@ public class AttributeToExcel {
 	}
 	
 	/**
-	 * 
-	 * @param readFileExtension
-	 * @throws IOException
+	 * Parse the data as a extension of your file
+	 * @throws FileNotFoundException 
+	 * @throws Exception
 	 */
-	private void checkingFileExist(String readFileExtension) throws IOException {
-		// Checking a file is existed
-		File file = new File(this.readFilePath);
-		if(!file.exists()) {
-			// throw FileNotFoundException if there is no file
-			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
-		}
-
-		//if do not set writeFilePath, this should be readFilePath_{dateformat}
-		SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
-		sdf.format(new Date());
-		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
+	public void parse() throws IOException {
+		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length());
+		
+		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
+				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)){
+			this.parseTextType(readFileExtension);
+		} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
+				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
+			this.parseExcelType(readFileExtension);
+		} else {
+			throw new FileNotFoundException("A extension of file you read must be .csv, .xls, .xlsx and .txt");
 		}
 	}
 	
 	/**
-	 * 
-	 * @param resultMap
-	 * @param entityName
-	 * @param attributeName
-	 * @param attributeValue
-	 */
-	private void createResultMap(Map<String, Map<String, String>> resultMap, String entityName, String attributeName, String attributeValue) {
-		if(!resultMap.containsKey(entityName)) 
-			resultMap.put(entityName, new HashMap<String, String>());
-
-		// Change value if there is code in codeMap
-		if(attributeValue != null && codeMap.containsKey(attributeName)) 
-			attributeValue = this.changeCodeValue(attributeName, attributeValue);
-		// Put blank " " if the attribute value is empty.
-		resultMap.get(entityName).put(attributeName,  attributeValue.equals(MsgCode.MSG_CODE_STRING_SPACE) ? MsgCode.MSG_CODE_STRING_SPACE : attributeValue);
-	}
-	
-
-	/**
-	 * 
-	 * @param attributeName
-	 * @param attributeValue
-	 * @return
-	 */
-	private String changeCodeValue(String attributeName, String attributeValue) {
-		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : attributeValue;
-	}
-	
-	/**
-	 * 
-	 * @param cell
-	 * @return
-	 */
-	private String getCellValue(Cell cell) {
-		String msg = "";
-		if (cell != null) {
-			switch (cell.getCellType()) {
-			case FORMULA:
-				msg = cell.getCellFormula();
-				break;
-			case NUMERIC:
-				msg = cell.getNumericCellValue() == (int) cell.getNumericCellValue() ? 
-						String.valueOf((int) cell.getNumericCellValue()) : String.valueOf(cell.getNumericCellValue());
-				break;
-			case STRING:
-				msg = cell.getStringCellValue().trim();
-				break;
-			case BLANK:
-				msg = cell.toString();
-				break;
-			case BOOLEAN:
-				msg = String.valueOf(cell.getBooleanCellValue());
-				break;
-			case ERROR:
-				msg = String.valueOf(cell.getErrorCellValue());
-				break;
-			default:
-				msg = "";
-				break;
-			}
-		}
-		return msg;
-	}
-	
-	/**
-	 * 
+	 * Parse excel file (.xlsx, .xls)
 	 * @param readFileExtension
 	 * @throws IOException
 	 */
@@ -235,9 +168,9 @@ public class AttributeToExcel {
 	    String entityName, attributeName, attributeValue; 
     	for(int index = this.startWithLine; index < sheet.getPhysicalNumberOfRows(); index++) {
     		row = sheet.getRow(index);
-	    	entityName = this.getCellValue(row.getCell(0));
-	    	attributeName = this.getCellValue(row.getCell(1));
-	    	attributeValue = this.getCellValue(row.getCell(2));
+	    	entityName = ExcelUtil.getCellValue(row.getCell(0));
+	    	attributeName = ExcelUtil.getCellValue(row.getCell(1));
+	    	attributeValue = ExcelUtil.getCellValue(row.getCell(2));
 	    	
 	    	this.createResultMap(resultMap, entityName, attributeName, attributeValue);
     	}
@@ -291,7 +224,7 @@ public class AttributeToExcel {
 	}
 	
 	/**
-	 * 
+	 * Parse text file (.txt, .csv)
 	 * @param readFileExtension
 	 * @throws IOException
 	 */
@@ -386,22 +319,52 @@ public class AttributeToExcel {
 	}
 	
 	/**
-	 * 
-	 * @throws FileNotFoundException 
-	 * @throws Exception
+	 * Check the file is existed or not
+	 * @param readFileExtension
+	 * @throws IOException
 	 */
-	public void parse() throws IOException {
-		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length());
-		
-		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)){
-			this.parseTextType(readFileExtension);
-		} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
-			this.parseExcelType(readFileExtension);
-		} else {
-			throw new FileNotFoundException("A extension of file you read must be .csv, .xls, .xlsx and .txt");
+	private void checkingFileExist(String readFileExtension) throws IOException {
+		// Checking a file is existed
+		File file = new File(this.readFilePath);
+		if(!file.exists()) {
+			// throw FileNotFoundException if there is no file
+			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
 		}
+
+		//if do not set writeFilePath, this should be readFilePath_{dateformat}
+		SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
+		sdf.format(new Date());
+		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
+		}
+	}
+	
+	/**
+	 * Put lines in file to resultMap 
+	 * @param resultMap
+	 * @param entityName
+	 * @param attributeName
+	 * @param attributeValue
+	 */
+	private void createResultMap(Map<String, Map<String, String>> resultMap, String entityName, String attributeName, String attributeValue) {
+		if(!resultMap.containsKey(entityName)) 
+			resultMap.put(entityName, new HashMap<String, String>());
+
+		// Change value if there is code in codeMap
+		if(attributeValue != null && codeMap.containsKey(attributeName)) 
+			attributeValue = this.changeCodeValue(attributeName, attributeValue);
+		// Put blank " " if the attribute value is empty.
+		resultMap.get(entityName).put(attributeName,  attributeValue.equals(MsgCode.MSG_CODE_STRING_SPACE) ? MsgCode.MSG_CODE_STRING_SPACE : attributeValue);
+	}
+	
+	/**
+	 * Change an attribute value if there is mapped code
+	 * @param attributeName
+	 * @param attributeValue
+	 * @return
+	 */
+	private String changeCodeValue(String attributeName, String attributeValue) {
+		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : attributeValue;
 	}
 	
 	public static void main(String[] args) throws IOException {
