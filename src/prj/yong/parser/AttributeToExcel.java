@@ -137,18 +137,16 @@ public class AttributeToExcel {
 	/**
 	 * Parse excel file (.xlsx, .xls)
 	 * @param readFileExtension
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	private void parseExcelType(String readFileExtension) throws IOException {
+	private void parseExcelType(String readFileExtension) throws Exception {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		Workbook workbook = null;
 
 		// Checking file is existed and Set writeFilePath
 		if(FileUtil.isFileExist(this.readFilePath)) {
-			//if do not set writeFilePath, this should be readFilePath_{dateformat}
-			if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-				this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
-			}
+			// Set writeFilePath if do not set manually
+			this.setDefaultWriteFilePath(readFileExtension);
 		}
 
 		// Set FileInputStream and Open file
@@ -231,23 +229,19 @@ public class AttributeToExcel {
 	/**
 	 * Parse text file (.txt, .csv)
 	 * @param readFileExtension
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	private void parseTextType(String readFileExtension) throws IOException {
+	private void parseTextType(String readFileExtension) throws Exception {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		
 		// Checking file is existed and Set writeFilePath
 		if(FileUtil.isFileExist(this.readFilePath)) {
-			//if do not set writeFilePath, this should be readFilePath_{dateformat}
-			SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
-			sdf.format(new Date());
-			if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-				this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
-			}
+			// Set writeFilePath if do not set manually
+			this.setDefaultWriteFilePath(readFileExtension);
 		}
-		
+				
 		try {
 			// spliter of csv should be ,
 			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
@@ -331,25 +325,16 @@ public class AttributeToExcel {
 	}
 	
 	/**
-	 * Check the file is existed or not
+	 * Set default writeFilePath if do not set manually
 	 * @param readFileExtension
-	 * @throws IOException
+	 * @throws Exception
 	 */
-//	private void checkingFileExist(String readFileExtension) throws IOException {
-//		// Checking a file is existed
-//		File file = new File(this.readFilePath);
-//		if(!file.exists()) {
-//			// throw FileNotFoundException if there is no file
-//			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
-//		}
-//
-//		//if do not set writeFilePath, this should be readFilePath_{dateformat}
-//		SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
-//		sdf.format(new Date());
-//		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-//			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
-//		}
-//	}
+	private void setDefaultWriteFilePath(String readFileExtension) throws Exception {
+		//if do not set writeFilePath, this should be readFilePath_{dateformat}
+		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
+		}
+	}
 	
 	/**
 	 * Put lines in file to resultMap 
@@ -377,13 +362,5 @@ public class AttributeToExcel {
 	 */
 	private String changeCodeValue(String attributeName, String attributeValue) {
 		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : attributeValue;
-	}
-	
-	public static void main(String[] args) throws IOException {
-		AttributeToExcel ate = new AttributeToExcel();
-		ate.setReadFilePath("C:\\Users\\82736\\Desktop\\attr.xlsx");
-		ate.addCodeValue("Model Type", "57", "A");
-		ate.addCodeValue("Model Type", "54", "B");
-		ate.parse();
 	}
 }
