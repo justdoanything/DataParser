@@ -2,7 +2,6 @@ package prj.yong.parser;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,6 +26,7 @@ import lombok.Setter;
 import msg.MsgCode;
 import prj.yong.util.DateUtil;
 import prj.yong.util.ExcelUtil;
+import prj.yong.util.FileUtil;
 
 @Getter
 @Setter
@@ -144,7 +144,12 @@ public class AttributeToExcel {
 		Workbook workbook = null;
 
 		// Checking file is existed and Set writeFilePath
-		this.checkingFileExist(readFileExtension);
+		if(FileUtil.isFileExist(this.readFilePath)) {
+			//if do not set writeFilePath, this should be readFilePath_{dateformat}
+			if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+				this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
+			}
+		}
 
 		// Set FileInputStream and Open file
 	   	FileInputStream fis = new FileInputStream(this.readFilePath);
@@ -233,8 +238,15 @@ public class AttributeToExcel {
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		
-		// Checking file is existed and set writeFilePath
-		this.checkingFileExist(readFileExtension);
+		// Checking file is existed and Set writeFilePath
+		if(FileUtil.isFileExist(this.readFilePath)) {
+			//if do not set writeFilePath, this should be readFilePath_{dateformat}
+			SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
+			sdf.format(new Date());
+			if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+				this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
+			}
+		}
 		
 		try {
 			// spliter of csv should be ,
@@ -323,21 +335,21 @@ public class AttributeToExcel {
 	 * @param readFileExtension
 	 * @throws IOException
 	 */
-	private void checkingFileExist(String readFileExtension) throws IOException {
-		// Checking a file is existed
-		File file = new File(this.readFilePath);
-		if(!file.exists()) {
-			// throw FileNotFoundException if there is no file
-			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
-		}
-
-		//if do not set writeFilePath, this should be readFilePath_{dateformat}
-		SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
-		sdf.format(new Date());
-		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
-		}
-	}
+//	private void checkingFileExist(String readFileExtension) throws IOException {
+//		// Checking a file is existed
+//		File file = new File(this.readFilePath);
+//		if(!file.exists()) {
+//			// throw FileNotFoundException if there is no file
+//			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
+//		}
+//
+//		//if do not set writeFilePath, this should be readFilePath_{dateformat}
+//		SimpleDateFormat sdf = new SimpleDateFormat(MsgCode.MSG_VALUE_DATE_FORMAT);
+//		sdf.format(new Date());
+//		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+//			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
+//		}
+//	}
 	
 	/**
 	 * Put lines in file to resultMap 
