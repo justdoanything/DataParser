@@ -11,7 +11,7 @@ public class FileUtil {
 	 * @param readFileExtension
 	 * @throws IOException
 	 */
-	public static boolean isFileExist(String filePath) throws IOException {
+	public static boolean isFileExist(String filePath) throws FileNotFoundException {
 		// Checking a file is existed
 		File file = new File(filePath);
 		if(!file.exists()) {

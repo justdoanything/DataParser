@@ -1,18 +1,22 @@
 package prj.yong.parser;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.ValidationException;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -59,12 +63,12 @@ public class AttributeToExcel {
 	/**
 	 * Initial Values
 	 */
-	private String returnType = MsgCode.MSG_CODE_FILE_PATH;
 	private int startWithLine = 0;
 	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
 	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
-	private String spliter = MsgCode.MSG_CODE_FILE_SPLITER;
+	private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
 	private boolean isFileOpen = false;
+	private boolean isGetString = false;
 	private Map<String, Map<String, String>> codeMap = new HashMap<>();
 	
 	/**
@@ -102,6 +106,15 @@ public class AttributeToExcel {
 		this.isFileOpen = isFileOpen;
 	}
 	
+	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen, boolean isGetString) {
+		this.startWithLine = startWithLine;
+		this.readFilePath = readfilePath;
+		this.writeFilePath = writeFilePath;
+		this.spliter = spliter;
+		this.isFileOpen = isFileOpen;
+		this.isGetString = isGetString;
+	}
+	
 	/**
 	 * Add code value to codeMap
 	 * @param name
@@ -117,42 +130,54 @@ public class AttributeToExcel {
 	
 	/**
 	 * Parse the data as a extension of your file
-	 * @throws FileNotFoundException 
+	 * @throws IOException 
+	 * @throws DateTimeParseException 
+	 * @throws StringIndexOutOfBoundsException 
 	 * @throws Exception
 	 */
-	public String parse() throws Exception {
+	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
 		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length());
 		
-		if(this.returnType.equals(MsgCode.MSG_CODE_RETURN_TYPE_FILE) || this.returnType.equals(MsgCode.MSG_CODE_RETURN_TYPE_STRING)) {
-			if(this.returnType.equals(MsgCode.MSG_CODE_RETURN_TYPE_FILE)) {
-				if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
-						|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
-						|| readFileExtension.equals(MsgCode.MSG_CODE_STRING_BLANK)){
-					resultString = this.parseTextType(readFileExtension);
-				} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
-						|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
-					resultString = this.parseExcelType(readFileExtension);
-				} else {
-					throw new FileNotFoundException("A extension of file you read must be '.csv', '.xls', '.xlsx' and '.txt'");
-				}
-			} else {
-				resultString = this.parseStringType(readFileExtension);
-			}
-		}else {
-			throw new InputMismatchException("A value named returnType must be 'FILE' or 'STRING'");
+		this.validPrivateValues();
+		
+		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
+				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
+				|| readFileExtension.equals(MsgCode.MSG_CODE_STRING_BLANK)){
+			resultString = this.parseTextType(readFileExtension);
+		} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
+				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
+			resultString = this.parseExcelType(readFileExtension);
+		} else {
+			throw new FileNotFoundException("A extension of file you read must be '.csv', '.xls', '.xlsx' and '.txt'");
 		}
 		return resultString;
 	}
 	
 	/**
+	 * Valid private values
+	 * @throws Exception
+	 */
+	private void validPrivateValues() throws ValidationException, NullPointerException {
+		if(this.startWithLine < 0)
+			throw new ValidationException("A required value has an exception : startWithLine should be over 0");
+		
+		if(this.readFilePath == null || this.writeFilePath == null || this.spliter == null || this.codeMap == null)
+			throw new NullPointerException("A required value has an exception : all of values cannot be null");
+	}
+	
+	/**
 	 * Parse excel file (.xlsx, .xls)
 	 * @param readFileExtension
+	 * @throws DateTimeParseException 
+	 * @throws StringIndexOutOfBoundsException 
+	 * @throws IOException 
 	 * @throws Exception 
 	 */
-	private String parseExcelType(String readFileExtension) throws Exception {
+	private String parseExcelType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		Workbook workbook = null;
+		String resultString = "";
 
 		// Checking file is existed and Set writeFilePath
 		if(FileUtil.isFileExist(this.readFilePath)) {
@@ -202,30 +227,37 @@ public class AttributeToExcel {
 	 	int cellIndex = 0;
 	 	Sheet resultSheet = workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
 	 	row = resultSheet.createRow(rowIndex++);
+	 	this.writeResultString(resultString, MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
 	 	row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_FIELD_NAME);;
 	 	for(String entity : entityList) {
 	 		for(String attribute : (resultMap.get(entity)).keySet()) {
 	 			if(!attributeList.contains(attribute)) {
 	 				attributeList.add(attribute);
 	 				row.createCell(cellIndex++).setCellValue(attribute);
+	 				this.writeResultString(resultString, attribute + MsgCode.MSG_CODE_STRING_TAB);
 	 			}
 	 		}
 	 	}
+	 	this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_NEW_LINE);
 	 	
 	 	// Write Attribute value as attribute and name
 	 	for(String entity : entityList) {
 	 		cellIndex = 0;
 	 		row = resultSheet.createRow(rowIndex++);
 	 		row.createCell(cellIndex++).setCellValue(entity);
+	 		this.writeResultString(resultString, entity + MsgCode.MSG_CODE_STRING_TAB);
 	 		
 	 		for(String attribute : attributeList) {
 	 			if((resultMap.get(entity)).containsKey(attribute)) {
 	 				row.createCell(cellIndex++).setCellValue(resultMap.get(entity).get(attribute));
+	 				this.writeResultString(resultString, resultMap.get(entity).get(attribute) + MsgCode.MSG_CODE_STRING_TAB);
 	 			} else {
 	 				row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
+	 				this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_BLANK + MsgCode.MSG_CODE_STRING_TAB);
 	 			}
 	 		}
 	 	}
+	 	this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_NEW_LINE);
 	 	
 	 	// Write result file
 	 	FileOutputStream fos = new FileOutputStream(this.writeFilePath, false);
@@ -236,18 +268,25 @@ public class AttributeToExcel {
 	 	workbook.close();
 	 	fos.close();
 	 	
-	 	return MsgCode.MSG_CODE_STRING_SUCCESS;
+	 	if(this.isFileOpen)
+			Desktop.getDesktop().edit(new File(writeFilePath));
+	 	
+	 	return resultString;
 	}
 	
 	/**
 	 * Parse text file (.txt, .csv)
 	 * @param readFileExtension
+	 * @throws DateTimeParseException 
+	 * @throws StringIndexOutOfBoundsException 
+	 * @throws IOException 
 	 * @throws Exception 
 	 */
-	private String parseTextType(String readFileExtension) throws Exception {
+	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		BufferedReader br = null;
 		BufferedWriter bw = null;
+		String resultString = "";
 		
 		// Checking file is existed and Set writeFilePath
 		if(FileUtil.isFileExist(this.readFilePath)) {
@@ -295,6 +334,7 @@ public class AttributeToExcel {
 			
 			// Write attribute in first line
 			bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
+			this.writeResultString(resultString, MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
 			List<String> attributeList = new ArrayList<>();
 			for(String entity : entityList) {
 				for(String attribute : (resultMap.get(entity)).keySet()) {
@@ -302,32 +342,43 @@ public class AttributeToExcel {
 						attributeList.add(attribute);
 						bw.write(attribute);
 						bw.write(this.spliter);
+						this.writeResultString(resultString, attribute + this.spliter);
 						bw.flush();
+						
 					}
 				}
 			}
 			bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_NEW_LINE);
 			bw.flush();
+
 			
 			// Write Attribute value as attribute and name
 			for(String entity : entityList) {
 				bw.write(entity);
 				bw.write(this.spliter);
+				this.writeResultString(resultString, entity + this.spliter);
 				
 				for(String attribute : attributeList) {
 					if((resultMap.get(entity)).containsKey(attribute)) {
 						bw.write(resultMap.get(entity).get(attribute));
 						bw.write(this.spliter);
+						this.writeResultString(resultString, resultMap.get(entity).get(attribute) + this.spliter);
 					} else {
 						bw.write(MsgCode.MSG_CODE_STRING_BLANK);
 						bw.write(this.spliter);
+						this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_BLANK + this.spliter);
 					}
 					bw.flush();
 				}
 				bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
+				this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_NEW_LINE);
 				bw.flush();
+				
 			}
 			
+			if(this.isFileOpen)
+				Desktop.getDesktop().edit(new File(writeFilePath));
 		}catch (Exception e) {
 			e.printStackTrace();
 			throw new IOException(e);
@@ -335,18 +386,7 @@ public class AttributeToExcel {
 			if(br != null) try { br.close(); } catch(IOException e) {}
 			if(bw != null) try { br.close(); } catch(IOException e) {}
 		}
-		return MsgCode.MSG_CODE_STRING_SUCCESS;
-	}
-	
-	/**
-	 * Parse String
-	 * @param readFileExtension
-	 * @return
-	 * @throws Exception
-	 */
-	private String parseStringType(String readFileExtension) throws Exception {
-		
-		return "";
+		return resultString;
 	}
 	
 	/**
@@ -354,7 +394,7 @@ public class AttributeToExcel {
 	 * @param readFileExtension
 	 * @throws Exception
 	 */
-	private void setDefaultWriteFilePath(String readFileExtension) throws Exception {
+	private void setDefaultWriteFilePath(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException {
 		//if do not set writeFilePath, this should be readFilePath_{dateformat}
 		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
 			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
@@ -387,5 +427,19 @@ public class AttributeToExcel {
 	 */
 	private String changeCodeValue(String attributeName, String attributeValue) {
 		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : attributeValue;
+	}
+	
+	/**
+	 * Append resultString if getString is true
+	 * @param input
+	 * @param appender
+	 * @return
+	 */
+	private String writeResultString(String input, String appender) {
+		if(this.isGetString) {
+			return input + appender;
+		}else {
+			return MsgCode.MSG_CODE_STRING_BLANK;
+		}
 	}
 }
