@@ -376,6 +376,8 @@ public class AttributeToExcel {
 				bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
 				if(this.isGetString) {
 					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+//					CommonUtil util = new CommonUtil();
+//					util.copyClipboard(resultString.toString());
 //					CommonUtil.copyClipboard(resultString.toString());
 				}
 				bw.flush();
