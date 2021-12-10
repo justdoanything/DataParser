@@ -27,6 +27,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import lombok.Getter;
 import lombok.Setter;
 import msg.MsgCode;
+import prj.yong.util.CommonUtil;
 import prj.yong.util.DateUtil;
 import prj.yong.util.ExcelUtil;
 import prj.yong.util.FileUtil;
@@ -177,7 +178,7 @@ public class AttributeToExcel {
 	private String parseExcelType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		Workbook workbook = null;
-		String resultString = "";
+		StringBuilder resultString = new StringBuilder();
 
 		// Checking file is existed and Set writeFilePath
 		if(FileUtil.isFileExist(this.readFilePath)) {
@@ -227,37 +228,40 @@ public class AttributeToExcel {
 	 	int cellIndex = 0;
 	 	Sheet resultSheet = workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
 	 	row = resultSheet.createRow(rowIndex++);
-	 	this.writeResultString(resultString, MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
+	 	if(this.isGetString) resultString.append(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
 	 	row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_FIELD_NAME);;
 	 	for(String entity : entityList) {
 	 		for(String attribute : (resultMap.get(entity)).keySet()) {
 	 			if(!attributeList.contains(attribute)) {
 	 				attributeList.add(attribute);
 	 				row.createCell(cellIndex++).setCellValue(attribute);
-	 				this.writeResultString(resultString, attribute + MsgCode.MSG_CODE_STRING_TAB);
+	 				if(this.isGetString) resultString.append(attribute + MsgCode.MSG_CODE_STRING_TAB);
 	 			}
 	 		}
 	 	}
-	 	this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_NEW_LINE);
+	 	if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
 	 	
 	 	// Write Attribute value as attribute and name
 	 	for(String entity : entityList) {
 	 		cellIndex = 0;
 	 		row = resultSheet.createRow(rowIndex++);
 	 		row.createCell(cellIndex++).setCellValue(entity);
-	 		this.writeResultString(resultString, entity + MsgCode.MSG_CODE_STRING_TAB);
+	 		if(this.isGetString) resultString.append(entity + MsgCode.MSG_CODE_STRING_TAB);
 	 		
 	 		for(String attribute : attributeList) {
 	 			if((resultMap.get(entity)).containsKey(attribute)) {
 	 				row.createCell(cellIndex++).setCellValue(resultMap.get(entity).get(attribute));
-	 				this.writeResultString(resultString, resultMap.get(entity).get(attribute) + MsgCode.MSG_CODE_STRING_TAB);
+	 				if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute) + MsgCode.MSG_CODE_STRING_TAB);
 	 			} else {
 	 				row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
-	 				this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_BLANK + MsgCode.MSG_CODE_STRING_TAB);
+	 				if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK + MsgCode.MSG_CODE_STRING_TAB);
 	 			}
 	 		}
 	 	}
-	 	this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_NEW_LINE);
+	 	if(this.isGetString) {
+	 		resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+//	 		CommonUtil.copyClipboard(resultString.toString());
+	 	}
 	 	
 	 	// Write result file
 	 	FileOutputStream fos = new FileOutputStream(this.writeFilePath, false);
@@ -271,7 +275,7 @@ public class AttributeToExcel {
 	 	if(this.isFileOpen)
 			Desktop.getDesktop().edit(new File(writeFilePath));
 	 	
-	 	return resultString;
+	 	return resultString.toString();
 	}
 	
 	/**
@@ -286,7 +290,7 @@ public class AttributeToExcel {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		BufferedReader br = null;
 		BufferedWriter bw = null;
-		String resultString = "";
+		StringBuilder resultString = new StringBuilder();
 		
 		// Checking file is existed and Set writeFilePath
 		if(FileUtil.isFileExist(this.readFilePath)) {
@@ -334,7 +338,6 @@ public class AttributeToExcel {
 			
 			// Write attribute in first line
 			bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
-			this.writeResultString(resultString, MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
 			List<String> attributeList = new ArrayList<>();
 			for(String entity : entityList) {
 				for(String attribute : (resultMap.get(entity)).keySet()) {
@@ -342,14 +345,14 @@ public class AttributeToExcel {
 						attributeList.add(attribute);
 						bw.write(attribute);
 						bw.write(this.spliter);
-						this.writeResultString(resultString, attribute + this.spliter);
+						if(this.isGetString) resultString.append(attribute + this.spliter);
 						bw.flush();
 						
 					}
 				}
 			}
 			bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
-			this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_NEW_LINE);
+			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
 			bw.flush();
 
 			
@@ -357,24 +360,25 @@ public class AttributeToExcel {
 			for(String entity : entityList) {
 				bw.write(entity);
 				bw.write(this.spliter);
-				this.writeResultString(resultString, entity + this.spliter);
-				
+				if(this.isGetString) resultString.append(entity + this.spliter);
 				for(String attribute : attributeList) {
 					if((resultMap.get(entity)).containsKey(attribute)) {
 						bw.write(resultMap.get(entity).get(attribute));
 						bw.write(this.spliter);
-						this.writeResultString(resultString, resultMap.get(entity).get(attribute) + this.spliter);
+						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute) + this.spliter);
 					} else {
 						bw.write(MsgCode.MSG_CODE_STRING_BLANK);
 						bw.write(this.spliter);
-						this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_BLANK + this.spliter);
+						if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK + this.spliter);
 					}
 					bw.flush();
 				}
 				bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
-				this.writeResultString(resultString, MsgCode.MSG_CODE_STRING_NEW_LINE);
+				if(this.isGetString) {
+					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+//					CommonUtil.copyClipboard(resultString.toString());
+				}
 				bw.flush();
-				
 			}
 			
 			if(this.isFileOpen)
@@ -386,7 +390,7 @@ public class AttributeToExcel {
 			if(br != null) try { br.close(); } catch(IOException e) {}
 			if(bw != null) try { br.close(); } catch(IOException e) {}
 		}
-		return resultString;
+		return resultString.toString();
 	}
 	
 	/**
@@ -427,19 +431,5 @@ public class AttributeToExcel {
 	 */
 	private String changeCodeValue(String attributeName, String attributeValue) {
 		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : attributeValue;
-	}
-	
-	/**
-	 * Append resultString if getString is true
-	 * @param input
-	 * @param appender
-	 * @return
-	 */
-	private String writeResultString(String input, String appender) {
-		if(this.isGetString) {
-			return input + appender;
-		}else {
-			return MsgCode.MSG_CODE_STRING_BLANK;
-		}
 	}
 }
