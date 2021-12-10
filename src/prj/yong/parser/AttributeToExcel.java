@@ -8,10 +8,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +59,7 @@ public class AttributeToExcel {
 	/**
 	 * Initial Values
 	 */
+	private String returnType = MsgCode.MSG_CODE_FILE_PATH;
 	private int startWithLine = 0;
 	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
 	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
@@ -120,18 +120,29 @@ public class AttributeToExcel {
 	 * @throws FileNotFoundException 
 	 * @throws Exception
 	 */
-	public void parse() throws IOException {
+	public String parse() throws Exception {
+		String resultString = "";
 		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length());
 		
-		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)){
-			this.parseTextType(readFileExtension);
-		} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
-			this.parseExcelType(readFileExtension);
-		} else {
-			throw new FileNotFoundException("A extension of file you read must be .csv, .xls, .xlsx and .txt");
+		if(this.returnType.equals(MsgCode.MSG_CODE_RETURN_TYPE_FILE) || this.returnType.equals(MsgCode.MSG_CODE_RETURN_TYPE_STRING)) {
+			if(this.returnType.equals(MsgCode.MSG_CODE_RETURN_TYPE_FILE)) {
+				if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
+						|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
+						|| readFileExtension.equals(MsgCode.MSG_CODE_STRING_BLANK)){
+					resultString = this.parseTextType(readFileExtension);
+				} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
+						|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
+					resultString = this.parseExcelType(readFileExtension);
+				} else {
+					throw new FileNotFoundException("A extension of file you read must be '.csv', '.xls', '.xlsx' and '.txt'");
+				}
+			} else {
+				resultString = this.parseStringType(readFileExtension);
+			}
+		}else {
+			throw new InputMismatchException("A value named returnType must be 'FILE' or 'STRING'");
 		}
+		return resultString;
 	}
 	
 	/**
@@ -139,7 +150,7 @@ public class AttributeToExcel {
 	 * @param readFileExtension
 	 * @throws Exception 
 	 */
-	private void parseExcelType(String readFileExtension) throws Exception {
+	private String parseExcelType(String readFileExtension) throws Exception {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		Workbook workbook = null;
 
@@ -224,6 +235,8 @@ public class AttributeToExcel {
 	    // I/O Close
 	 	workbook.close();
 	 	fos.close();
+	 	
+	 	return MsgCode.MSG_CODE_STRING_SUCCESS;
 	}
 	
 	/**
@@ -231,7 +244,7 @@ public class AttributeToExcel {
 	 * @param readFileExtension
 	 * @throws Exception 
 	 */
-	private void parseTextType(String readFileExtension) throws Exception {
+	private String parseTextType(String readFileExtension) throws Exception {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		BufferedReader br = null;
 		BufferedWriter bw = null;
@@ -322,6 +335,18 @@ public class AttributeToExcel {
 			if(br != null) try { br.close(); } catch(IOException e) {}
 			if(bw != null) try { br.close(); } catch(IOException e) {}
 		}
+		return MsgCode.MSG_CODE_STRING_SUCCESS;
+	}
+	
+	/**
+	 * Parse String
+	 * @param readFileExtension
+	 * @return
+	 * @throws Exception
+	 */
+	private String parseStringType(String readFileExtension) throws Exception {
+		
+		return "";
 	}
 	
 	/**
