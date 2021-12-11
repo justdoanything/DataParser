@@ -58,7 +58,7 @@ public class TypeConverter {
 	/*
 	 * List<VO> -> Map<String, Object>
 	 */
-	public static List<Map<String, Object>> convertListVoToListMap(List<?> list) throws Exception {
+	public static List<Map<String, Object>> convertListObjectToListMap(List<?> list) throws Exception {
 		if(list == null || list.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -74,7 +74,7 @@ public class TypeConverter {
 	/*
 	 * Map<String, Object> -> List<VO>
 	 */
-	public static <T> List<T> convertListMapToListVO(List<Map<String, Object>> list, Class<T> type) throws Exception {
+	public static <T> List<T> convertListMapToListObject(List<Map<String, Object>> list, Class<T> type) throws Exception {
 		if(type == null || list == null || list.isEmpty()) {
 			throw new NullPointerException("Parameter must be not null");
 		}
