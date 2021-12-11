@@ -137,7 +137,7 @@ public class AttributeToExcel {
 	 */
 	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
-		String readFileExtension = this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length());
+		String readFileExtension = this.readFilePath.contains(".") ? this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length()) : MsgCode.MSG_CODE_STRING_BLANK;
 		
 		this.validPrivateValues();
 		
@@ -398,7 +398,9 @@ public class AttributeToExcel {
 	private void setDefaultWriteFilePath(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException {
 		//if do not set writeFilePath, this should be readFilePath_{dateformat}
 		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-			this.writeFilePath = readFilePath.replace(readFileExtension, "") + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) + readFileExtension;
+			this.writeFilePath = readFilePath.replace(readFileExtension, "") 
+									+ "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) 
+									+ readFileExtension;
 		}
 	}
 	
