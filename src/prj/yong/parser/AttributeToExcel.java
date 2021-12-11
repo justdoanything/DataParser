@@ -67,7 +67,8 @@ public class AttributeToExcel {
 	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
 	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
 	private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
-	private boolean isFileOpen = false;
+	private boolean isWriteFile = true;
+	private boolean isOpenFile = false;
 	private boolean isGetString = false;
 	private Map<String, Map<String, String>> codeMap = new HashMap<>();
 	
@@ -98,20 +99,30 @@ public class AttributeToExcel {
 		this.spliter = spliter;
 	}
 	
-	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen) {
+	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
-		this.isFileOpen = isFileOpen;
+		this.isWriteFile = isWriteFile;
 	}
 	
-	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen, boolean isGetString) {
+	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
-		this.isFileOpen = isFileOpen;
+		this.isWriteFile = isWriteFile;
+		this.isOpenFile = isOpenFile;
+	}
+	
+	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile, boolean isGetString) {
+		this.startWithLine = startWithLine;
+		this.readFilePath = readfilePath;
+		this.writeFilePath = writeFilePath;
+		this.spliter = spliter;
+		this.isWriteFile = isWriteFile;
+		this.isOpenFile = isOpenFile;
 		this.isGetString = isGetString;
 	}
 	
@@ -163,7 +174,13 @@ public class AttributeToExcel {
 			throw new ValidationException("A required value has an exception : startWithLine should be over 0");
 		
 		if(this.readFilePath == null || this.writeFilePath == null || this.spliter == null || this.codeMap == null)
-			throw new NullPointerException("A required value has an exception : all of values cannot be null");
+			throw new NullPointerException("A required value has an exception : All of values cannot be null");
+		
+		if(!this.isWriteFile && !this.isGetString)
+			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+		
+		if(!isWriteFile)
+			this.isOpenFile = false;
 	}
 	
 	/**
@@ -270,7 +287,7 @@ public class AttributeToExcel {
 	 	workbook.close();
 	 	fos.close();
 	 	
-	 	if(this.isFileOpen)
+	 	if(this.isOpenFile)
 			Desktop.getDesktop().edit(new File(writeFilePath));
 	 	
 	 	return resultString.toString();
@@ -303,7 +320,7 @@ public class AttributeToExcel {
 			
 			// Set Reader and Writer and Open file
 			br = new BufferedReader(new FileReader(readFilePath));
-			bw = new BufferedWriter(new FileWriter(writeFilePath));
+			if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
 			
 			// Put line to resultMap from file
 			String line;
@@ -335,57 +352,48 @@ public class AttributeToExcel {
 		 	}
 			
 			// Write attribute in first line
-			bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
+			if(this.isWriteFile) bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
 			List<String> attributeList = new ArrayList<>();
 			for(String entity : entityList) {
 				for(String attribute : (resultMap.get(entity)).keySet()) {
 					if(!attributeList.contains(attribute)) {
 						attributeList.add(attribute);
-						bw.write(attribute);
-						bw.write(this.spliter);
+						if(this.isWriteFile) { bw.write(attribute); bw.write(this.spliter); bw.flush(); }
 						if(this.isGetString) resultString.append(attribute).append(this.spliter);
-						bw.flush();
 						
 					}
 				}
 			}
-			bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
 			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
-			bw.flush();
-
 			
 			// Write Attribute value as attribute and name
 			for(String entity : entityList) {
-				bw.write(entity);
-				bw.write(this.spliter);
+				if(this.isWriteFile) { bw.write(entity); bw.write(this.spliter); }
 				if(this.isGetString) resultString.append(entity).append(this.spliter);
 				for(String attribute : attributeList) {
 					if((resultMap.get(entity)).containsKey(attribute)) {
-						bw.write(resultMap.get(entity).get(attribute));
-						bw.write(this.spliter);
+						if(this.isWriteFile) { bw.write(resultMap.get(entity).get(attribute)); bw.write(this.spliter); bw.flush(); }
 						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(this.spliter);
 					} else {
-						bw.write(MsgCode.MSG_CODE_STRING_BLANK);
-						bw.write(this.spliter);
+						if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_BLANK); bw.write(this.spliter); bw.flush(); }
 						if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK).append(this.spliter);
 					}
-					bw.flush();
 				}
-				bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
+				if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
 				if(this.isGetString) {
 					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
 				}
-				bw.flush();
 			}
 			
-			if(this.isFileOpen)
+			if(this.isOpenFile)
 				Desktop.getDesktop().edit(new File(writeFilePath));
 		}catch (Exception e) {
 			e.printStackTrace();
 			throw new IOException(e);
 		}finally {
-			if(br != null) try { br.close(); } catch(IOException e) {}
-			if(bw != null) try { br.close(); } catch(IOException e) {}
+			if(br != null) try { br.close(); } catch(IOException e) {throw new IOException(e);}
+			if(bw != null) try { br.close(); } catch(IOException e) {throw new IOException(e);}
 		}
 		return resultString.toString();
 	}
