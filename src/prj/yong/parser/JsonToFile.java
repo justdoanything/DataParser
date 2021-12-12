@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonToExcel {
+public class JsonToFile {
 	public String makeExcelData(String FilePath, boolean autoFileOpen) {
 		BufferedReader br = null;
 		BufferedWriter bw = null;

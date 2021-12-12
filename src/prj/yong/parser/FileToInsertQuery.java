@@ -27,7 +27,7 @@ import msg.MsgCode;
 @Getter
 @Setter
 @SuppressWarnings("rawtypes")
-public class ExcelToInsertQuery {
+public class FileToInsertQuery {
 	/**
 	 * Initial Values
 	 */
@@ -35,6 +35,7 @@ public class ExcelToInsertQuery {
 	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
 	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
 	private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
+	private boolean isWriteFile = true;
 	private boolean isFileOpen = false;
 	private boolean isGetString = false;
 	private boolean isBulkInsert = true;
@@ -43,31 +44,31 @@ public class ExcelToInsertQuery {
 	/**
 	 * Class Constructor
 	 */
-	public ExcelToInsertQuery() {	}
+	public FileToInsertQuery() {	}
 	
-	public ExcelToInsertQuery(int startWithLine) {
+	public FileToInsertQuery(int startWithLine) {
 		this.startWithLine = startWithLine;
 	}
 	
-	public ExcelToInsertQuery(int startWithLine, String readfilePath) {
+	public FileToInsertQuery(int startWithLine, String readfilePath) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 	}
 	
-	public ExcelToInsertQuery(int startWithLine, String readfilePath, String writeFilePath) {
+	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 	}
 	
-	public ExcelToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter) {
+	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
 	}
 	
-	public ExcelToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen) {
+	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
@@ -75,7 +76,7 @@ public class ExcelToInsertQuery {
 		this.isFileOpen = isFileOpen;
 	}
 	
-	public ExcelToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen, boolean isGetString) {
+	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen, boolean isGetString) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;

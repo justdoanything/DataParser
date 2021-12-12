@@ -34,7 +34,7 @@ import prj.yong.util.FileUtil;
 @Getter
 @Setter
 @SuppressWarnings("resource")
-public class AttributeToExcel {
+public class AttributeToFile {
 
 	/******************************************************
 	 * 
@@ -75,31 +75,31 @@ public class AttributeToExcel {
 	/**
 	 * Class Constructor
 	 */
-	public AttributeToExcel() {	}
+	public AttributeToFile() {	}
 	
-	public AttributeToExcel(int startWithLine) {
+	public AttributeToFile(int startWithLine) {
 		this.startWithLine = startWithLine;
 	}
 	
-	public AttributeToExcel(int startWithLine, String readfilePath) {
+	public AttributeToFile(int startWithLine, String readfilePath) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 	}
 	
-	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath) {
+	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 	}
 	
-	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter) {
+	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath, String spliter) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
 	}
 	
-	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile) {
+	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
@@ -107,7 +107,7 @@ public class AttributeToExcel {
 		this.isWriteFile = isWriteFile;
 	}
 	
-	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile) {
+	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
@@ -116,7 +116,7 @@ public class AttributeToExcel {
 		this.isOpenFile = isOpenFile;
 	}
 	
-	public AttributeToExcel(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile, boolean isGetString) {
+	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile, boolean isGetString) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;

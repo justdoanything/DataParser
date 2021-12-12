@@ -1,5 +1,5 @@
 package prj.yong.parser;
 
-public class ExcelToJson {
+public class FileToJson {
 
 }
