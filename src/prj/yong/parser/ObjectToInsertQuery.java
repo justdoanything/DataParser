@@ -19,12 +19,26 @@ import lombok.Setter;
 public class ObjectToInsertQuery {
 
 	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public List<String> parse() throws Exception {
 
 		this.printBulkInsertQuery(null,null,null,0);
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param vo
+	 * @param additional
+	 * @param contentList
+	 * @param bulkInsertCnt
+	 * @return
+	 * @throws Exception
+	 */
 	private List<String> printBulkInsertQuery(Object vo, Map additional, JSONArray contentList, int bulkInsertCnt) throws Exception {
 		String bulkInsertQuery = "";
 		List<String> bulkInsertQueryList = new ArrayList<>();
