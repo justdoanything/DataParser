@@ -14,6 +14,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonToFile {
+	
+	/**
+	 * 
+	 * @param FilePath
+	 * @param autoFileOpen
+	 * @return
+	 */
 	public String makeExcelData(String FilePath, boolean autoFileOpen) {
 		BufferedReader br = null;
 		BufferedWriter bw = null;
