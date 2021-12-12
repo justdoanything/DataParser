@@ -36,7 +36,7 @@ public class FileToInsertQuery {
 	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
 	private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
 	private boolean isWriteFile = true;
-	private boolean isFileOpen = false;
+	private boolean isOpenFile = false;
 	private boolean isGetString = false;
 	private boolean isBulkInsert = true;
 	private String tableName = MsgCode.MSG_CODE_STRING_BLANK;
@@ -68,29 +68,58 @@ public class FileToInsertQuery {
 		this.spliter = spliter;
 	}
 	
-	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen) {
+	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
-		this.isFileOpen = isFileOpen;
+		this.isWriteFile = isWriteFile;
+		this.isOpenFile = isOpenFile;
 	}
 	
-	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isFileOpen, boolean isGetString) {
+	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile, boolean isGetString) {
 		this.startWithLine = startWithLine;
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
-		this.isFileOpen = isFileOpen;
+		this.isWriteFile = isWriteFile;
+		this.isOpenFile = isOpenFile;
 		this.isGetString = isGetString;
 	}
 	
+	public FileToInsertQuery(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile, boolean isGetString, boolean isBulkInsert) {
+		this.startWithLine = startWithLine;
+		this.readFilePath = readfilePath;
+		this.writeFilePath = writeFilePath;
+		this.spliter = spliter;
+		this.isWriteFile = isWriteFile;
+		this.isOpenFile = isOpenFile;
+		this.isGetString = isGetString;
+		this.isBulkInsert = isBulkInsert;
+	}
+	
+	/**
+	 * 
+	 * @param readFileExtension
+	 * @return
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws IOException
+	 */
 	private String parseExcelType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 
 		
 		return "";
 	}
 	
+	/**
+	 * 
+	 * @param readFileExtension
+	 * @return
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws IOException
+	 */
 	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		
 		BufferedReader br = null;
@@ -137,7 +166,7 @@ public class FileToInsertQuery {
     			bw.write("\n");
     		}
     		bw.close();
-    		if(isFileOpen) Desktop.getDesktop().edit(new File(writeFilePath));
+    		if(isOpenFile) Desktop.getDesktop().edit(new File(writeFilePath));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
