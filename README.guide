@@ -4,35 +4,60 @@ https://github.com/justdoanything/dataparser
 https://github.com/justdoanything/EnglishWordExam
 
 1. AttributeToExcel
-/******************************************************
- * 
- * This class makes Excel Chart format like below.
- * 
- * [ Input ]
- * Name  | Attribute Name | Attribute Value
- * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
- * TV	 | Size			  | 65 inch
- * TV	 | Company		  | LG
- * TV	 | Quality		  | HIGH
- * Audio | Size			  | 32
- * Audio | Company		  | Apple
- * Audio | Channel		  | Dual
- * 
- * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
- * 
- * [ Output]
- * Name	 | Size		| Company	| Quality	| Channel
- * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
- * TV	 | 65 inch	| LG		| HIGH		|
- * Autio | 32		| Apple		|		| Dual
- *
- ******************************************************/
+	/******************************************************
+	 * 
+	 * This class read a file and makes table structure data like Excel.
+	 * 
+	 * [ Input ]
+	 * Name  | Attribute Name | Attribute Value
+	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+	 * TV	  | Size			      | 65 inch
+	 * TV	  | Company		      | LG
+	 * TV	  | Quality		      | HIGH
+	 * Audio | Size			      | 32
+	 * Audio | Company		    | Apple
+	 * Audio | Channel		    | Dual
+	 * 
+	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	 * 
+	 * [ Output ]
+	 * Name	  | Size		| Company	| Quality	| Channel
+	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+	 * TV	    | 65 inch	| LG		  | HIGH		|
+	 * Audio  | 32		  | Apple		|			    | Dual
+	 *
+	 ******************************************************/	
 
 2.TypeConverter
   (1) Map → Object (VO)
   (2) Object (VO) → Map
 
 3.ExcelToInsertQuery
+	/******************************************************
+	 * 
+	 * This class read a file and makes insert query format like below.
+	 * 
+	 * [ Input ]
+	 * Name	  | Size		| Company	| Quality	| Channel
+	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+	 * TV     | 65 inch	| LG		  | HIGH		|
+	 * Audio  | 32		  | Apple		|			    | Dual
+	 *
+	 * 
+	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	 * 
+	 * [ Output ]
+	 * 1. Bulk Insert Type
+	 * INSERT INTO {tableName} ( Name, Size, Company, Quality, Channel )
+	 * VALUES
+	 * ('TV', '65 inch', 'LG', 'HIGH' null)
+	 * ,('Audio', '32', 'Apple', null, 'Dual');
+	 * 
+	 * 2. Non-Bulk Insert Type
+	 * INSERT INTO {tableName} ( Name, Size, Company, Quality, Channel ) VALUES ('TV', '65 inch', 'LG', 'HIGH' null);
+	 * INSERT INTO {tableName} ( Name, Size, Company, Quality, Channel ) VALUES ('Audio', '32', 'Apple', null, 'Dual');; 
+	 *
+	 ******************************************************/
 
 3.JsonToExcel
 
