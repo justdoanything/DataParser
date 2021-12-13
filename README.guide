@@ -21,10 +21,10 @@ https://github.com/justdoanything/EnglishWordExam
 	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	 * 
 	 * [ Output ]
-	 * Name	  | Size		| Company	| Quality	| Channel
+	 * Name	  | Size	| Company	| Quality	| Channel
 	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-	 * TV	  | 65 inch	| LG		  | HIGH		|
-	 * Audio  | 32		  | Apple		|			    | Dual
+	 * TV	  | 65 inch	| LG		| HIGH		|
+	 * Audio  | 32		| Apple		|		| Dual
 	 *
 	 ******************************************************/	
 
@@ -38,10 +38,10 @@ https://github.com/justdoanything/EnglishWordExam
 	 * This class read a file and makes insert query format like below.
 	 * 
 	 * [ Input ]
-	 * Name	  | Size		| Company	| Quality	| Channel
+	 * Name	  | Size	| Company	| Quality	| Channel
 	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-	 * TV     | 65 inch	| LG		  | HIGH		|
-	 * Audio  | 32		  | Apple		|			    | Dual
+	 * TV     | 65 inch	| LG		| HIGH		|
+	 * Audio  | 32		| Apple		|		| Dual
 	 *
 	 * 
 	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
