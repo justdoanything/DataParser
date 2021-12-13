@@ -3,7 +3,11 @@ https://github.com/justdoanything/WatchDB
 https://github.com/justdoanything/dataparser
 https://github.com/justdoanything/EnglishWordExam
 
-1. AttributeToFile
+1.TypeConverter
+  (1) Map → Object (VO)
+  (2) Object (VO) → Map
+
+2. AttributeToFile
 	/******************************************************
 	 * 
 	 * This class read a file and makes table structure data like Excel.
@@ -27,10 +31,6 @@ https://github.com/justdoanything/EnglishWordExam
 	 * Audio  | 32		| Apple		|		| Dual
 	 *
 	 ******************************************************/	
-
-2.TypeConverter
-  (1) Map → Object (VO)
-  (2) Object (VO) → Map
 
 3.FileToInsertQuery
 	/******************************************************
