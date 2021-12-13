@@ -170,10 +170,12 @@ public class FileToInsertQuery {
             boolean isFirst = true;
             while ((line = br.readLine()) != null) {
             	if(isFirst) {
+            		// Write Query Header
             		line = line.replace(this.spliter, ", ");
             		queryHeader.append(line).append(") VALUES ");;
             		isFirst = false;
             	} else {
+            		// Merge Query Body
             		line = line.replace(this.spliter, "', '").replace("''", "null");
             		
             		if(isBulkInsert){
@@ -183,9 +185,11 @@ public class FileToInsertQuery {
             		}
             	}
             }
+            // Replace last word ',' to ';'
             if(isBulkInsert)
             	queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(","), ";");
             
+            // Write result into file
             if(this.isWriteFile) {
             	bw.write(queryHeader.toString());
             	bw.write(queryBody.toString());
@@ -252,40 +256,5 @@ public class FileToInsertQuery {
 									+ "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) 
 									+ readFileExtension;
 		}
-	}
-
-	
-	public List<String> printBulkInsertQuery(Object vo, Map additional, JSONArray contentList, int bulkInsertCnt) throws Exception {
-		String bulkInsertQuery = "";
-		List<String> bulkInsertQueryList = new ArrayList<>();
-
-		for (int index = 0; index < contentList.length(); index++) {
-			JSONObject json = contentList.getJSONObject(index);
-
-			// Put additional key/value to JSONObject
-			if(additional != null) {
-				for(Object key : additional.keySet()) {
-					json.put(key.toString(), additional.get(key).toString());
-				}
-			}
-			
-			// JSONObject to VO
-			Gson gson = new Gson();
-			vo = gson.fromJson(json.toString(), vo.getClass());
-//			bulkInsertQuery += vo.getAllValues();
-			
-			if (index > 0 && (index+1) % bulkInsertCnt == 0) {
-				bulkInsertQueryList.add(bulkInsertQuery);
-				bulkInsertQuery = "";
-			} else {
-				if (index != contentList.length() - 1)
-					bulkInsertQuery += ", ";
-				else{
-					bulkInsertQueryList.add(bulkInsertQuery);
-				}
-			}
-		}
-
-		return bulkInsertQueryList;
 	}
 }
