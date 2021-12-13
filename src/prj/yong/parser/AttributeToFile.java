@@ -38,7 +38,7 @@ public class AttributeToFile {
 
 	/******************************************************
 	 * 
-	 * This class makes Excel Chart format like below.
+	 * This class makes table structure data like Excel.
 	 * 
 	 * [ Input ]
 	 * Name  | Attribute Name | Attribute Value
@@ -52,11 +52,11 @@ public class AttributeToFile {
 	 * 
 	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	 * 
-	 * [ Output]
+	 * [ Output ]
 	 * Name	 | Size		| Company	| Quality	| Channel
 	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 	 * TV	 | 65 inch	| LG		| HIGH		|
-	 * Autio | 32		| Apple		|			| Dual
+	 * Audio | 32		| Apple		|			| Dual
 	 *
 	 ******************************************************/	
 	
