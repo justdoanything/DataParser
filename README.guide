@@ -74,7 +74,7 @@ https://github.com/justdoanything/EnglishWordExam
 	 * public class sampleVO {
 	 * 	private String value1;
 	 * 	private String value2;
-	 *  private int value3;
+	 *  	private int value3;
 	 * }
 	 * 
 	 * input parameter is List<sampleVO> of size 3
