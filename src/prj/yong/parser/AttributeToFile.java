@@ -184,6 +184,111 @@ public class AttributeToFile {
 	}
 	
 	/**
+	 * Parse text file (.txt, .csv)
+	 * @param readFileExtension
+	 * @throws DateTimeParseException 
+	 * @throws StringIndexOutOfBoundsException 
+	 * @throws IOException 
+	 * @throws Exception 
+	 */
+	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
+		Map<String, Map<String, String>> resultMap = new HashMap<>();
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+		StringBuilder resultString = new StringBuilder();
+		
+		// Checking file is existed and Set writeFilePath
+		if(FileUtil.isFileExist(this.readFilePath)) {
+			// Set writeFilePath if do not set manually
+			this.setDefaultWriteFilePath(readFileExtension);
+		}
+				
+		try {
+			// spliter of csv should be ,
+			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
+				this.spliter = ",";
+			
+			// Set Reader and Writer and Open file
+			br = new BufferedReader(new FileReader(readFilePath));
+			if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
+			
+			// Put line to resultMap from file
+			String line;
+			String[] lineArray;
+			int index = 0;
+			String entityName, attributeName, attributeValue;
+			while((line = br.readLine()) != null) {
+				// Checking startWithLine
+				if(this.startWithLine != 0) {
+					this.startWithLine -= 1;
+					continue;
+				}
+				
+				lineArray = line.split(this.spliter);
+				entityName = lineArray[0] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[0];
+				attributeName = lineArray[1] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[1];
+				attributeValue = lineArray[2] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[2];
+				this.createResultMap(resultMap, entityName, attributeName, attributeValue);
+				index = 1;
+			}
+			if(index == 0)
+				throw new IOException("startWithLine over than the row there is in file");
+			
+		    // Add entity to entityList
+		 	List<String> entityList = new ArrayList<>();
+		 	for(String entity : resultMap.keySet()) {
+		 		if(!entityList.contains(entity))
+		 			entityList.add(entity);
+		 	}
+			
+			// Write attribute in first line
+			if(this.isWriteFile) bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
+			List<String> attributeList = new ArrayList<>();
+			for(String entity : entityList) {
+				for(String attribute : (resultMap.get(entity)).keySet()) {
+					if(!attributeList.contains(attribute)) {
+						attributeList.add(attribute);
+						if(this.isWriteFile) { bw.write(attribute); bw.write(this.spliter); bw.flush(); }
+						if(this.isGetString) resultString.append(attribute).append(this.spliter);
+						
+					}
+				}
+			}
+			if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
+			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			
+			// Write Attribute value as attribute and name
+			for(String entity : entityList) {
+				if(this.isWriteFile) { bw.write(entity); bw.write(this.spliter); }
+				if(this.isGetString) resultString.append(entity).append(this.spliter);
+				for(String attribute : attributeList) {
+					if((resultMap.get(entity)).containsKey(attribute)) {
+						if(this.isWriteFile) { bw.write(resultMap.get(entity).get(attribute)); bw.write(this.spliter); bw.flush(); }
+						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(this.spliter);
+					} else {
+						if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_BLANK); bw.write(this.spliter); bw.flush(); }
+						if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK).append(this.spliter);
+					}
+				}
+				if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
+				if(this.isGetString) {
+					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+				}
+			}
+			
+			if(this.isOpenFile)
+				Desktop.getDesktop().edit(new File(writeFilePath));
+		}catch (Exception e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}finally {
+			if(br != null) try { br.close(); } catch(IOException e) {throw new IOException(e);}
+			if(bw != null) try { br.close(); } catch(IOException e) {throw new IOException(e);}
+		}
+		return resultString.toString();
+	}
+	
+	/**
 	 * Parse excel file (.xlsx, .xls)
 	 * @param readFileExtension
 	 * @throws DateTimeParseException 
@@ -291,111 +396,6 @@ public class AttributeToFile {
 			Desktop.getDesktop().edit(new File(writeFilePath));
 	 	
 	 	return resultString.toString();
-	}
-	
-	/**
-	 * Parse text file (.txt, .csv)
-	 * @param readFileExtension
-	 * @throws DateTimeParseException 
-	 * @throws StringIndexOutOfBoundsException 
-	 * @throws IOException 
-	 * @throws Exception 
-	 */
-	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
-		Map<String, Map<String, String>> resultMap = new HashMap<>();
-		BufferedReader br = null;
-		BufferedWriter bw = null;
-		StringBuilder resultString = new StringBuilder();
-		
-		// Checking file is existed and Set writeFilePath
-		if(FileUtil.isFileExist(this.readFilePath)) {
-			// Set writeFilePath if do not set manually
-			this.setDefaultWriteFilePath(readFileExtension);
-		}
-				
-		try {
-			// spliter of csv should be ,
-			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
-				this.spliter = ",";
-			
-			// Set Reader and Writer and Open file
-			br = new BufferedReader(new FileReader(readFilePath));
-			if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
-			
-			// Put line to resultMap from file
-			String line;
-			String[] lineArray;
-			int index = 0;
-			String entityName, attributeName, attributeValue;
-			while((line = br.readLine()) != null) {
-				// Checking startWithLine
-				if(this.startWithLine != 0) {
-					this.startWithLine -= 1;
-					continue;
-				}
-				
-				lineArray = line.split(this.spliter);
-				entityName = lineArray[0] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[0];
-				attributeName = lineArray[1] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[1];
-				attributeValue = lineArray[2] == null ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[2];
-				this.createResultMap(resultMap, entityName, attributeName, attributeValue);
-				index = 1;
-			}
-			if(index == 0)
-				throw new IOException("startWithLine over than the row there is in file");
-			
-		    // Add entity to entityList
-		 	List<String> entityList = new ArrayList<>();
-		 	for(String entity : resultMap.keySet()) {
-		 		if(!entityList.contains(entity))
-		 			entityList.add(entity);
-		 	}
-			
-			// Write attribute in first line
-			if(this.isWriteFile) bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
-			List<String> attributeList = new ArrayList<>();
-			for(String entity : entityList) {
-				for(String attribute : (resultMap.get(entity)).keySet()) {
-					if(!attributeList.contains(attribute)) {
-						attributeList.add(attribute);
-						if(this.isWriteFile) { bw.write(attribute); bw.write(this.spliter); bw.flush(); }
-						if(this.isGetString) resultString.append(attribute).append(this.spliter);
-						
-					}
-				}
-			}
-			if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
-			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
-			
-			// Write Attribute value as attribute and name
-			for(String entity : entityList) {
-				if(this.isWriteFile) { bw.write(entity); bw.write(this.spliter); }
-				if(this.isGetString) resultString.append(entity).append(this.spliter);
-				for(String attribute : attributeList) {
-					if((resultMap.get(entity)).containsKey(attribute)) {
-						if(this.isWriteFile) { bw.write(resultMap.get(entity).get(attribute)); bw.write(this.spliter); bw.flush(); }
-						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(this.spliter);
-					} else {
-						if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_BLANK); bw.write(this.spliter); bw.flush(); }
-						if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK).append(this.spliter);
-					}
-				}
-				if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
-				if(this.isGetString) {
-					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
-				}
-			}
-			
-			if(this.isOpenFile)
-				Desktop.getDesktop().edit(new File(writeFilePath));
-		}catch (Exception e) {
-			e.printStackTrace();
-			throw new IOException(e);
-		}finally {
-			if(br != null) try { br.close(); } catch(IOException e) {throw new IOException(e);}
-			if(bw != null) try { br.close(); } catch(IOException e) {throw new IOException(e);}
-		}
-		return resultString.toString();
 	}
 	
 	/**
