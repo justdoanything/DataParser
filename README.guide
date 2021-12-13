@@ -11,19 +11,19 @@ https://github.com/justdoanything/EnglishWordExam
 	 * [ Input ]
 	 * Name  | Attribute Name | Attribute Value
 	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-	 * TV	  | Size			      | 65 inch
-	 * TV	  | Company		      | LG
-	 * TV	  | Quality		      | HIGH
-	 * Audio | Size			      | 32
-	 * Audio | Company		    | Apple
-	 * Audio | Channel		    | Dual
+	 * TV	 | Size		  | 65 inch
+	 * TV	 | Company	  | LG
+	 * TV	 | Quality	  | HIGH
+	 * Audio | Size		  | 32
+	 * Audio | Company	  | Apple
+	 * Audio | Channel	  | Dual
 	 * 
 	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	 * 
 	 * [ Output ]
 	 * Name	  | Size		| Company	| Quality	| Channel
 	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-	 * TV	    | 65 inch	| LG		  | HIGH		|
+	 * TV	  | 65 inch	| LG		  | HIGH		|
 	 * Audio  | 32		  | Apple		|			    | Dual
 	 *
 	 ******************************************************/	
