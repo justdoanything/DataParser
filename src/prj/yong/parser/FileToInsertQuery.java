@@ -213,7 +213,7 @@ public class FileToInsertQuery {
             }
             // Replace last word ',' to ';'
             if(isBulkInsert)
-            	queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(","), ";");
+            	queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
             
             // Write result into file if isWirteFile is true
             if(this.isWriteFile) {
@@ -223,6 +223,7 @@ public class FileToInsertQuery {
             	bw.write(queryBody.toString());
             	bw.flush();
             }
+            
             // Set result if isGetString is true
             if(this.isGetString)
             	resultString.append(queryHeader).append(queryBody);            	
@@ -277,32 +278,49 @@ public class FileToInsertQuery {
 				throw new IOException("There is no sheet in file");
 			
 			// Read Excel File and write queryHeader and queryBody
-			String line;
 			StringBuilder queryHeader = new StringBuilder("INSERT INTO " + this.tableName + " (");
 			StringBuilder queryBody = new StringBuilder();
 			boolean isFirst = true;
 			Row row = null;
+			int cellCount = -1;
 			for(int index = 0; index < sheet.getPhysicalNumberOfRows(); index++) {
+				StringBuilder queryBodyLine = new StringBuilder();
 				row = sheet.getRow(index);
+				int cellIndex = 0;
+				
 				if(isFirst) {
-					// Write Query Header
-					line = ExcelUtil.getCellValue(row.getCell(0)).replace("'", "").replace(this.spliter, ", ");
-					queryHeader.append(line).append(") VALUES ");;
+					// Write queryHeader and count header fields 
+					while(row.getCell(cellIndex) != null) {
+						// Write Query Header
+						queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
+						if(row.getCell(cellIndex) != null) queryHeader.append(", ");
+						cellIndex++;
+					}
+					cellCount = cellIndex;
+				} else {
+					// Write queryBody as much as cellCount 
+					while(cellIndex < cellCount) {
+						// Merge Query Body
+						
+						queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
+						if(cellIndex + 1 != cellCount) queryBodyLine.append(", ");
+						cellIndex++;
+					}
+				}
+				if(isFirst) {
+					queryHeader.append(") VALUES \r\n");
 					isFirst = false;
 				} else {
-					// Merge Query Body
-					line = ExcelUtil.getCellValue(row.getCell(0)).replace("'", "").replace(this.spliter, "', '").replace("''", "null");
-					
 					if(isBulkInsert){
-						queryBody.append("('" + line + "'),\r\n");
+						queryBody.append("(").append(queryBodyLine).append("),\r\n");
 					} else {
-						queryBody.append(queryHeader).append("('" + line + "');\r\n");
+						queryBody.append(queryHeader).append("('").append(queryBodyLine).append("');\r\n");
 					}
 				}
 			}
 			// Replace last word ',' to ';'
 			if(isBulkInsert)
-				queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(","), ";");
+				queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
 			
 			// Write result into file if isWirteFile is true
 			if(this.isWriteFile) {
