@@ -4,36 +4,36 @@ import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.ValidationException;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.google.gson.Gson;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import lombok.Getter;
 import lombok.Setter;
 import msg.MsgCode;
 import prj.yong.util.DateUtil;
+import prj.yong.util.ExcelUtil;
 import prj.yong.util.FileUtil;
 
 @Getter
 @Setter
-@SuppressWarnings("rawtypes")
 public class FileToInsertQuery {
 	
 	/******************************************************
 	 * 
-	 * This class makes Excel Chart format like below.
+	 * This class read a file and makes insert query format like below.
 	 * 
 	 * [ Input ]
 	 * Name	 | Size		| Company	| Quality	| Channel
@@ -45,10 +45,15 @@ public class FileToInsertQuery {
 	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	 * 
 	 * [ Output ]
+	 * 1. Bulk Insert Type
 	 * INSERT INTO {tableName} ( Name, Size, Company, Quality, Channel )
 	 * VALUES
 	 * ('TV', '65 inch', 'LG', 'HIGH' null)
 	 * ,('Audio', '32', 'Apple', null, 'Dual');
+	 * 
+	 * 2. Non-Bulk Insert Type
+	 * INSERT INTO {tableName} ( Name, Size, Company, Quality, Channel ) VALUES ('TV', '65 inch', 'LG', 'HIGH' null);
+	 * INSERT INTO {tableName} ( Name, Size, Company, Quality, Channel ) VALUES ('Audio', '32', 'Apple', null, 'Dual');; 
 	 *
 	 ******************************************************/
 	
@@ -112,11 +117,15 @@ public class FileToInsertQuery {
 	}
 	
 	/**
-	 * 
+	 * Parse the data as a extension of your file
 	 * @return
-	 * @throws Exception
+	 * @throws ValidationException
+	 * @throws NullPointerException
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws IOException
 	 */
-	public String parse() throws Exception {
+	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
 		String readFileExtension = this.readFilePath.contains(".") ? this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length()) : MsgCode.MSG_CODE_STRING_BLANK;
 		
@@ -136,7 +145,23 @@ public class FileToInsertQuery {
 	}
 	
 	/**
-	 * 
+	 * Valid private values
+	 * @throws ValidationException
+	 * @throws NullPointerException
+	 */
+	private void validPrivateValues() throws ValidationException, NullPointerException {
+		if(this.readFilePath == null || this.writeFilePath == null || this.spliter == null || this.tableName == null)
+			throw new NullPointerException("A required value has an exception : all of values cannot be null");
+		
+		if(!this.isWriteFile && !this.isGetString)
+			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+		
+		if(!isWriteFile)
+			this.isOpenFile = false;
+	}
+	
+	/**
+	 * Parse text file (.txt, .csv)
 	 * @param readFileExtension
 	 * @return
 	 * @throws StringIndexOutOfBoundsException
@@ -160,10 +185,11 @@ public class FileToInsertQuery {
      		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
      			this.spliter = ",";
         	
+     		// Set Reader and Writer and Open file
         	br = new BufferedReader(new FileReader(readFilePath));
         	if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
 
-        	// Read File
+        	// Read Excel File and write queryHeader and queryBody
             String line;
             StringBuilder queryHeader = new StringBuilder("INSERT INTO " + this.tableName + " (");
             StringBuilder queryBody = new StringBuilder();
@@ -189,16 +215,18 @@ public class FileToInsertQuery {
             if(isBulkInsert)
             	queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(","), ";");
             
-            // Write result into file
+            // Write result into file if isWirteFile is true
             if(this.isWriteFile) {
             	bw.write(queryHeader.toString());
+            	bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); 
+            	bw.flush();
             	bw.write(queryBody.toString());
             	bw.flush();
             }
+            // Set result if isGetString is true
             if(this.isGetString)
             	resultString.append(queryHeader).append(queryBody);            	
             	
-    		bw.close();
     		if(isOpenFile) 
     			Desktop.getDesktop().edit(new File(writeFilePath));
         } catch (FileNotFoundException e) {
@@ -214,7 +242,7 @@ public class FileToInsertQuery {
 	}
 	
 	/**
-	 * 
+	 * Parse excel file (.xlsx, .xls)
 	 * @param readFileExtension
 	 * @return
 	 * @throws StringIndexOutOfBoundsException
@@ -222,32 +250,93 @@ public class FileToInsertQuery {
 	 * @throws IOException
 	 */
 	private String parseExcelType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
+		Workbook workbook = null;
+		StringBuilder resultString = new StringBuilder();
 
+		// Checking file is existed and Set writeFilePath
+		if(FileUtil.isFileExist(this.readFilePath)) {
+			// Set writeFilePath if do not set manually
+			this.setDefaultWriteFilePath(readFileExtension);
+		}
+
+		try {
+			// spliter of xls, xlsx should be \t
+			this.spliter = MsgCode.MSG_CODE_STRING_TAB;
+			
+			// Set FileInputStream and Open file
+			FileInputStream fis = new FileInputStream(this.readFilePath);
+			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)) 
+				workbook = new HSSFWorkbook(fis);
+			else
+				workbook = new XSSFWorkbook(fis);
+			fis.close();
+			
+			// Select first sheet
+			Sheet sheet = workbook.getSheetAt(0);
+			if(sheet == null)
+				throw new IOException("There is no sheet in file");
+			
+			// Read Excel File and write queryHeader and queryBody
+			String line;
+			StringBuilder queryHeader = new StringBuilder("INSERT INTO " + this.tableName + " (");
+			StringBuilder queryBody = new StringBuilder();
+			boolean isFirst = true;
+			Row row = null;
+			for(int index = 0; index < sheet.getPhysicalNumberOfRows(); index++) {
+				row = sheet.getRow(index);
+				if(isFirst) {
+					// Write Query Header
+					line = ExcelUtil.getCellValue(row.getCell(0)).replace("'", "").replace(this.spliter, ", ");
+					queryHeader.append(line).append(") VALUES ");;
+					isFirst = false;
+				} else {
+					// Merge Query Body
+					line = ExcelUtil.getCellValue(row.getCell(0)).replace("'", "").replace(this.spliter, "', '").replace("''", "null");
+					
+					if(isBulkInsert){
+						queryBody.append("('" + line + "'),\r\n");
+					} else {
+						queryBody.append(queryHeader).append("('" + line + "');\r\n");
+					}
+				}
+			}
+			// Replace last word ',' to ';'
+			if(isBulkInsert)
+				queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(","), ";");
+			
+			// Write result into file if isWirteFile is true
+			if(this.isWriteFile) {
+				// Write result file
+				FileOutputStream fos = new FileOutputStream(this.writeFilePath, false);
+				workbook.write(fos);
+				fos.flush();
+				fos.close();
+			}
+			
+			// Set result if isGetString is true
+			if(this.isGetString)
+				resultString.append(queryHeader).append(queryBody);            	
+			
+			if(isOpenFile) 
+				Desktop.getDesktop().edit(new File(writeFilePath));
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		} finally {
+			// I/O Close
+			if(workbook != null) try { workbook.close(); } catch(IOException e) {throw new IOException(e);}
+		}
 		
-		return "";
+		return resultString.toString();
 	}
-	
-	
-	
-	/**
-	 * Valid private values
-	 * @throws Exception
-	 */
-	private void validPrivateValues() throws ValidationException, NullPointerException {
-		if(this.readFilePath == null || this.writeFilePath == null || this.spliter == null || this.tableName == null)
-			throw new NullPointerException("A required value has an exception : all of values cannot be null");
-		
-		if(!this.isWriteFile && !this.isGetString)
-			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
-		
-		if(!isWriteFile)
-			this.isOpenFile = false;
-	}
+
 	
 	/**
 	 * Set default writeFilePath if do not set manually
 	 * @param readFileExtension
-	 * @throws Exception
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
 	 */
 	private void setDefaultWriteFilePath(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException {
 		//if do not set writeFilePath, this should be readFilePath_{dateformat}
