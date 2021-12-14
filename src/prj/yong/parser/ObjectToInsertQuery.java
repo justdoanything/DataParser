@@ -12,12 +12,46 @@ import com.google.gson.Gson;
 
 import lombok.Getter;
 import lombok.Setter;
+import msg.MsgCode;
 
 @Getter
 @Setter
 @SuppressWarnings("rawtypes")
 public class ObjectToInsertQuery {
 
+	/******************************************************
+	 * 
+	 * This class creates an bulk insert query using an Object with local variables.
+	 * This is useful for converting VO Object and DTO Object to insert query.
+	 * 
+	 * public class sampleVO {
+	 * 	private String value1;
+	 * 	private String value2;
+	 *  private int value3;
+	 * }
+	 * 
+	 * input parameter is List<sampleVO> of size 3
+	 *  
+	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	 * 
+	 * INSERT INTO {tableName} (value1, value2, value3) VALUES 
+	 * ('test1', 'test2', '111'),
+	 * ('test1', 'test2', '111'),
+	 * ('test1', 'test2', '111');
+	 *
+	 ******************************************************/
+	
+	/**
+	 * Initial Values
+	 */
+	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
+	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
+	private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
+	private boolean isWriteFile = true;
+	private boolean isOpenFile = false;
+	private boolean isGetString = false;
+	private boolean isBulkInsert = true;
+	private String tableName = MsgCode.MSG_CODE_STRING_BLANK;
 	
 	/**
 	 * 
