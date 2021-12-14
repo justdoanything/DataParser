@@ -33,7 +33,6 @@ import prj.yong.util.FileUtil;
 
 @Getter
 @Setter
-@SuppressWarnings("resource")
 public class AttributeToFile {
 
 	/******************************************************
@@ -141,10 +140,12 @@ public class AttributeToFile {
 	
 	/**
 	 * Parse the data as a extension of your file
-	 * @throws IOException 
-	 * @throws DateTimeParseException 
-	 * @throws StringIndexOutOfBoundsException 
-	 * @throws Exception
+	 * @return
+	 * @throws ValidationException
+	 * @throws NullPointerException
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws IOException
 	 */
 	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
@@ -167,7 +168,8 @@ public class AttributeToFile {
 	
 	/**
 	 * Valid private values
-	 * @throws Exception
+	 * @throws ValidationException
+	 * @throws NullPointerException
 	 */
 	private void validPrivateValues() throws ValidationException, NullPointerException {
 		if(this.startWithLine < 0)
@@ -186,10 +188,10 @@ public class AttributeToFile {
 	/**
 	 * Parse text file (.txt, .csv)
 	 * @param readFileExtension
-	 * @throws DateTimeParseException 
-	 * @throws StringIndexOutOfBoundsException 
-	 * @throws IOException 
-	 * @throws Exception 
+	 * @return
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws IOException
 	 */
 	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
@@ -212,7 +214,7 @@ public class AttributeToFile {
 			br = new BufferedReader(new FileReader(readFilePath));
 			if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
 			
-			// Put line to resultMap from file
+			// Read Excel File and Put line to resultMap
 			String line;
 			String[] lineArray;
 			int index = 0;
@@ -231,6 +233,8 @@ public class AttributeToFile {
 				this.createResultMap(resultMap, entityName, attributeName, attributeValue);
 				index = 1;
 			}
+			
+			// Throw IOException if startWithLine over than the row there is in file
 			if(index == 0)
 				throw new IOException("startWithLine over than the row there is in file");
 			
@@ -270,7 +274,11 @@ public class AttributeToFile {
 						if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK).append(this.spliter);
 					}
 				}
+				
+				// Write result into file if isWirteFile is true
 				if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
+				
+		        // Set result if isGetString is true				
 				if(this.isGetString) {
 					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
 				}
@@ -291,120 +299,129 @@ public class AttributeToFile {
 	/**
 	 * Parse excel file (.xlsx, .xls)
 	 * @param readFileExtension
-	 * @throws DateTimeParseException 
-	 * @throws StringIndexOutOfBoundsException 
-	 * @throws IOException 
-	 * @throws Exception 
+	 * @return
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws IOException
 	 */
 	private String parseExcelType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		Workbook workbook = null;
 		StringBuilder resultString = new StringBuilder();
 
-		// spliter of xls, xlsx should be \t
-		this.spliter = MsgCode.MSG_CODE_STRING_TAB;
-		
 		// Checking file is existed and Set writeFilePath
 		if(FileUtil.isFileExist(this.readFilePath)) {
 			// Set writeFilePath if do not set manually
 			this.setDefaultWriteFilePath(readFileExtension);
 		}
-
-		// Set FileInputStream and Open file
-	   	FileInputStream fis = new FileInputStream(this.readFilePath);
-	   	if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)) 
-	   		workbook = new HSSFWorkbook(fis);
-	   	else
-	   		workbook = new XSSFWorkbook(fis);
-	   	fis.close();
-	    
-	   	// Select first sheet
-	    Sheet sheet = workbook.getSheetAt(0);
-	    if(sheet == null)
-	    	throw new IOException("There is no sheet in file");
-
-	    // Throw IOException if startWithLine over than the row there is in file
-    	if(this.startWithLine != 0 && sheet.getRow(this.startWithLine - 1) == null)
-    		throw new IOException("startWithLine over than the row there is in file");
-
-	    // Read Excel File and Put line to resultMap
-	    Row row = null;
-	    String entityName, attributeName, attributeValue; 
-    	for(int index = this.startWithLine; index < sheet.getPhysicalNumberOfRows(); index++) {
-    		row = sheet.getRow(index);
-	    	entityName = ExcelUtil.getCellValue(row.getCell(0));
-	    	attributeName = ExcelUtil.getCellValue(row.getCell(1));
-	    	attributeValue = ExcelUtil.getCellValue(row.getCell(2));
-	    	
-	    	this.createResultMap(resultMap, entityName, attributeName, attributeValue);
-    	}
-    	
-	    // Add name to namelist
-	 	List<String> entityList = new ArrayList<>();
-	 	for(String entity : resultMap.keySet()) {
-	 		if(!entityList.contains(entity))
-	 			entityList.add(entity);
-	 	}
-	 			
-	 	// Write attribute in first line
-	 	List<String> attributeList = new ArrayList<>();
-	 	int rowIndex = 0;
-	 	int cellIndex = 0;
-	 	Sheet resultSheet = workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
-	 	row = resultSheet.createRow(rowIndex++);
-	 	if(this.isGetString) resultString.append(MsgCode.MSG_CODE_FIELD_NAME).append(this.spliter);
-	 	row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_FIELD_NAME);
-	 	for(String entity : entityList) {
-	 		for(String attribute : (resultMap.get(entity)).keySet()) {
-	 			if(!attributeList.contains(attribute)) {
-	 				attributeList.add(attribute);
-	 				row.createCell(cellIndex++).setCellValue(attribute);
-	 				if(this.isGetString) resultString.append(attribute).append(MsgCode.MSG_CODE_STRING_TAB);
-	 			}
-	 		}
-	 	}
-	 	if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
-	 	
-	 	// Write Attribute value as attribute and name
-	 	for(String entity : entityList) {
-	 		cellIndex = 0;
-	 		row = resultSheet.createRow(rowIndex++);
-	 		row.createCell(cellIndex++).setCellValue(entity);
-	 		if(this.isGetString) resultString.append(entity).append(MsgCode.MSG_CODE_STRING_TAB);
-	 		
-	 		for(String attribute : attributeList) {
-	 			if((resultMap.get(entity)).containsKey(attribute)) {
-	 				row.createCell(cellIndex++).setCellValue(resultMap.get(entity).get(attribute));
-	 				if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(MsgCode.MSG_CODE_STRING_TAB);
-	 			} else {
-	 				row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
-	 				if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK).append(MsgCode.MSG_CODE_STRING_TAB);
-	 			}
-	 		}
-	 	}
-	 	if(this.isGetString) {
-	 		resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
-	 	}
-	 	
-	 	// Write result file
-	 	FileOutputStream fos = new FileOutputStream(this.writeFilePath, false);
-	    workbook.write(fos);
-	    fos.flush();
-	    
-	    // I/O Close
-	 	workbook.close();
-	 	fos.close();
-	 	
-	 	if(this.isOpenFile)
-			Desktop.getDesktop().edit(new File(writeFilePath));
-	 	
+					
+		try {
+			// spliter of xls, xlsx should be \t
+			this.spliter = MsgCode.MSG_CODE_STRING_TAB;
+			
+			// Set FileInputStream and Open file
+			FileInputStream fis = new FileInputStream(this.readFilePath);
+			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)) 
+				workbook = new HSSFWorkbook(fis);
+			else
+				workbook = new XSSFWorkbook(fis);
+			fis.close();
+			
+			// Select first sheet
+			Sheet sheet = workbook.getSheetAt(0);
+			if(sheet == null)
+				throw new IOException("There is no sheet in file");
+			
+			// Throw IOException if startWithLine over than the row there is in file
+			if(this.startWithLine != 0 && sheet.getRow(this.startWithLine - 1) == null)
+				throw new IOException("startWithLine over than the row there is in file");
+			
+			// Read Excel File and Put line to resultMap
+			Row row = null;
+			String entityName, attributeName, attributeValue; 
+			for(int index = this.startWithLine; index < sheet.getPhysicalNumberOfRows(); index++) {
+				row = sheet.getRow(index);
+				entityName = ExcelUtil.getCellValue(row.getCell(0));
+				attributeName = ExcelUtil.getCellValue(row.getCell(1));
+				attributeValue = ExcelUtil.getCellValue(row.getCell(2));
+				
+				this.createResultMap(resultMap, entityName, attributeName, attributeValue);
+			}
+			
+			// Add name to namelist
+			List<String> entityList = new ArrayList<>();
+			for(String entity : resultMap.keySet()) {
+				if(!entityList.contains(entity))
+					entityList.add(entity);
+			}
+			
+			// Write attribute in first line
+			List<String> attributeList = new ArrayList<>();
+			int rowIndex = 0;
+			int cellIndex = 0;
+			Sheet resultSheet = workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
+			row = resultSheet.createRow(rowIndex++);
+			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_FIELD_NAME).append(this.spliter);
+			if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_FIELD_NAME);
+			for(String entity : entityList) {
+				for(String attribute : (resultMap.get(entity)).keySet()) {
+					if(!attributeList.contains(attribute)) {
+						attributeList.add(attribute);
+						if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(attribute);
+						if(this.isGetString) resultString.append(attribute).append(MsgCode.MSG_CODE_STRING_TAB);
+					}
+				}
+			}
+			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			
+			// Write Attribute value as attribute and name
+			for(String entity : entityList) {
+				cellIndex = 0;
+				row = resultSheet.createRow(rowIndex++);
+				if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(entity);
+				if(this.isGetString) resultString.append(entity).append(MsgCode.MSG_CODE_STRING_TAB);
+				
+				for(String attribute : attributeList) {
+					if((resultMap.get(entity)).containsKey(attribute)) {
+						if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(resultMap.get(entity).get(attribute));
+						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(MsgCode.MSG_CODE_STRING_TAB);
+					} else {
+						if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
+						if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK).append(MsgCode.MSG_CODE_STRING_TAB);
+					}
+				}
+			}
+			
+			// Write result into file if isWirteFile is true
+			if(this.isWriteFile) {
+				FileOutputStream fos = new FileOutputStream(this.writeFilePath, false);
+				workbook.write(fos);
+				fos.flush();
+				fos.close();
+			}
+						
+			// Set result if isGetString is true
+			if(this.isGetString) {
+				resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			}
+			
+			if(this.isOpenFile)
+				Desktop.getDesktop().edit(new File(writeFilePath));
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		} finally {
+			// I/O Close
+			if(workbook != null) try { workbook.close(); } catch(IOException e) {throw new IOException(e);}
+		}
 	 	return resultString.toString();
 	}
 	
 	/**
 	 * Set default writeFilePath if do not set manually
 	 * @param readFileExtension
-	 * @throws Exception
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
 	 */
 	private void setDefaultWriteFilePath(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException {
 		//if do not set writeFilePath, this should be readFilePath_{dateformat}
@@ -416,7 +433,7 @@ public class AttributeToFile {
 	}
 	
 	/**
-	 * Put lines in file to resultMap 
+	 * Put lines in file to resultMap
 	 * @param resultMap
 	 * @param entityName
 	 * @param attributeName
