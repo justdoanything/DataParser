@@ -38,7 +38,7 @@ public class AttributeToFile {
 
 	/******************************************************
 	 * 
-	 * This class makes table structure data like Excel.
+	 * This class read a file and makes table structure data like Excel.
 	 * 
 	 * [ Input ]
 	 * Name  | Attribute Name | Attribute Value
@@ -301,6 +301,9 @@ public class AttributeToFile {
 		Workbook workbook = null;
 		StringBuilder resultString = new StringBuilder();
 
+		// spliter of xls, xlsx should be \t
+		this.spliter = MsgCode.MSG_CODE_STRING_TAB;
+		
 		// Checking file is existed and Set writeFilePath
 		if(FileUtil.isFileExist(this.readFilePath)) {
 			// Set writeFilePath if do not set manually
