@@ -51,17 +51,18 @@ public class ObjectToInsertQuery {
 	private boolean isOpenFile = false;
 	private boolean isGetString = false;
 	private boolean isBulkInsert = true;
+	private int bulkInsertCnt = 100;
 	private String tableName = MsgCode.MSG_CODE_STRING_BLANK;
+	private Map addtionalMap;
 	
 	/**
 	 * 
 	 * @return
 	 * @throws Exception
 	 */
-	public List<String> parse() throws Exception {
-
-		this.printBulkInsertQuery(null,null,null,0);
-		return null;
+	public List<String> parse(Object obj, JSONArray contentList) throws Exception {
+		List<String> resultList = this.printBulkInsertQuery(obj,addtionalMap,contentList,bulkInsertCnt);
+		return resultList;
 	}
 	
 	/**
