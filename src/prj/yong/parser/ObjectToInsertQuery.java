@@ -2,6 +2,7 @@ package prj.yong.parser;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,25 +45,28 @@ public class ObjectToInsertQuery {
 	/**
 	 * Initial Values
 	 */
-	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
-	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
-	private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
-	private boolean isWriteFile = true;
-	private boolean isOpenFile = false;
-	private boolean isGetString = false;
-	private boolean isBulkInsert = true;
 	private int bulkInsertCnt = 100;
 	private String tableName = MsgCode.MSG_CODE_STRING_BLANK;
-	private Map addtionalMap;
+	private Map<String, String> addtionalFieldMap = new HashMap<>();
 	
 	/**
 	 * 
 	 * @return
 	 * @throws Exception
 	 */
-	public List<String> parse(Object obj, JSONArray contentList) throws Exception {
-		List<String> resultList = this.printBulkInsertQuery(obj,addtionalMap,contentList,bulkInsertCnt);
+	public List<String> getQuery(Object obj, JSONArray contentList) throws Exception {
+		List<String> resultList = this.writeBulkInsertQuery(obj,contentList,bulkInsertCnt);
 		return resultList;
+	}
+	
+	/**
+	 * Add addtional field to AddtionalFieldMap
+	 * @param name
+	 * @param code
+	 * @param value
+	 */
+	public void addAddtionalFieldMap(String key, String value) {
+		addtionalFieldMap.put(key, value);
 	}
 	
 	/**
@@ -74,7 +78,7 @@ public class ObjectToInsertQuery {
 	 * @return
 	 * @throws Exception
 	 */
-	private List<String> printBulkInsertQuery(Object vo, Map additional, JSONArray contentList, int bulkInsertCnt) throws Exception {
+	private List<String> writeBulkInsertQuery(Object vo, JSONArray contentList, int bulkInsertCnt) throws Exception {
 		String bulkInsertQuery = "";
 		List<String> bulkInsertQueryList = new ArrayList<>();
 
@@ -82,9 +86,9 @@ public class ObjectToInsertQuery {
 			JSONObject json = contentList.getJSONObject(index);
 
 			// Put additional key/value to JSONObject
-			if(additional != null) {
-				for(Object key : additional.keySet()) {
-					json.put(key.toString(), additional.get(key).toString());
+			if(addtionalFieldMap != null) {
+				for(Object key : addtionalFieldMap.keySet()) {
+					json.put(key.toString(), addtionalFieldMap.get(key).toString());
 				}
 			}
 			
@@ -119,9 +123,9 @@ public class ObjectToInsertQuery {
 			try {
 				value = field.get(vo);
 				if(index != length - 1)
-					toString += value == null ? value + "," : "'" + value.toString().replace("',","") + "',";
+					toString += value == null ? value + "," : "'" + value.toString().replace("'", "").replace("',","") + "',";
 				else
-					toString += value == null ? value 		: "'" + value.toString().replace("'","") + "'";
+					toString += value == null ? value 		: "'" + value.toString().replace("'", "").replace("'","") + "'";
 				
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();
