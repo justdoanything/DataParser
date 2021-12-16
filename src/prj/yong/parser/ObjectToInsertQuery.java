@@ -17,7 +17,6 @@ import msg.MsgCode;
 
 @Getter
 @Setter
-@SuppressWarnings("rawtypes")
 public class ObjectToInsertQuery {
 
 	/******************************************************
@@ -50,19 +49,8 @@ public class ObjectToInsertQuery {
 	private Map<String, String> addtionalFieldMap = new HashMap<>();
 	
 	/**
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	public List<String> getQuery(Object obj, JSONArray contentList) throws Exception {
-		List<String> resultList = this.writeBulkInsertQuery(obj,contentList,bulkInsertCnt);
-		return resultList;
-	}
-	
-	/**
-	 * Add addtional field to AddtionalFieldMap
-	 * @param name
-	 * @param code
+	 * Add additional field to Map
+	 * @param key
 	 * @param value
 	 */
 	public void addAddtionalFieldMap(String key, String value) {
@@ -70,20 +58,70 @@ public class ObjectToInsertQuery {
 	}
 	
 	/**
-	 * 
-	 * @param vo
-	 * @param additional
-	 * @param contentList
-	 * @param bulkInsertCnt
+	 * Write bulk insert query by using list object (VO, DTO, ...)
+	 * @param listObj
 	 * @return
 	 * @throws Exception
 	 */
-	private List<String> writeBulkInsertQuery(Object vo, JSONArray contentList, int bulkInsertCnt) throws Exception {
-		String bulkInsertQuery = "";
+	public List<String> getQuery(List<Object> listObj) throws Exception {
+		List<String> resultList = this.writeBulkInsertQuery(listObj);
+		return resultList;
+	}
+	
+	/**
+	 * Put each JSON data to object (VO, DTO, ...) and write bulk insert query
+	 * @param listObj
+	 * @param contentList
+	 * @return
+	 * @throws Exception
+	 */
+	public List<String> getQuery(Object obj, JSONArray jsonArray) throws Exception {
+		List<String> resultList = this.writeBulkInsertQuery(obj, jsonArray);
+		return resultList;
+	}
+	
+	/**
+	 * Write bulk insert query by using list object (VO, DTO, ...)
+	 * @param listObj
+	 * @return
+	 * @throws Exception
+	 */
+	private List<String> writeBulkInsertQuery(List<Object> listObj) throws Exception {
 		List<String> bulkInsertQueryList = new ArrayList<>();
+		StringBuilder bulkInsertQuery = new StringBuilder("INSERT INTO " + this.tableName + "(" + this.getAllFields(listObj.get(0)).toString() + ") VALUES\r\n");
 
-		for (int index = 0; index < contentList.length(); index++) {
-			JSONObject json = contentList.getJSONObject(index);
+		for(int index = 0; index < listObj.size(); index++) {
+
+			bulkInsertQuery.append(this.getAllValues(listObj.get(index)));
+		
+			if (index > 0 && (index + 1) % this.bulkInsertCnt == 0) {
+				bulkInsertQueryList.add(bulkInsertQuery.toString());
+				bulkInsertQuery = new StringBuilder("INSERT INTO " + this.tableName + "(" + this.getAllFields(listObj.get(0)).toString() + ") VALUES\r\n");
+			} else {
+				if (index != listObj.size() - 1)
+					bulkInsertQuery.append(", ");
+				else{
+					bulkInsertQueryList.add(bulkInsertQuery.toString());
+				}
+			}
+		}
+		
+		return bulkInsertQueryList;
+	}
+	
+	/**
+	 * Put each JSON data to obj (VO, DTO, ...) and write bulk insert query
+	 * @param obj
+	 * @param jsonArray
+	 * @return
+	 * @throws Exception
+	 */
+	private List<String> writeBulkInsertQuery(Object obj, JSONArray jsonArray) throws Exception {
+		List<String> bulkInsertQueryList = new ArrayList<>();
+		StringBuilder bulkInsertQuery = new StringBuilder("INSERT INTO " + this.tableName + "(" + this.getAllFields(obj).toString() + ") VALUES\r\n");
+
+		for (int index = 0; index < jsonArray.length(); index++) {
+			JSONObject json = jsonArray.getJSONObject(index);
 
 			// Put additional key/value to JSONObject
 			if(addtionalFieldMap != null) {
@@ -92,19 +130,20 @@ public class ObjectToInsertQuery {
 				}
 			}
 			
-			// JSONObject to VO
+			// JSONObject to Object (VO, DTO, ...)
 			Gson gson = new Gson();
-			vo = gson.fromJson(json.toString(), vo.getClass());
-			bulkInsertQuery += this.getAllValues(vo);
+			obj = gson.fromJson(json.toString(), obj.getClass());
+			bulkInsertQuery.append(this.getAllValues(obj));
 			
-			if (index > 0 && (index+1) % bulkInsertCnt == 0) {
-				bulkInsertQueryList.add(bulkInsertQuery);
-				bulkInsertQuery = "";
+			// Write bulk insert query
+			if (index > 0 && (index+1) % this.bulkInsertCnt == 0) {
+				bulkInsertQueryList.add(bulkInsertQuery.toString());
+				bulkInsertQuery = new StringBuilder("INSERT INTO " + this.tableName + "(" + this.getAllFields(obj).toString() + ") VALUES\r\n");
 			} else {
-				if (index != contentList.length() - 1)
-					bulkInsertQuery += ", ";
+				if (index != jsonArray.length() - 1)
+					bulkInsertQuery.append(", ");
 				else{
-					bulkInsertQueryList.add(bulkInsertQuery);
+					bulkInsertQueryList.add(bulkInsertQuery.toString());
 				}
 			}
 		}
@@ -112,16 +151,16 @@ public class ObjectToInsertQuery {
 		return bulkInsertQueryList;
 	}
 	
-	private String getAllValues(Object vo) {
+	private String getAllValues(Object obj) {
     	String toString = "(";
 
-    	int length = vo.getClass().getDeclaredFields().length;
+    	int length = obj.getClass().getDeclaredFields().length;
 		for(int index = 0; index < length; index++) {	
-			Field field = vo.getClass().getDeclaredFields()[index];
+			Field field = obj.getClass().getDeclaredFields()[index];
 			field.setAccessible(true);
 			Object value;
 			try {
-				value = field.get(vo);
+				value = field.get(obj);
 				if(index != length - 1)
 					toString += value == null ? value + "," : "'" + value.toString().replace("'", "").replace("',","") + "',";
 				else
@@ -135,4 +174,17 @@ public class ObjectToInsertQuery {
 		toString += ")";
 		return toString;
     }
+	
+	private List<String> getAllFields(Object obj) {
+		List<String> fieldList = new ArrayList<>();
+		
+		int length = obj.getClass().getDeclaredFields().length;
+		for(int index = 0; index < length; index++) {	
+			Field field = obj.getClass().getDeclaredFields()[index];
+			field.setAccessible(true);
+			fieldList.add(field.getName());
+		}
+		
+		return fieldList;
+	}
 }
