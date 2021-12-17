@@ -151,6 +151,11 @@ public class ObjectToInsertQuery {
 		return bulkInsertQueryList;
 	}
 	
+	/**
+	 * Get the values ​​of variables in object
+	 * @param obj
+	 * @return
+	 */
 	private String getAllValues(Object obj) {
     	String toString = "(";
 
@@ -175,6 +180,11 @@ public class ObjectToInsertQuery {
 		return toString;
     }
 	
+	/**
+	 * Get field name ​​of variables in object
+	 * @param obj
+	 * @return
+	 */
 	private List<String> getAllFields(Object obj) {
 		List<String> fieldList = new ArrayList<>();
 		
