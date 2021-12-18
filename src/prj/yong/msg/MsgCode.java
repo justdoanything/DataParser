@@ -1,4 +1,4 @@
-package msg;
+package prj.yong.msg;
 
 public class MsgCode {
 	public static String MSG_VALUE_DATE_FORMAT = "yyyyMMddHHmmss";
