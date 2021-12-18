@@ -13,7 +13,7 @@ import com.google.gson.Gson;
 
 import lombok.Getter;
 import lombok.Setter;
-import msg.MsgCode;
+import prj.yong.msg.MsgCode;
 
 @Getter
 @Setter
