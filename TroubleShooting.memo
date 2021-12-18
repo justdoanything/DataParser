@@ -1,0 +1,8 @@
+Maven 빌드로 .jar 생성 후 다른 프로젝트에서 import로 사용할 때, poi.jar 사용 못하던 문제
+  - 에러내용 : Exception in thread "main" java.lang.NoClassDefFoundError: org/apache/poi/ss/usermodel/Workbook at Runner.MainClass.main(MainClass.java:46)
+Caused by: java.lang.ClassNotFoundException: org.apache.poi.ss.usermodel.Workbook
+	at java.net.URLClassLoader.findClass(Unknown Source)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Unknown Source)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	... 1 more
