@@ -15,17 +15,15 @@ Caused by: java.lang.ClassNotFoundException: org.apache.poi.ss.usermodel.Workboo
 		</dependency>
 		
 Resolve Step :
-  * poi-ooxml은 다른 .jar와 다르게 WEB-INF 안에 maven 폴더가 존재하지 않음. (pom.xml, pom.properties)
-  1. maven build를 할 때 poi.jar가 포함이 안된건지, 아니면 다른 프로젝트에서 import를 사용할 때 제대로 참조를 못하는지 확인해봐야함.
-	➡ YONGYVER.jar을 import한 프로젝트가 maven 프로젝트가 아니라서 안된건지 테스트
-		❎ maven project로 변환 후 실행했는데 실패
-    - 다른 외부 jar (lombok, json)은 잘 동작하는지 테스트
-      => poi 부분을 삭제하고 다시 빌드해서 테스트
-    - ssh_tunneling 프로젝트를 maven으로 빌드 후 local에서 run했을 때 dependency jar 참조를 잘하는지 테스트
-      => 
-    - poi.jar를 외부lib로 선언하고 그 lib를 명시적으로 사용하도록 선언하는 방법
+	1. maven build를 할 때 poi.jar가 포함이 안된건지, 아니면 다른 프로젝트에서 import를 사용할 때 제대로 참조를 못하는지 확인해봐야함.
+		➡ YONGYVER.jar을 import한 프로젝트가 maven 프로젝트가 아니라서 안된건지 테스트
+			❎ maven project로 변환 후 실행했는데 실패
+    	➡ 다른 외부 jar (lombok, json)은 잘 동작하는지 테스트
+			❎ poi.jar를 사용하지 않는 ObjectToInsertQuery Class로 테스트했으니 Gson Jar에서 NoClassDefError 받음
+    	✅ Maven Project에서 사용하던 외부 jar는 Maven Build 시 자동으로 포함되지 않음을 확인.
+    2. Maven Build 옵션 중 외부 lib를 포함하도록 하는 방법
 	  => 
 	- maven build를 할 때 poi가 제대로 됐는지 확인해봐야함
 	  => 외부 프로젝트에서 YONGYVER.jar를 보면 pom.xml, pom.properties만 존재함. poi.jar가 명시적으로 있지 않음.
 	  => 외부 프로젝트를 maven 프로젝트로 convert 하여 실행될 때 종속되있는 .jar의 pom.xml을 읽어서 필요한 dependency를 내려받는지 확인해봐야함
-	  
+  * poi-ooxml은 다른 .jar와 다르게 WEB-INF 안에 maven 폴더가 존재하지 않음. (pom.xml, pom.properties)	  
