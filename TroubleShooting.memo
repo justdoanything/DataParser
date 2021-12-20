@@ -23,11 +23,19 @@
 			❎ poi.jar를 사용하지 않는 ObjectToInsertQuery Class로 테스트했으니 Gson Jar에서 NoClassDefError 받음
     	✅ Maven Project에서 사용하던 외부 jar는 Maven Build 시 자동으로 포함되지 않음을 확인.
     	✅ gson.jar는 pom.properties, pom.xml을 포함하지만 동작하지 않음을 확인.
-    2️⃣ Maven Build 옵션 중 외부 lib를 포함하도록 하는 방법
-		➡
-	- maven build를 할 때 poi가 제대로 됐는지 확인해봐야함
-	  => 외부 프로젝트에서 YONGYVER.jar를 보면 pom.xml, pom.properties만 존재함. poi.jar가 명시적으로 있지 않음.
-	  => 외부 프로젝트를 maven 프로젝트로 convert 하여 실행될 때 종속되있는 .jar의 pom.xml을 읽어서 필요한 dependency를 내려받는지 확인해봐야함
-	3️⃣
-	4️⃣
-	5️⃣
+	2️⃣ Maven Build 옵션 중 외부 lib를 포함하도록 하는 방법
+		❤ Maven Build의 plugin 중 "maven-assembly-plugin"에 jar-with-dependencies 를 추가해서 해결.
+		- 참고 자료 : https://kogun82.tistory.com/151
+		- Maven Buld 시 Goal : assembly:assembly
+		- 사용한 Plugin
+		<plugins>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-assembly-plugin</artifactId>
+		        <configuration>
+		          	<descriptorRefs>
+		            	<descriptorRef>jar-with-dependencies</descriptorRef>
+		          	</descriptorRefs>
+		        </configuration>
+			</plugin>
+		</plugins>
