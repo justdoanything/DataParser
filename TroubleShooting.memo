@@ -24,7 +24,7 @@
     	✅ Maven Project에서 사용하던 외부 jar는 Maven Build 시 자동으로 포함되지 않음을 확인.
     	✅ gson.jar는 pom.properties, pom.xml을 포함하지만 동작하지 않음을 확인.
 	2️⃣ Maven Build 옵션 중 외부 lib를 포함하도록 하는 방법
-		❤ Maven Build의 plugin 중 "maven-assembly-plugin"에 jar-with-dependencies 를 추가해서 해결.
+		🎉 Maven Build의 plugin 중 "maven-assembly-plugin"에 jar-with-dependencies 를 추가해서 해결.
 		- 참고 자료 : https://kogun82.tistory.com/151
 		- Maven Buld 시 Goal : assembly:assembly
 		- 사용한 Plugin
