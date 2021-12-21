@@ -67,6 +67,7 @@ public class FileToInsertQuery {
 	private boolean isOpenFile = false;
 	private boolean isGetString = false;
 	private boolean isBulkInsert = true;
+	private int bulkInsertCnt = 100;
 	private String tableName = MsgCode.MSG_CODE_STRING_BLANK;
 
 	/**
@@ -106,7 +107,7 @@ public class FileToInsertQuery {
 		this.isGetString = isGetString;
 	}
 	
-	public FileToInsertQuery(String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile, boolean isGetString, boolean isBulkInsert) {
+	public FileToInsertQuery(String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile, boolean isGetString, boolean isBulkInsert, int bulkInsertCnt) {
 		this.readFilePath = readfilePath;
 		this.writeFilePath = writeFilePath;
 		this.spliter = spliter;
@@ -114,6 +115,7 @@ public class FileToInsertQuery {
 		this.isOpenFile = isOpenFile;
 		this.isGetString = isGetString;
 		this.isBulkInsert = isBulkInsert;
+		this.bulkInsertCnt = bulkInsertCnt;
 	}
 	
 	/**
@@ -194,21 +196,37 @@ public class FileToInsertQuery {
             StringBuilder queryHeader = new StringBuilder("INSERT INTO " + this.tableName + " (");
             StringBuilder queryBody = new StringBuilder();
             boolean isFirst = true;
+            int index = 0;
             while ((line = br.readLine()) != null) {
-            	if(isFirst) {
-            		// Write Query Header
-            		line = line.replace(this.spliter, ", ");
-            		queryHeader.append(line).append(") VALUES ");;
-            		isFirst = false;
+            	if(isBulkInsert) {
+            		if(isFirst) {
+                		// Write Query Header
+                		line = line.replace(this.spliter, ", ");
+                		queryHeader.append(line).append(") VALUES \r\n");;
+                		isFirst = false;
+                	} else {
+                		// Merge Query Body
+                		line = line.replace(this.spliter, "', '").replace("''", "null");
+                		if(index > 0 && index % this.bulkInsertCnt == 0) {
+                			// End of bulkInsertCnt
+            				queryBody.append("('").append(line).append("');\r\n\r\n");
+            				queryBody.append(queryHeader);
+                		} else {
+                			queryBody.append("('").append(line).append("'),\r\n");
+                		}
+                	}
+            		index++;
             	} else {
-            		// Merge Query Body
-            		line = line.replace(this.spliter, "', '").replace("''", "null");
-            		
-            		if(isBulkInsert){
-            			queryBody.append("('" + line + "'),\r\n");
-            		} else {
-            			queryBody.append(queryHeader).append("('" + line + "');\r\n");
-            		}
+            		if(isFirst) {
+                		// Write Query Header
+                		line = line.replace(this.spliter, ", ");
+                		queryHeader.append(line).append(") VALUES ");;
+                		isFirst = false;
+                	} else {
+                		// Merge Query Body
+                		line = line.replace(this.spliter, "', '").replace("''", "null");
+                		queryBody.append(queryHeader).append("('").append(line).append("');\r\n");
+                	}
             	}
             }
             // Replace last word ',' to ';'
@@ -301,7 +319,6 @@ public class FileToInsertQuery {
 					// Write queryBody as much as cellCount 
 					while(cellIndex < cellCount) {
 						// Merge Query Body
-						
 						queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
 						if(cellIndex + 1 != cellCount) queryBodyLine.append(", ");
 						cellIndex++;
