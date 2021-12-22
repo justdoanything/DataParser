@@ -6,7 +6,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,6 +28,7 @@ import prj.yong.util.FileUtil;
 
 @Getter
 @Setter
+@SuppressWarnings("resource")
 public class FileToInsertQuery {
 	
 	/******************************************************
@@ -235,19 +235,25 @@ public class FileToInsertQuery {
             
             // Write result into file if isWirteFile is true
             if(this.isWriteFile) {
-            	bw.write(queryHeader.toString());
-            	bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); 
-            	bw.flush();
+            	if(this.isBulkInsert) {
+            		bw.write(queryHeader.toString());
+            		bw.flush();
+            	}
+            	
             	bw.write(queryBody.toString());
             	bw.flush();
+            	
+            	if(isOpenFile) 
+        			Desktop.getDesktop().edit(new File(writeFilePath));
             }
             
             // Set result if isGetString is true
-            if(this.isGetString)
-            	resultString.append(queryHeader).append(queryBody);            	
-            	
-    		if(isOpenFile) 
-    			Desktop.getDesktop().edit(new File(writeFilePath));
+            if(this.isGetString) {
+            	if(this.isBulkInsert) {
+					resultString.append(queryHeader);
+            	}
+            	resultString.append(queryBody);            	
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -301,17 +307,19 @@ public class FileToInsertQuery {
 			boolean isFirst = true;
 			Row row = null;
 			int cellCount = -1;
-			for(int index = 0; index < sheet.getPhysicalNumberOfRows(); index++) {
+			int index = 0;
+			for(int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
 				StringBuilder queryBodyLine = new StringBuilder();
-				row = sheet.getRow(index);
+				row = sheet.getRow(rowNum);
 				int cellIndex = 0;
 				
+				// Write queryHeader
 				if(isFirst) {
 					// Write queryHeader and count header fields 
 					while(row.getCell(cellIndex) != null) {
 						// Write Query Header
 						queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
-						if(row.getCell(cellIndex) != null) queryHeader.append(", ");
+						if(row.getCell(cellIndex + 1) != null) queryHeader.append(", ");
 						cellIndex++;
 					}
 					cellCount = cellIndex;
@@ -323,37 +331,59 @@ public class FileToInsertQuery {
 						if(cellIndex + 1 != cellCount) queryBodyLine.append(", ");
 						cellIndex++;
 					}
-				}
-				if(isFirst) {
+				} 
+				
+				// Write queryBody
+				if(isFirst && this.isBulkInsert) {
 					queryHeader.append(") VALUES \r\n");
 					isFirst = false;
-				} else {
-					if(isBulkInsert){
-						queryBody.append("(").append(queryBodyLine).append("),\r\n");
+				} else if(isFirst && !this.isBulkInsert) {
+					queryHeader.append(") VALUES ");
+					isFirst = false;
+				} else if(!isFirst && this.isBulkInsert) {
+					if(index > 0 && index % this.bulkInsertCnt == 0) {
+						queryBody.append("(").append(queryBodyLine).append(");\r\n\r\n");
+						queryBody.append(queryHeader);
 					} else {
-						queryBody.append(queryHeader).append("('").append(queryBodyLine).append("');\r\n");
+						queryBody.append("(").append(queryBodyLine).append("),\r\n");
 					}
+					index++;
+				} else if (!isFirst && !this.isBulkInsert) {
+					queryBody.append(queryHeader).append("('").append(queryBodyLine).append("');\r\n");
+				} else {
+					
 				}
 			}
+				
 			// Replace last word ',' to ';'
 			if(isBulkInsert)
 				queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
 			
 			// Write result into file if isWirteFile is true
 			if(this.isWriteFile) {
-				// Write result file
-				FileOutputStream fos = new FileOutputStream(this.writeFilePath, false);
-				workbook.write(fos);
-				fos.flush();
-				fos.close();
+				//Write txt file (not excel file_
+				writeFilePath = writeFilePath.replace("xlsx", "txt").replace("xls", "txt");
+				BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath));
+            	
+				if(this.isBulkInsert) {
+            		bw.write(queryHeader.toString());
+            		bw.flush();
+            	}
+				
+				bw.write(queryBody.toString());
+            	bw.flush();
+            	
+            	if(isOpenFile) 
+    				Desktop.getDesktop().edit(new File(writeFilePath));
 			}
 			
 			// Set result if isGetString is true
-			if(this.isGetString)
-				resultString.append(queryHeader).append(queryBody);            	
-			
-			if(isOpenFile) 
-				Desktop.getDesktop().edit(new File(writeFilePath));
+			if(this.isGetString) {
+				if(this.isBulkInsert) {
+					resultString.append(queryHeader);
+            	}
+				resultString.append(queryBody);            	
+			}
 			
 		}catch (Exception e) {
 			e.printStackTrace();
