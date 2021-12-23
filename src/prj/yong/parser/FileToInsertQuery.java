@@ -341,7 +341,7 @@ public class FileToInsertQuery {
 					queryHeader.append(") VALUES ");
 					isFirst = false;
 				} else if(!isFirst && this.isBulkInsert) {
-					if(index > 0 && index % this.bulkInsertCnt == 0) {
+					if(index > 0 && (index  + 1) % this.bulkInsertCnt == 0) {
 						queryBody.append("(").append(queryBodyLine).append(");\r\n\r\n");
 						queryBody.append(queryHeader);
 					} else {
