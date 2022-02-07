@@ -1,8 +1,10 @@
 DataParser
 ===
 ## Project Info
-This program parses simple data to make your job easier.
+This program parses simple data to make your job easier.\
 You can run this after importing with jar file or refer to the code as it is.
+
+It will be registered in maven dependency.
 
 ## Unit From
 https://github.com/justdoanything/WatchDB \
