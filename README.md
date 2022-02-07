@@ -7,9 +7,7 @@ You can run this after importing with jar file or refer to the code as it is.
 It will be registered in maven dependency.
 
 ## Unit From
-https://github.com/justdoanything/WatchDB \
-https://github.com/justdoanything/dataparser \
-https://github.com/justdoanything/EnglishWordExam 
+https://github.com/justdoanything/dataparser_old
 
 ## Sample Type Of Classes 
 - #### TypeConverter.java
