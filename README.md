@@ -18,7 +18,7 @@ https://github.com/justdoanything/EnglishWordExam
 ---
 - #### AttributeToFile.java
   This class reads a file and makes table structure data like Excel.
-  - ###### Input
+  - ###### 🔰 Input
 	Name | Attribute Name | Attribute Value
 	---|---|---
 	TV | Size | 65 inch
@@ -27,7 +27,7 @@ https://github.com/justdoanything/EnglishWordExam
 	Audio | Size | 32
 	Audio | Company | Apple
 	Audio | Channel	| Dual
-  - ###### Output
+  - ###### 🔰 Output
     Name | Size	| Company | Quality	| Channel
     ---|---|---|---|---
     TV | 65 inch | LG | HIGH |
@@ -35,12 +35,12 @@ https://github.com/justdoanything/EnglishWordExam
 ---
 - #### FileToInsertQuery.java
   This class reads a file and makes insert query format like below.
-  - ###### Input
+  - ###### 🔰 Input
     Name | Size | Company | Quality | Channel
 	---|---|---|---|---
 	 TV | 65 inch | LG | HIGH |
 	 Audio | 32	| Apple	| | Dual
-  - ###### Output
+  - ###### 🔰 Output
     1. Bulk Insert Type
 	```sql
 	INSERT INTO test_table ( Name, Size, Company, Quality, Channel ) VALUES
@@ -54,20 +54,20 @@ https://github.com/justdoanything/EnglishWordExam
 	```
 ---
 - #### JsonToFile.java
-  - ###### Input
-  - ###### Output
+  - ###### 🔰 Input
+  - ###### 🔰 Output
 ---
 - #### FileToJson.java
-  - ###### Input
-  - ###### Output
+  - ###### 🔰 Input
+  - ###### 🔰 Output
 ---
 - #### CheckingJson.java
-  - ###### Input
-  - ###### Output
+  - ###### 🔰 Input
+  - ###### 🔰 Output
 ---
 - #### ObjectToInsertQuery.java
   This class creates a bulk insert query using an object with local variables.  This is a old way to convert a value object to insert query but you can use if you like old fashion :P
-  - ###### Input
+  - ###### 🔰 Input
 	```java
 	// input parameter is List<sampleVO> of size 3
 	public class sampleVO {
@@ -76,7 +76,7 @@ https://github.com/justdoanything/EnglishWordExam
 		private String value3;
 	}
 	```
-  - ###### Output
+  - ###### 🔰 Output
   	```sql
 	INSERT INTO test_table (value1, value2, value3) VALUES
 	('test1', 'test2', '111'),
