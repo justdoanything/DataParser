@@ -11,23 +11,21 @@ public class AttributeToFileTest {
 
     String sysdir = System.getProperty("user.dir") + "/testingFile/atf/";
 
-    String readFileName = "test_atf";
-    String wrtieFileName = "test_atf_result";
-    String answerFileName = "test_atf_answer";
+    String readFilePath = sysdir + "test_atf";
+    String wrtieFilePath = sysdir + "test_atf_result";
+    String answerFilePath = sysdir + "test_atf_answer";
     AttributeToFile atf = AttributeToFile.builder()
-                                            .readFilePath(sysdir + readFileName)
-                                            .writeFilePath(sysdir + wrtieFileName)
+                                            .readFilePath(readFilePath)
+                                            .writeFilePath(wrtieFilePath)
                                             .isWriteFile(true)
-                                            .isOpenFile(true)
+                                            // .isOpenFile(true)
                                             .isGetString(true)
                                             .spliter("|")
                                             .startWithLine(1)
                                             .build();
-    atf.parse();
-
+    System.out.println(atf.parse()); 
     
-    System.out.println(fileCat(sysdir + answerFileName, sysdir + wrtieFileName));
-
+    System.out.println(fileCat(wrtieFilePath, answerFilePath));
   }
 
   public static boolean fileCat(String first, String second) throws IOException{
