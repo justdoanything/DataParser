@@ -1,4 +1,4 @@
-package prj.yong.util;
+package org.dataparser.util;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;

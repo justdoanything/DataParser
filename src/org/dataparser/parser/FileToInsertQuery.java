@@ -1,4 +1,4 @@
-package prj.yong.parser;
+package org.dataparser.parser;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -18,13 +18,13 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.dataparser.msg.MsgCode;
+import org.dataparser.util.DateUtil;
+import org.dataparser.util.ExcelUtil;
+import org.dataparser.util.FileUtil;
 
 import lombok.Getter;
 import lombok.Setter;
-import prj.yong.msg.MsgCode;
-import prj.yong.util.DateUtil;
-import prj.yong.util.ExcelUtil;
-import prj.yong.util.FileUtil;
 
 @Getter
 @Setter

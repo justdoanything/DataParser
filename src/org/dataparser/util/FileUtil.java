@@ -1,4 +1,4 @@
-package prj.yong.util;
+package org.dataparser.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;

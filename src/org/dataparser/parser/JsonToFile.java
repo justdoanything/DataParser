@@ -1,4 +1,4 @@
-package prj.yong.parser;
+package org.dataparser.parser;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;

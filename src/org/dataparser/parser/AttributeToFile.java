@@ -1,4 +1,4 @@
-package prj.yong.parser;
+package org.dataparser.parser;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -23,42 +23,20 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.dataparser.inf.AttributeToFileInterface;
+import org.dataparser.msg.MsgCode;
+import org.dataparser.util.DateUtil;
+import org.dataparser.util.ExcelUtil;
+import org.dataparser.util.FileUtil;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import prj.yong.msg.MsgCode;
-import prj.yong.util.DateUtil;
-import prj.yong.util.ExcelUtil;
-import prj.yong.util.FileUtil;
 
 @Getter
 @Setter
-public class AttributeToFile {
-
-	/******************************************************
-	 * 
-	 * This class read a file and makes table structure data like Excel.
-	 * 
-	 * [ Input ]
-	 * Name  | Attribute Name | Attribute Value
-	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-	 * TV	 | Size			  | 65 inch
-	 * TV	 | Company		  | LG
-	 * TV	 | Quality		  | HIGH
-	 * Audio | Size			  | 32
-	 * Audio | Company		  | Apple
-	 * Audio | Channel		  | Dual
-	 * 
-	 * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	 * 
-	 * [ Output ]
-	 * Name	 | Size		| Company	| Quality	| Channel
-	 * ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-	 * TV	 | 65 inch	| LG		| HIGH		|
-	 * Audio | 32		| Apple		|			| Dual
-	 *
-	 ******************************************************/	
-	
+@Builder
+public class AttributeToFile implements AttributeToFileInterface {
 	/**
 	 * Initial Values
 	 */
@@ -72,66 +50,12 @@ public class AttributeToFile {
 	private Map<String, Map<String, String>> codeMap = new HashMap<>();
 	
 	/**
-	 * Class Constructor
-	 */
-	public AttributeToFile() {	}
-	
-	public AttributeToFile(int startWithLine) {
-		this.startWithLine = startWithLine;
-	}
-	
-	public AttributeToFile(int startWithLine, String readfilePath) {
-		this.startWithLine = startWithLine;
-		this.readFilePath = readfilePath;
-	}
-	
-	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath) {
-		this.startWithLine = startWithLine;
-		this.readFilePath = readfilePath;
-		this.writeFilePath = writeFilePath;
-	}
-	
-	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath, String spliter) {
-		this.startWithLine = startWithLine;
-		this.readFilePath = readfilePath;
-		this.writeFilePath = writeFilePath;
-		this.spliter = spliter;
-	}
-	
-	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile) {
-		this.startWithLine = startWithLine;
-		this.readFilePath = readfilePath;
-		this.writeFilePath = writeFilePath;
-		this.spliter = spliter;
-		this.isWriteFile = isWriteFile;
-	}
-	
-	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile) {
-		this.startWithLine = startWithLine;
-		this.readFilePath = readfilePath;
-		this.writeFilePath = writeFilePath;
-		this.spliter = spliter;
-		this.isWriteFile = isWriteFile;
-		this.isOpenFile = isOpenFile;
-	}
-	
-	public AttributeToFile(int startWithLine, String readfilePath, String writeFilePath, String spliter, boolean isWriteFile, boolean isOpenFile, boolean isGetString) {
-		this.startWithLine = startWithLine;
-		this.readFilePath = readfilePath;
-		this.writeFilePath = writeFilePath;
-		this.spliter = spliter;
-		this.isWriteFile = isWriteFile;
-		this.isOpenFile = isOpenFile;
-		this.isGetString = isGetString;
-	}
-	
-	/**
 	 * Add code value to codeMap
 	 * @param name
 	 * @param code
 	 * @param value
 	 */
-	public void addCodeValue(String name, String code, String value) {
+	public void setCodeMap(String name, String code, String value) {
 		if(!codeMap.containsKey(name)) {
 			codeMap.put(name, new HashMap<String, String>());
 		}
@@ -161,7 +85,7 @@ public class AttributeToFile {
 				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
 			resultString = this.parseExcelType(readFileExtension);
 		} else {
-			throw new FileNotFoundException("A extension of file you read must be '.csv', '.xls', '.xlsx' and '.txt'");
+			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
 		}
 		return resultString;
 	}

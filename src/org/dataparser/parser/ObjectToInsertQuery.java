@@ -1,4 +1,4 @@
-package prj.yong.parser;
+package org.dataparser.parser;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dataparser.msg.MsgCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,7 +14,6 @@ import com.google.gson.Gson;
 
 import lombok.Getter;
 import lombok.Setter;
-import prj.yong.msg.MsgCode;
 
 @Getter
 @Setter
