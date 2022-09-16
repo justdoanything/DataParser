@@ -1,5 +1,7 @@
 package org.dataparser.parser;
 
-public class CheckingJson {
+import org.dataparser.inf.CheckingJsonInterface;
+
+public class CheckingJson implements CheckingJsonInterface {
 
 }

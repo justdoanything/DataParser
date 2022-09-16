@@ -1,5 +1,7 @@
 package org.dataparser.parser;
 
-public class FileToJson {
+import org.dataparser.inf.FileToJsonInterface;
+
+public class FileToJson implements FileToJsonInterface {
 
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dataparser.inf.ObjectToInsertQueryInterface;
 import org.dataparser.msg.MsgCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,7 +18,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ObjectToInsertQuery {
+public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
 
 	/******************************************************
 	 * 

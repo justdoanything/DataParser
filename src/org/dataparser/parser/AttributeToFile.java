@@ -40,14 +40,14 @@ public class AttributeToFile implements AttributeToFileInterface {
 	/**
 	 * Initial Values
 	 */
-	private int startWithLine = 0;
-	private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
-	private String writeFilePath = MsgCode.MSG_CODE_STRING_BLANK;
-	private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
-	private boolean isWriteFile = true;
-	private boolean isOpenFile = false;
-	private boolean isGetString = false;
-	private Map<String, Map<String, String>> codeMap = new HashMap<>();
+	@Builder.Default private int startWithLine = 0;
+	@Builder.Default private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
+	@Builder.Default private String writeFilePath = MsgCode.MSG_CODE_FILE_PATH;
+	@Builder.Default private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
+	@Builder.Default private boolean isWriteFile = true;
+	@Builder.Default private boolean isOpenFile = false;
+	@Builder.Default private boolean isGetString = false;
+	@Builder.Default private Map<String, Map<String, String>> codeMap = new HashMap<>();
 	
 	/**
 	 * Add code value to codeMap
@@ -73,7 +73,10 @@ public class AttributeToFile implements AttributeToFileInterface {
 	 */
 	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
-		String readFileExtension = this.readFilePath.contains(".") ? this.readFilePath.substring(this.readFilePath.lastIndexOf("."), readFilePath.length()) : MsgCode.MSG_CODE_STRING_BLANK;
+		String readFileExtension = FileUtil.getFileExtention(readFilePath);
+
+		File file = new File(readFilePath);
+		file.getName();
 		
 		this.validPrivateValues();
 		
@@ -104,7 +107,7 @@ public class AttributeToFile implements AttributeToFileInterface {
 		
 		if(!this.isWriteFile && !this.isGetString)
 			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
-		
+
 		if(!isWriteFile)
 			this.isOpenFile = false;
 	}
@@ -150,7 +153,7 @@ public class AttributeToFile implements AttributeToFileInterface {
 					continue;
 				}
 				
-				lineArray = line.split(this.spliter);
+				lineArray = line.split("\\" + this.spliter);
 				entityName = lineArray.length == 0 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[0];
 				attributeName = lineArray.length == 1 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[1];
 				attributeValue = lineArray.length == 2 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[2];
@@ -162,7 +165,7 @@ public class AttributeToFile implements AttributeToFileInterface {
 			if(index == 0)
 				throw new IOException("startWithLine over than the row there is in file");
 			
-		    // Add entity to entityList
+		  // Add entity to entityList
 		 	List<String> entityList = new ArrayList<>();
 		 	for(String entity : resultMap.keySet()) {
 		 		if(!entityList.contains(entity))
@@ -203,7 +206,7 @@ public class AttributeToFile implements AttributeToFileInterface {
 				// Write result into file if isWirteFile is true
 				if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
 				
-		        // Set result if isGetString is true				
+		    // Set result if isGetString is true				
 				if(this.isGetString) {
 					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
 				}

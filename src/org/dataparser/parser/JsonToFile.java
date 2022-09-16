@@ -10,10 +10,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.dataparser.inf.JsonToFileInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonToFile {
+public class JsonToFile implements JsonToFileInterface {
 	
 	/**
 	 * 

@@ -18,6 +18,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.dataparser.inf.FileToInsertQueryInterface;
 import org.dataparser.msg.MsgCode;
 import org.dataparser.util.DateUtil;
 import org.dataparser.util.ExcelUtil;
@@ -29,7 +30,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @SuppressWarnings("resource")
-public class FileToInsertQuery {
+public class FileToInsertQuery implements FileToInsertQueryInterface {
 	
 	/******************************************************
 	 * 
