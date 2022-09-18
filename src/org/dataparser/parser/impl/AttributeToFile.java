@@ -1,4 +1,4 @@
-package org.dataparser.parser;
+package org.dataparser.parser.impl;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,8 +24,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.dataparser.inf.AttributeToFileInterface;
 import org.dataparser.msg.MsgCode;
+import org.dataparser.parser.AttributeToFileInterface;
 import org.dataparser.util.DateUtil;
 import org.dataparser.util.ExcelUtil;
 import org.dataparser.util.FileUtil;
@@ -41,8 +42,8 @@ public class AttributeToFile implements AttributeToFileInterface {
 	 * Initial Values
 	 */
 	@Builder.Default private int startWithLine = 0;
-	@Builder.Default private String readFilePath = MsgCode.MSG_CODE_FILE_PATH;
-	@Builder.Default private String writeFilePath = MsgCode.MSG_CODE_FILE_PATH;
+	private String readFilePath;
+	private String writeFilePath;
 	@Builder.Default private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
 	@Builder.Default private boolean isWriteFile = true;
 	@Builder.Default private boolean isOpenFile = false;
@@ -73,12 +74,9 @@ public class AttributeToFile implements AttributeToFileInterface {
 	 */
 	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
-		String readFileExtension = FileUtil.getFileExtention(readFilePath);
+		String readFileExtension = FileUtil.getFileExtension(readFilePath);
 
-		File file = new File(readFilePath);
-		file.getName();
-		
-		this.validPrivateValues();
+		this.validRequiredValues();
 		
 		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
 				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
@@ -97,19 +95,33 @@ public class AttributeToFile implements AttributeToFileInterface {
 	 * Valid private values
 	 * @throws ValidationException
 	 * @throws NullPointerException
+	 * @throws FileSystemException
+	 * @throws DateTimeParseException
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws FileNotFoundException
 	 */
-	private void validPrivateValues() throws ValidationException, NullPointerException {
+	private void validRequiredValues() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException, FileNotFoundException {
+		if(!FileUtil.isFileExist(this.readFilePath))
+			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
+
 		if(this.startWithLine < 0)
-			throw new ValidationException("A required value has an exception : startWithLine should be over 0");
+			throw new ValidationException("A required value has an exception : startWithLine should be over 0.");
 		
-		if(this.readFilePath == null || this.writeFilePath == null || this.spliter == null || this.codeMap == null)
-			throw new NullPointerException("A required value has an exception : All of values cannot be null");
+		if(this.readFilePath == null || this.spliter == null || this.codeMap == null)
+			throw new NullPointerException("A required value has an exception : All of values cannot be null.");
 		
 		if(!this.isWriteFile && !this.isGetString)
 			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
-		if(!isWriteFile)
-			this.isOpenFile = false;
+		if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
+			throw new ValidationException("A required value has an exception : csv file must be ','.");	
+		
+		if(!this.isWriteFile && this.isOpenFile)
+			throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+		this.isOpenFile = false;
+
+		if(this.readFilePath == null || this.readFilePath.length() == 0)
+			this.setDefaultWriteFilePath(this.readFilePath);
 	}
 	
 	/**
@@ -126,17 +138,7 @@ public class AttributeToFile implements AttributeToFileInterface {
 		BufferedWriter bw = null;
 		StringBuilder resultString = new StringBuilder();
 		
-		// Checking file is existed and Set writeFilePath
-		if(FileUtil.isFileExist(this.readFilePath)) {
-			// Set writeFilePath if do not set manually
-			this.setDefaultWriteFilePath(readFileExtension);
-		}
-				
 		try {
-			// spliter of csv should be ,
-			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
-				this.spliter = ",";
-			
 			// Set Reader and Writer and Open file
 			br = new BufferedReader(new FileReader(readFilePath));
 			if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
@@ -237,12 +239,6 @@ public class AttributeToFile implements AttributeToFileInterface {
 		Workbook workbook = null;
 		StringBuilder resultString = new StringBuilder();
 
-		// Checking file is existed and Set writeFilePath
-		if(FileUtil.isFileExist(this.readFilePath)) {
-			// Set writeFilePath if do not set manually
-			this.setDefaultWriteFilePath(readFileExtension);
-		}
-					
 		try {
 			// spliter of xls, xlsx should be \t
 			this.spliter = MsgCode.MSG_CODE_STRING_TAB;
@@ -350,13 +346,16 @@ public class AttributeToFile implements AttributeToFileInterface {
 	 * @param readFileExtension
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
+	 * @throws FileSystemException
 	 */
-	private void setDefaultWriteFilePath(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException {
+	private void setDefaultWriteFilePath(String readFilePath) throws StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
 		//if do not set writeFilePath, this should be readFilePath_{dateformat}
-		if(this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-			this.writeFilePath = readFilePath.replace(readFileExtension, "") 
-									+ "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0) 
-									+ readFileExtension;
+		if(this.writeFilePath == null || this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+			this.writeFilePath = FileUtil.getFileName(readFilePath)
+			+ "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0);
+			
+			if(FileUtil.getFileExtension(readFilePath) != null)
+			  this.writeFilePath += "." + FileUtil.getFileExtension(readFilePath);
 		}
 	}
 	

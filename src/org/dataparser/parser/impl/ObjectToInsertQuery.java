@@ -1,4 +1,4 @@
-package org.dataparser.parser;
+package org.dataparser.parser.impl;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dataparser.inf.ObjectToInsertQueryInterface;
 import org.dataparser.msg.MsgCode;
+import org.dataparser.parser.ObjectToInsertQueryInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

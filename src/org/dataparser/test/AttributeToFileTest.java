@@ -3,28 +3,28 @@ package org.dataparser.test;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.dataparser.parser.AttributeToFile;
+import org.dataparser.parser.impl.AttributeToFile;
 
 public class AttributeToFileTest {
   
   public static void main(String[] args) throws Exception { 
 
-    String sysdir = System.getProperty("user.dir") + "/testingFile/atf/";
+    String sysdir = System.getProperty("user.dir") + "/test/atf/";
 
-    String readFilePath = sysdir + "test_atf";
-    String wrtieFilePath = sysdir + "test_atf_result";
-    String answerFilePath = sysdir + "test_atf_answer";
+    String readFilePath = sysdir + "test_no_extension";
+    String wrtieFilePath = sysdir + "test_no_extension_result";
+    String answerFilePath = sysdir + "test_no_extension_answer";
     AttributeToFile atf = AttributeToFile.builder()
                                             .readFilePath(readFilePath)
-                                            .writeFilePath(wrtieFilePath)
+                                            // .writeFilePath(wrtieFilePath)
                                             .isWriteFile(true)
-                                            // .isOpenFile(true)
                                             .isGetString(true)
                                             .spliter("|")
                                             .startWithLine(1)
                                             .build();
     System.out.println(atf.parse()); 
     
+    wrtieFilePath = atf.getWriteFilePath();
     System.out.println(fileCat(wrtieFilePath, answerFilePath));
   }
 

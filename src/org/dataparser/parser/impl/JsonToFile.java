@@ -1,4 +1,4 @@
-package org.dataparser.parser;
+package org.dataparser.parser.impl;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -10,7 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.dataparser.inf.JsonToFileInterface;
+import org.dataparser.parser.JsonToFileInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

@@ -1,4 +1,4 @@
-package org.dataparser.inf;
+package org.dataparser.parser;
 
 public interface FileToJsonInterface {
   

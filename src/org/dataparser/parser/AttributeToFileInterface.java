@@ -1,4 +1,4 @@
-package org.dataparser.inf;
+package org.dataparser.parser;
 
 import java.io.IOException;
 import java.time.format.DateTimeParseException;

@@ -1,4 +1,4 @@
-package org.dataparser.parser;
+package org.dataparser.parser.impl;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -18,8 +18,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.dataparser.inf.FileToInsertQueryInterface;
 import org.dataparser.msg.MsgCode;
+import org.dataparser.parser.FileToInsertQueryInterface;
 import org.dataparser.util.DateUtil;
 import org.dataparser.util.ExcelUtil;
 import org.dataparser.util.FileUtil;
