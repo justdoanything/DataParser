@@ -12,29 +12,30 @@ public class AttributeToFileTest {
     String sysdir = System.getProperty("user.dir") + "/test/atf/";
 
     String readFilePath = sysdir + "test_no_extension";
-    String wrtieFilePath = sysdir + "test_no_extension_result";
+    String writeFilePath = sysdir + "test_no_extension_result";
     String answerFilePath = sysdir + "test_no_extension_answer";
+    
     AttributeToFile atf = AttributeToFile.builder()
                                             .readFilePath(readFilePath)
-                                            // .writeFilePath(wrtieFilePath)
                                             .isWriteFile(true)
                                             .isGetString(true)
                                             .spliter("|")
                                             .startWithLine(1)
                                             .build();
-    System.out.println(atf.parse()); 
+    atf.setCodeMap("Company","Apple","애플");
+    atf.setCodeMap("Company","LG","엘쥐");
     
-    wrtieFilePath = atf.getWriteFilePath();
-    System.out.println(fileCat(wrtieFilePath, answerFilePath));
+    System.out.println(atf.parse()); 
+    System.out.println(compareFile(answerFilePath, atf.getWriteFilePath()));
   }
 
-  public static boolean fileCat(String first, String second) throws IOException{
+  public static boolean compareFile(String answerFilePath, String resultFilePath) throws IOException{
     FileInputStream fis1 = null;  
     FileInputStream fis2 = null;
 
     try {
-      fis1 = new FileInputStream(first);
-      fis2 = new FileInputStream(second);
+      fis1 = new FileInputStream(answerFilePath);
+      fis2 = new FileInputStream(resultFilePath);
 
       int readData1 = 0; int readData2 = 0; 
       while(true){

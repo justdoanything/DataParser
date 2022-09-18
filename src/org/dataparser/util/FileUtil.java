@@ -38,4 +38,9 @@ public class FileUtil {
 		File file = new File(filePath);
 		return file.getName();
 	}
+
+	public static String getFilePath(String filePath) {
+		File file = new File(filePath);
+		return file.getPath();
+	}
 }

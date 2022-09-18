@@ -118,10 +118,28 @@ public class AttributeToFile implements AttributeToFileInterface {
 		
 		if(!this.isWriteFile && this.isOpenFile)
 			throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
-		this.isOpenFile = false;
 
-		if(this.readFilePath == null || this.readFilePath.length() == 0)
+		if(this.writeFilePath == null || this.writeFilePath.length() == 0)
 			this.setDefaultWriteFilePath(this.readFilePath);
+	}
+
+	/**
+	 * Set default writeFilePath if do not set manually
+	 * @param readFileExtension
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws FileSystemException
+	 */
+	private void setDefaultWriteFilePath(String readFilePath) throws StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
+		//if do not set writeFilePath, this should be readFilePath_{dateformat}
+		if(this.writeFilePath == null || this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+			String writeFileName = FileUtil.getFileName(readFilePath) + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0);
+			
+			if(!FileUtil.getFileExtension(readFilePath).equals(""))
+			  writeFileName += "." + FileUtil.getFileExtension(readFilePath);
+			
+			this.writeFilePath = FileUtil.getFilePath(readFilePath) + writeFileName;
+		}
 	}
 	
 	/**
@@ -156,9 +174,9 @@ public class AttributeToFile implements AttributeToFileInterface {
 				}
 				
 				lineArray = line.split("\\" + this.spliter);
-				entityName = lineArray.length == 0 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[0];
-				attributeName = lineArray.length == 1 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[1];
-				attributeValue = lineArray.length == 2 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[2];
+				entityName = lineArray.length == 0 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[0].trim();
+				attributeName = lineArray.length == 1 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[1].trim();
+				attributeValue = lineArray.length == 2 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[2].trim();
 				this.createResultMap(resultMap, entityName, attributeName, attributeValue);
 				index = 1;
 			}
@@ -265,9 +283,9 @@ public class AttributeToFile implements AttributeToFileInterface {
 			String entityName, attributeName, attributeValue; 
 			for(int index = this.startWithLine; index < sheet.getPhysicalNumberOfRows(); index++) {
 				row = sheet.getRow(index);
-				entityName = ExcelUtil.getCellValue(row.getCell(0));
-				attributeName = ExcelUtil.getCellValue(row.getCell(1));
-				attributeValue = ExcelUtil.getCellValue(row.getCell(2));
+				entityName = ExcelUtil.getCellValue(row.getCell(0)).trim();
+				attributeName = ExcelUtil.getCellValue(row.getCell(1)).trim();
+				attributeValue = ExcelUtil.getCellValue(row.getCell(2)).trim();
 				
 				this.createResultMap(resultMap, entityName, attributeName, attributeValue);
 			}
@@ -339,24 +357,6 @@ public class AttributeToFile implements AttributeToFileInterface {
 			if(workbook != null) try { workbook.close(); } catch(IOException e) {throw new IOException(e);}
 		}
 	 	return resultString.toString();
-	}
-	
-	/**
-	 * Set default writeFilePath if do not set manually
-	 * @param readFileExtension
-	 * @throws StringIndexOutOfBoundsException
-	 * @throws DateTimeParseException
-	 * @throws FileSystemException
-	 */
-	private void setDefaultWriteFilePath(String readFilePath) throws StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
-		//if do not set writeFilePath, this should be readFilePath_{dateformat}
-		if(this.writeFilePath == null || this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-			this.writeFilePath = FileUtil.getFileName(readFilePath)
-			+ "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0);
-			
-			if(FileUtil.getFileExtension(readFilePath) != null)
-			  this.writeFilePath += "." + FileUtil.getFileExtension(readFilePath);
-		}
 	}
 	
 	/**
