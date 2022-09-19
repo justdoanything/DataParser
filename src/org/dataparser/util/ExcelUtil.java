@@ -37,7 +37,7 @@ public class ExcelUtil {
 				break;
 			}
 		}
-		return msg;
+		return msg.trim();
 	}
 	
 }

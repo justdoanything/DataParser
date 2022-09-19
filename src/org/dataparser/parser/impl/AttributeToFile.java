@@ -26,7 +26,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dataparser.msg.MsgCode;
 import org.dataparser.parser.AttributeToFileInterface;
-import org.dataparser.util.DateUtil;
 import org.dataparser.util.ExcelUtil;
 import org.dataparser.util.FileUtil;
 
@@ -41,14 +40,14 @@ public class AttributeToFile implements AttributeToFileInterface {
 	/**
 	 * Initial Values
 	 */
-	@Builder.Default private int startWithLine = 0;
 	private String readFilePath;
 	private String writeFilePath;
+	@Builder.Default private int startWithLine = 0;
 	@Builder.Default private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
+	@Builder.Default private Map<String, Map<String, String>> codeMap = new HashMap<>();
 	@Builder.Default private boolean isWriteFile = true;
 	@Builder.Default private boolean isOpenFile = false;
 	@Builder.Default private boolean isGetString = false;
-	@Builder.Default private Map<String, Map<String, String>> codeMap = new HashMap<>();
 	
 	/**
 	 * Add code value to codeMap
@@ -104,10 +103,13 @@ public class AttributeToFile implements AttributeToFileInterface {
 		if(!FileUtil.isFileExist(this.readFilePath))
 			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
 
+		if(this.writeFilePath == null || this.writeFilePath.length() == 0)
+			this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
+
 		if(this.startWithLine < 0)
 			throw new ValidationException("A required value has an exception : startWithLine should be over 0.");
 		
-		if(this.readFilePath == null || this.spliter == null || this.codeMap == null)
+		if(this.readFilePath == null || this.writeFilePath == null || this.spliter == null || this.codeMap == null)
 			throw new NullPointerException("A required value has an exception : All of values cannot be null.");
 		
 		if(!this.isWriteFile && !this.isGetString)
@@ -118,30 +120,8 @@ public class AttributeToFile implements AttributeToFileInterface {
 		
 		if(!this.isWriteFile && this.isOpenFile)
 			throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
-
-		if(this.writeFilePath == null || this.writeFilePath.length() == 0)
-			this.setDefaultWriteFilePath(this.readFilePath);
 	}
 
-	/**
-	 * Set default writeFilePath if do not set manually
-	 * @param readFileExtension
-	 * @throws StringIndexOutOfBoundsException
-	 * @throws DateTimeParseException
-	 * @throws FileSystemException
-	 */
-	private void setDefaultWriteFilePath(String readFilePath) throws StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
-		//if do not set writeFilePath, this should be readFilePath_{dateformat}
-		if(this.writeFilePath == null || this.writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-			String writeFileName = FileUtil.getFileName(readFilePath) + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0);
-			
-			if(!FileUtil.getFileExtension(readFilePath).equals(""))
-			  writeFileName += "." + FileUtil.getFileExtension(readFilePath);
-			
-			this.writeFilePath = FileUtil.getFilePath(readFilePath) + writeFileName;
-		}
-	}
-	
 	/**
 	 * Parse text file (.txt, .csv)
 	 * @param readFileExtension
