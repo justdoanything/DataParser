@@ -62,12 +62,13 @@ public class FileUtil {
 		//if do not set writeFilePath, this should be readFilePath_{dateformat}
 		String writeFilePath = "";
 		if(writeFilePath == null || writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
-			String writeFileName = FileUtil.getFileName(readFilePath) + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0);
+			String readFileName = FileUtil.getFileName(readFilePath);
+			String writeFileName = readFileName + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0);
 			
 			if(!FileUtil.getFileExtension(readFilePath).equals(""))
-			  writeFileName += "." + FileUtil.getFileExtension(readFilePath);
-			
-			writeFilePath = FileUtil.getFilePath(readFilePath) + writeFileName;
+				writeFileName += "." + FileUtil.getFileExtension(readFilePath);
+
+			writeFilePath = FileUtil.getFilePath(readFilePath).replace(readFileName, writeFileName);
 		}
 		return writeFilePath;
 	}

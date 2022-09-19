@@ -11,6 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.ValidationException;
 
@@ -139,11 +141,13 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
             		if(isFirst) {
                 		// Write Query Header
                 		line = line.replace(this.spliter, ", ");
+										line = Arrays.stream(line.split("\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
                 		queryHeader.append(line).append(") VALUES \r\n");;
                 		isFirst = false;
                 	} else {
                 		// Merge Query Body
                 		line = line.replace(this.spliter, "', '").replace("''", "null");
+										line = Arrays.stream(line.split("\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
                 		if(index > 0 && index % this.bulkInsertCnt == 0) {
                 			// End of bulkInsertCnt
             				queryBody.append("('").append(line.trim()).append("');\r\n\r\n");
@@ -156,11 +160,13 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
             	} else {
             		if(isFirst) {
                 		// Write Query Header
+										line = Arrays.stream(line.split("\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
                 		line = line.replace(this.spliter, ", ");
-                		queryHeader.append(line).append(") VALUES ");;
+                		queryHeader.append(line).append(") VALUES ");
                 		isFirst = false;
                 	} else {
                 		// Merge Query Body
+										line = Arrays.stream(line.split("\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
                 		line = line.replace(this.spliter, "', '").replace("''", "null");
                 		queryBody.append(queryHeader).append("('").append(line.trim()).append("');\r\n");
                 	}

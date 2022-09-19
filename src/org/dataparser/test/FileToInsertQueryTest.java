@@ -21,7 +21,7 @@ public class FileToInsertQueryTest {
                                             .isGetString(true)
                                             .spliter("|")
                                             .tableName("testTable")
-                                            .isBulkInsert(false)
+                                            .isBulkInsert(true)
                                             .build();
     System.out.println(ftiq.parse()); 
     System.out.println(compareFile(answerFilePath, ftiq.getWriteFilePath()));
