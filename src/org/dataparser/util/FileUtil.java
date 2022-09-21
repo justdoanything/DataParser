@@ -1,6 +1,7 @@
 package org.dataparser.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
@@ -72,4 +73,34 @@ public class FileUtil {
 		}
 		return writeFilePath;
 	}
+
+	/**
+	 * 
+	 * @param answerFilePath
+	 * @param resultFilePath
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean compareFile(String filePath1, String filePath2) throws IOException{
+
+		try(
+				FileInputStream fis1 = new FileInputStream(filePath1);
+				FileInputStream fis2 = new FileInputStream(filePath2);) {
+      int readData1 = 0; 
+			int readData2 = 0; 
+      while(true){
+        readData1 = fis1.read();
+        readData2 = fis2.read();
+        if(readData1!=readData2||(readData1!=-1&&readData2==-1)) {
+          return false;
+        }
+        if(readData1==-1) {
+          return true;
+        }
+      } 
+    }catch (Exception e) { 
+      e.printStackTrace();
+    }
+    return false;
+  }
 }

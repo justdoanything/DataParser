@@ -89,10 +89,10 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 		if(!FileUtil.isFileExist(this.readFilePath))
 			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
 
-		if(this.writeFilePath == null || this.writeFilePath.length() == 0)
+		if(this.isWriteFile && (this.writeFilePath == null || this.writeFilePath.length() == 0))
 			this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
 			
-		if(this.readFilePath == null || this.writeFilePath == null || this.spliter == null || this.tableName == null)
+		if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.spliter == null || this.tableName == null)
 			throw new NullPointerException("A required value has an exception : all of values cannot be null");
 		
 		if(this.tableName.length() < 1)
@@ -101,11 +101,11 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 		if(!this.isWriteFile && !this.isGetString)
 			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
-		if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
-			throw new ValidationException("A required value has an exception : csv file must be ','.");	
-		
 		if(!this.isWriteFile && this.isOpenFile)
 			throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+
+		if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
+			throw new ValidationException("A required value has an exception : csv file must be ','.");	
 	}
 	
 	/**
