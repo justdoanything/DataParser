@@ -1,5 +1,7 @@
 package org.dataparser.parser.impl;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -113,6 +115,12 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
 				}
 			}
 		}
+
+		BufferedWriter bw = null;
+		if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
+		bw.write(bulkInsertQueryList.toString());
+		bw.flush();
+		bw.close();
 		
 		return bulkInsertQueryList;
 	}
@@ -186,7 +194,7 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
 		
 		toString += ")";
 		return toString;
-    }
+  }
 	
 	/**
 	 * Get field name ​​of variables in object

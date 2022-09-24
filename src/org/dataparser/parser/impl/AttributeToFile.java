@@ -132,14 +132,11 @@ public class AttributeToFile implements AttributeToFileInterface {
 	 */
 	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
-		BufferedReader br = null;
-		BufferedWriter bw = null;
 		StringBuilder resultString = new StringBuilder();
 		
-		try {
-			// Set Reader and Writer and Open file
-			br = new BufferedReader(new FileReader(readFilePath));
-			if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
+		try (
+				BufferedReader br = new BufferedReader(new FileReader(readFilePath));
+				BufferedWriter bw = this.isWriteFile ? new BufferedWriter(new FileWriter(writeFilePath)) : null;){
 			
 			// Read Excel File and Put line to resultMap
 			String line;
@@ -217,9 +214,6 @@ public class AttributeToFile implements AttributeToFileInterface {
 		}catch (Exception e) {
 			e.printStackTrace();
 			throw new IOException(e);
-		}finally {
-			if(br != null) try { br.close(); } catch(IOException e) {throw new IOException(e);}
-			if(bw != null) try { br.close(); } catch(IOException e) {throw new IOException(e);}
 		}
 		return resultString.toString();
 	}
