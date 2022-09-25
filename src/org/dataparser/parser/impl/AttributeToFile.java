@@ -214,7 +214,6 @@ public class AttributeToFile implements AttributeToFileInterface {
 			if(this.isOpenFile)
 				Desktop.getDesktop().edit(new File(writeFilePath));
 		}catch (Exception e) {
-			e.printStackTrace();
 			throw new IOException(e);
 		}
 		return resultString.toString();
@@ -326,7 +325,6 @@ public class AttributeToFile implements AttributeToFileInterface {
 			if(this.isOpenFile)
 				Desktop.getDesktop().edit(new File(writeFilePath));
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new IOException(e);
 		} finally {
 			// I/O Close

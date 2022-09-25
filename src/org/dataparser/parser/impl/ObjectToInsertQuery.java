@@ -2,6 +2,7 @@ package org.dataparser.parser.impl;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +11,6 @@ import java.util.Map;
 
 import javax.xml.bind.ValidationException;
 
-import org.dataparser.msg.MsgCode;
 import org.dataparser.parser.ObjectToInsertQueryInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,7 +29,7 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
 	 * Initial Values
 	 */
 	private String writeFilePath;
-	private String tableName = MsgCode.MSG_CODE_STRING_BLANK;
+	private String tableName;
 	@Builder.Default private int bulkInsertCnt = 100;
 	@Builder.Default private boolean isWriteFile = true;
 	@Builder.Default private boolean isOpenFile = false;
@@ -116,11 +116,16 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
 			}
 		}
 
-		BufferedWriter bw = null;
-		if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
-		bw.write(bulkInsertQueryList.toString());
-		bw.flush();
-		bw.close();
+		
+		if(this.isWriteFile) {
+			try(BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath));){
+				bw.write(bulkInsertQueryList.toString());
+				bw.flush();
+			}catch(Exception e){
+				throw new IOException(e);
+			}
+		}
+			
 		
 		return bulkInsertQueryList;
 	}
@@ -188,7 +193,7 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
 					toString += value == null ? value 		: "'" + value.toString().replace("'", "").replace("'","") + "'";
 				
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
+				throw new IllegalArgumentException();
 			}
 		}
 		

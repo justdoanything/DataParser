@@ -40,7 +40,7 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	 */
 	private String readFilePath;
 	private String writeFilePath;
-	private String tableName = MsgCode.MSG_CODE_STRING_BLANK;
+	private String tableName;
 	@Builder.Default private int bulkInsertCnt = 100;
 	@Builder.Default private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
 	@Builder.Default private boolean isWriteFile = true;
@@ -190,14 +190,14 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
             // Set result if isGetString is true
             if(this.isGetString) {
             	if(this.isBulkInsert) {
-					resultString.append(queryHeader);
+								resultString.append(queryHeader);
             	}
             	resultString.append(queryBody);            	
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+						throw new FileNotFoundException();
         } catch (IOException e) {
-            e.printStackTrace();
+						throw new IOException(e);
         }
 		
 		return resultString.toString();
@@ -294,15 +294,17 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 			if(this.isWriteFile) {
 				//Write txt file (not excel file_
 				writeFilePath = writeFilePath.replace("xlsx", "txt").replace("xls", "txt");
-				BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath));
-            	
-				if(this.isBulkInsert) {
-          bw.write(queryHeader.toString());
-          bw.flush();
-        }
-				
-				bw.write(queryBody.toString());
-        bw.flush();
+				try(BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath));){
+					if(this.isBulkInsert) {
+						bw.write(queryHeader.toString());
+						bw.flush();
+					}
+					
+					bw.write(queryBody.toString());
+					bw.flush();
+				}catch(IOException e){
+					throw new IOException(e);
+				}
             	
         if(isOpenFile) 
     			Desktop.getDesktop().edit(new File(writeFilePath));
@@ -317,7 +319,6 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 			}
 			
 		}catch (Exception e) {
-			e.printStackTrace();
 			throw new IOException(e);
 		} finally {
 			// I/O Close
