@@ -312,7 +312,7 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 			if(this.isGetString) {
 				if(this.isBulkInsert) {
 					resultString.append(queryHeader);
-            	}
+				}
 				resultString.append(queryBody);            	
 			}
 			

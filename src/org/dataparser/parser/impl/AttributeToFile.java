@@ -179,7 +179,6 @@ public class AttributeToFile implements AttributeToFileInterface {
 						attributeList.add(attribute);
 						if(this.isWriteFile) { bw.write(attribute); bw.write(this.spliter); bw.flush(); }
 						if(this.isGetString) resultString.append(attribute).append(this.spliter);
-						
 					}
 				}
 			}
@@ -201,7 +200,10 @@ public class AttributeToFile implements AttributeToFileInterface {
 				}
 				
 				// Write result into file if isWirteFile is true
-				if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
+				if(this.isWriteFile) { 
+					bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); 
+					bw.flush(); 
+				}
 				
 		    // Set result if isGetString is true				
 				if(this.isGetString) {
