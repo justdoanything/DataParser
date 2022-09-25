@@ -117,19 +117,16 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	 * @throws IOException
 	 */
 	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
-		BufferedReader br = null;
-		BufferedWriter bw = null;
 		StringBuilder resultString = new StringBuilder();
 		
-        try {      	
+        try (
+					BufferedReader br = new BufferedReader(new FileReader(readFilePath));
+					BufferedWriter bw = this.isWriteFile ? new BufferedWriter(new FileWriter(writeFilePath)) : null;
+				) {      	
         	// spliter of csv should be ,
-     		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
-     			this.spliter = ",";
+     			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))	
+     				this.spliter = ",";
         	
-     		// Set Reader and Writer and Open file
-        	br = new BufferedReader(new FileReader(readFilePath));
-        	if(this.isWriteFile) bw = new BufferedWriter(new FileWriter(writeFilePath));
-
         	// Read Excel File and write queryHeader and queryBody
             String line;
             StringBuilder queryHeader = new StringBuilder("INSERT INTO " + this.tableName + " (");
@@ -201,9 +198,6 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(br != null) try {br.close(); } catch (IOException e) {throw new IOException(e);}
-            if(bw != null) try {bw.close(); } catch (IOException e) {throw new IOException(e);}
         }
 		
 		return resultString.toString();
@@ -221,12 +215,12 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 		Workbook workbook = null;
 		StringBuilder resultString = new StringBuilder();
 
-		try {
+		try (
+			FileInputStream fis = new FileInputStream(this.readFilePath);	
+		){
 			// spliter of xls, xlsx should be \t
 			this.spliter = MsgCode.MSG_CODE_STRING_TAB;
 			
-			// Set FileInputStream and Open file
-			FileInputStream fis = new FileInputStream(this.readFilePath);
 			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)) 
 				workbook = new HSSFWorkbook(fis);
 			else
@@ -303,15 +297,15 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath));
             	
 				if(this.isBulkInsert) {
-            		bw.write(queryHeader.toString());
-            		bw.flush();
-            	}
+          bw.write(queryHeader.toString());
+          bw.flush();
+        }
 				
 				bw.write(queryBody.toString());
-            	bw.flush();
+        bw.flush();
             	
-            	if(isOpenFile) 
-    				Desktop.getDesktop().edit(new File(writeFilePath));
+        if(isOpenFile) 
+    			Desktop.getDesktop().edit(new File(writeFilePath));
 			}
 			
 			// Set result if isGetString is true

@@ -228,15 +228,15 @@ public class AttributeToFile implements AttributeToFileInterface {
 	 */
 	private String parseExcelType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
-		Workbook workbook = null;
 		StringBuilder resultString = new StringBuilder();
+		Workbook workbook = null;
 
-		try {
+		try (FileInputStream fis = new FileInputStream(this.readFilePath);) {
 			// spliter of xls, xlsx should be \t
 			this.spliter = MsgCode.MSG_CODE_STRING_TAB;
 			
 			// Set FileInputStream and Open file
-			FileInputStream fis = new FileInputStream(this.readFilePath);
+			
 			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)) 
 				workbook = new HSSFWorkbook(fis);
 			else
