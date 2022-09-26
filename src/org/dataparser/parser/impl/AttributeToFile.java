@@ -31,6 +31,7 @@ import org.dataparser.util.FileUtil;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
@@ -40,8 +41,8 @@ public class AttributeToFile implements AttributeToFileInterface {
 	/**
 	 * Initial Values
 	 */
-	private String readFilePath;
-	private String writeFilePath;
+	@NonNull private String readFilePath;
+	@NonNull private String writeFilePath;
 	@Builder.Default private int startWithLine = 0;
 	@Builder.Default private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
 	@Builder.Default private Map<String, Map<String, String>> codeMap = new HashMap<>();

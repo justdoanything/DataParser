@@ -28,6 +28,7 @@ import org.dataparser.util.FileUtil;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
@@ -38,9 +39,9 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	/**
 	 * Initial Values
 	 */
-	private String readFilePath;
-	private String writeFilePath;
-	private String tableName;
+	@NonNull private String readFilePath;
+	@NonNull private String writeFilePath;
+	@NonNull private String tableName;
 	@Builder.Default private int bulkInsertCnt = 100;
 	@Builder.Default private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
 	@Builder.Default private boolean isWriteFile = true;
@@ -50,7 +51,6 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	
 	/**
 	 * Parse the data as a extension of your file
-	 * @return
 	 * @throws ValidationException
 	 * @throws NullPointerException
 	 * @throws StringIndexOutOfBoundsException
@@ -77,7 +77,7 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	}
 	
 	/**
-	 * Valid private values
+	 * Valid required private values
 	 * @throws ValidationException
 	 * @throws NullPointerException
 	 * @throws FileNotFoundException

@@ -99,8 +99,7 @@ public class FileUtil {
         }
       } 
     }catch (Exception e) { 
-      e.printStackTrace();
+			throw new IOException(e);
     }
-    return false;
   }
 }

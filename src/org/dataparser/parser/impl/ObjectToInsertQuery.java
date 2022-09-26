@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
@@ -28,8 +29,8 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
 	/**
 	 * Initial Values
 	 */
-	private String writeFilePath;
-	private String tableName;
+	@NonNull private String writeFilePath;
+	@NonNull private String tableName;
 	@Builder.Default private int bulkInsertCnt = 100;
 	@Builder.Default private boolean isWriteFile = true;
 	@Builder.Default private boolean isOpenFile = false;
@@ -206,16 +207,18 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
 	 * @param obj
 	 * @return
 	 */
-	private List<String> getAllFields(Object obj) {
-		List<String> fieldList = new ArrayList<>();
+	private String getAllFields(Object obj) {
+		StringBuffer fieldList = new StringBuffer();
 		
 		int length = obj.getClass().getDeclaredFields().length;
 		for(int index = 0; index < length; index++) {	
 			Field field = obj.getClass().getDeclaredFields()[index];
 			field.setAccessible(true);
-			fieldList.add(field.getName());
+			fieldList.append(field.getName());
+			if(index != length-1)
+				fieldList.append(",");
 		}
 		
-		return fieldList;
+		return fieldList.toString();
 	}
 }

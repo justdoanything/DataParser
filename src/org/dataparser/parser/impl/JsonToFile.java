@@ -8,31 +8,100 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileSystemException;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
+import javax.xml.bind.ValidationException;
+
+import org.dataparser.msg.MsgCode;
 import org.dataparser.parser.JsonToFileInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Builder
 public class JsonToFile implements JsonToFileInterface {
+	
+	@NonNull private String readFilePath;
+	@NonNull private String writeFilePath;
+	@Builder.Default private boolean isWriteFile = true;
+	@Builder.Default private boolean isOpenFile = false;
+	@Builder.Default private boolean isGetString = false;
+	@Builder.Default private boolean isBulkInsert = true;
 	
 	/**
 	 * 
-	 * @param FilePath
+	 * @return
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws ValidationException
+	 * @throws NullPointerException
+	 * @throws FileNotFoundException
+	 * @throws FileSystemException
+	 */
+	public String parse() throws StringIndexOutOfBoundsException, DateTimeParseException, ValidationException, NullPointerException, FileNotFoundException, FileSystemException {
+
+		this.validRequiredValues();
+		
+		return "";
+	}
+
+	/**
+	 * 
+	 * @throws ValidationException
+	 * @throws NullPointerException
+	 * @throws FileNotFoundException
+	 * @throws StringIndexOutOfBoundsException
+	 * @throws DateTimeParseException
+	 * @throws FileSystemException
+	 */
+	private void validRequiredValues() throws ValidationException, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
+		// if(!FileUtil.isFileExist(this.readFilePath))
+		// 	throw new FileNotFoundException("There is no file in " + this.readFilePath); 
+
+		// if(this.isWriteFile && (this.writeFilePath == null || this.writeFilePath.length() == 0))
+		// 	this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
+			
+		// if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.spliter == null || this.tableName == null)
+		// 	throw new NullPointerException("A required value has an exception : all of values cannot be null");
+		
+		// if(this.tableName.length() < 1)
+		// 	throw new NullPointerException("A required value has an exception : tableName must be set.");
+		
+		// if(!this.isWriteFile && !this.isGetString)
+		// 	throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+
+		// if(!this.isWriteFile && this.isOpenFile)
+		// 	throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+
+		// if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
+		// 	throw new ValidationException("A required value has an exception : csv file must be ','.");	
+	}
+
+	/**
+	 * 
+	 * @param filePath
 	 * @param autoFileOpen
 	 * @return
+	 * @throws IOException
 	 */
-	public String makeExcelData(String FilePath, boolean autoFileOpen) {
-		BufferedReader br = null;
-		BufferedWriter bw = null;
+	public String makeExcelData(String filePath, boolean autoFileOpen) throws IOException {
 
-		try {
-			String readFilePath = FilePath;
-			String writeFilePath = readFilePath.replace(".txt", "_excel.txt");
+		StringBuilder resultString = new StringBuilder();
+		readFilePath = filePath;
+		writeFilePath = readFilePath.replace(".txt", "_excel.txt");
 
-			br = new BufferedReader(new FileReader(readFilePath));
-			bw = new BufferedWriter(new FileWriter(writeFilePath));
-
+		try (
+			BufferedReader br = new BufferedReader(new FileReader(readFilePath));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath));
+		) {
 			String line;
 			JSONArray dataList = new JSONArray();
 			while ((line = br.readLine()) != null) {
@@ -59,7 +128,7 @@ public class JsonToFile implements JsonToFileInterface {
 				}
 			}
 			System.out.println();
-			bw.write("\n");
+			bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
 
 			for (Object data : dataList) {
 				JSONObject json = new JSONObject(data.toString());
@@ -83,24 +152,14 @@ public class JsonToFile implements JsonToFileInterface {
 
 			bw.close();
 
-			if (autoFileOpen) Desktop.getDesktop().edit(new File(writeFilePath));
-			return writeFilePath;
+			if (autoFileOpen) 
+				Desktop.getDesktop().edit(new File(writeFilePath));
+			
+				return writeFilePath;
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			throw new FileNotFoundException();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null)
-				try {
-					br.close();
-				} catch (IOException e) {
-				}
-			if (bw != null)
-				try {
-					bw.close();
-				} catch (IOException e) {
-				}
+			throw new IOException(e);
 		}
-		return null;
 	}
 }
