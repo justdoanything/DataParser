@@ -19,6 +19,9 @@ import java.util.Map;
 
 import javax.xml.bind.ValidationException;
 
+import lombok.Data;
+import lombok.Builder;
+import lombok.NonNull;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -29,19 +32,14 @@ import org.dataparser.parser.AttributeToFileInterface;
 import org.dataparser.util.ExcelUtil;
 import org.dataparser.util.FileUtil;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-
-@Getter
-@Setter
+@Data
 @Builder
 public class AttributeToFile implements AttributeToFileInterface {
 	/**
 	 * Initial Values
 	 */
-	@NonNull private String readFilePath;
+	@NonNull
+	private String readFilePath;
 	@NonNull private String writeFilePath;
 	@Builder.Default private int startWithLine = 0;
 	@Builder.Default private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
@@ -151,7 +149,7 @@ public class AttributeToFile implements AttributeToFileInterface {
 					continue;
 				}
 				
-				lineArray = line.split("\\" + this.spliter);
+				lineArray = line.split("\\\\" + this.spliter);
 				entityName = lineArray.length == 0 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[0].trim();
 				attributeName = lineArray.length == 1 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[1].trim();
 				attributeValue = lineArray.length == 2 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[2].trim();

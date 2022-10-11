@@ -14,18 +14,13 @@ import java.util.ArrayList;
 
 import javax.xml.bind.ValidationException;
 
+import lombok.*;
 import org.dataparser.msg.MsgCode;
 import org.dataparser.parser.JsonToFileInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-
-@Getter
-@Setter
+@Data
 @Builder
 public class JsonToFile implements JsonToFileInterface {
 	
