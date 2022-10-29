@@ -3,7 +3,7 @@ package org.dataparser.parser;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
 
-import javax.xml.bind.ValidationException;
+
 
 /******************************************************
 	 * 
@@ -30,5 +30,5 @@ import javax.xml.bind.ValidationException;
 	 ******************************************************/	
 public interface AttributeToFileInterface {
 	public void setCodeMap(String name, String code, String value);
-	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException;
+	public String parse() throws Exception, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException;
 }

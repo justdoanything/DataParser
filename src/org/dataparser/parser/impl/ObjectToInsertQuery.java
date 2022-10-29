@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.ValidationException;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -88,9 +86,10 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
      * Valid private values
      *
      * @throws NullPointerException
-     * @throws ValidationException
+     * @throws Exception
+     * @throws Exception
      */
-    private void validRequiredValues() throws NullPointerException, ValidationException {
+    private void validRequiredValues() throws NullPointerException, Exception {
         if (this.tableName.length() < 1)
             throw new NullPointerException("A required value has an exception : tableName must be set.");
 
@@ -98,10 +97,10 @@ public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
             throw new NullPointerException("A required value has an exception : writeFilePath must be set if you want to write a file.");
 
         if (!this.isWriteFile && !this.isGetString)
-            throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+            throw new Exception("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
         if (!this.isWriteFile && this.isOpenFile)
-            throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
+            throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
     }
 
     /**

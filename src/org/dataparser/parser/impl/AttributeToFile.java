@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.ValidationException;
-
 import lombok.Data;
 import lombok.Builder;
 import lombok.NonNull;
@@ -64,13 +62,12 @@ public class AttributeToFile implements AttributeToFileInterface {
 	/**
 	 * Parse the data as a extension of your file
 	 * @return
-	 * @throws ValidationException
 	 * @throws NullPointerException
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
 	 * @throws IOException
 	 */
-	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
+	public String parse() throws Exception {
 		String resultString = "";
 		String readFileExtension = FileUtil.getFileExtension(readFilePath);
 
@@ -91,14 +88,14 @@ public class AttributeToFile implements AttributeToFileInterface {
 	
 	/**
 	 * Valid private values
-	 * @throws ValidationException
+	 * @throws Exception
 	 * @throws NullPointerException
 	 * @throws FileSystemException
 	 * @throws DateTimeParseException
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws FileNotFoundException
 	 */
-	private void validRequiredValues() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException, FileNotFoundException {
+	private void validRequiredValues() throws Exception {
 		if(!FileUtil.isFileExist(this.readFilePath))
 			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
 
@@ -106,19 +103,19 @@ public class AttributeToFile implements AttributeToFileInterface {
 			this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
 
 		if(this.startWithLine < 0)
-			throw new ValidationException("A required value has an exception : startWithLine should be over 0.");
+			throw new Exception("A required value has an exception : startWithLine should be over 0.");
 		
 		if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.spliter == null || this.codeMap == null)
 			throw new NullPointerException("A required value has an exception : All of values cannot be null.");
 		
 		if(!this.isWriteFile && !this.isGetString)
-			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+			throw new Exception("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
 		if(!this.isWriteFile && this.isOpenFile)
-			throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+			throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
 		
 		if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
-			throw new ValidationException("A required value has an exception : csv file must be ','.");	
+			throw new Exception("A required value has an exception : csv file must be ','.");	
 	}
 
 	/**

@@ -14,7 +14,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.ValidationException;
+
 
 import lombok.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -46,13 +46,13 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	
 	/**
 	 * Parse the data as a extension of your file
-	 * @throws ValidationException
+	 * @throws Exception
 	 * @throws NullPointerException
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
 	 * @throws IOException
 	 */
-	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
+	public String parse() throws Exception, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
 		String readFileExtension = FileUtil.getFileExtension(readFilePath);
 		
@@ -73,14 +73,14 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	
 	/**
 	 * Valid required private values
-	 * @throws ValidationException
+	 * @throws Exception
 	 * @throws NullPointerException
 	 * @throws FileNotFoundException
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
 	 * @throws FileSystemException
 	 */
-	private void validRequiredValues() throws ValidationException, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
+	private void validRequiredValues() throws Exception, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
 		if(!FileUtil.isFileExist(this.readFilePath))
 			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
 
@@ -94,13 +94,13 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 			throw new NullPointerException("A required value has an exception : tableName must be set.");
 		
 		if(!this.isWriteFile && !this.isGetString)
-			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+			throw new Exception("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
 		if(!this.isWriteFile && this.isOpenFile)
-			throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+			throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
 
 		if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
-			throw new ValidationException("A required value has an exception : csv file must be ','.");	
+			throw new Exception("A required value has an exception : csv file must be ','.");	
 	}
 	
 	/**
