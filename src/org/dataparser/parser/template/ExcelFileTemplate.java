@@ -1,6 +1,7 @@
 package org.dataparser.parser.template;
 
 public class ExcelFileTemplate extends CommonTemplate {
+    
     public ExcelFileTemplate(FileTemplateBuilder builder) {
         this.readFilePath = builder.readFilePath;
         this.writeFilePath = builder.writeFilePath;
