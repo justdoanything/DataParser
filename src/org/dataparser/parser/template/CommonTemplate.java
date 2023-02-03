@@ -10,4 +10,11 @@ public abstract class CommonTemplate {
     protected boolean isOpenFile = false;
     protected boolean isGetString = false;
     protected Map<String, Map<String, String>> codeMap = new HashMap<>();
+
+    public void addCodeMap(String name, String code, String value) {
+        if(!codeMap.containsKey(name)) {
+			codeMap.put(name, new HashMap<>());
+		}
+		codeMap.get(name).put(code, value);
+    }
 }
