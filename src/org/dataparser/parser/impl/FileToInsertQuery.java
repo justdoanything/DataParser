@@ -14,8 +14,9 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.ValidationException;
 
+
+import lombok.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -26,13 +27,7 @@ import org.dataparser.parser.FileToInsertQueryInterface;
 import org.dataparser.util.ExcelUtil;
 import org.dataparser.util.FileUtil;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-
-@Getter
-@Setter
+@Data
 @Builder
 public class FileToInsertQuery implements FileToInsertQueryInterface {
 	
@@ -51,13 +46,13 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	
 	/**
 	 * Parse the data as a extension of your file
-	 * @throws ValidationException
+	 * @throws Exception
 	 * @throws NullPointerException
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
 	 * @throws IOException
 	 */
-	public String parse() throws ValidationException, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
+	public String parse() throws Exception, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
 		String readFileExtension = FileUtil.getFileExtension(readFilePath);
 		
@@ -78,14 +73,14 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	
 	/**
 	 * Valid required private values
-	 * @throws ValidationException
+	 * @throws Exception
 	 * @throws NullPointerException
 	 * @throws FileNotFoundException
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
 	 * @throws FileSystemException
 	 */
-	private void validRequiredValues() throws ValidationException, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
+	private void validRequiredValues() throws Exception, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
 		if(!FileUtil.isFileExist(this.readFilePath))
 			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
 
@@ -99,13 +94,13 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 			throw new NullPointerException("A required value has an exception : tableName must be set.");
 		
 		if(!this.isWriteFile && !this.isGetString)
-			throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+			throw new Exception("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
 		if(!this.isWriteFile && this.isOpenFile)
-			throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+			throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
 
 		if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
-			throw new ValidationException("A required value has an exception : csv file must be ','.");	
+			throw new Exception("A required value has an exception : csv file must be ','.");	
 	}
 	
 	/**
@@ -138,13 +133,13 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
             		if(isFirst) {
                 		// Write Query Header
                 		line = line.replace(this.spliter, ", ");
-										line = Arrays.stream(line.split("\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
+										line = Arrays.stream(line.split("\\\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
                 		queryHeader.append(line).append(") VALUES \r\n");;
                 		isFirst = false;
                 	} else {
                 		// Merge Query Body
                 		line = line.replace(this.spliter, "', '").replace("''", "null");
-										line = Arrays.stream(line.split("\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
+										line = Arrays.stream(line.split("\\\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
                 		if(index > 0 && index % this.bulkInsertCnt == 0) {
                 			// End of bulkInsertCnt
             				queryBody.append("('").append(line.trim()).append("');\r\n\r\n");
@@ -157,13 +152,13 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
             	} else {
             		if(isFirst) {
                 		// Write Query Header
-										line = Arrays.stream(line.split("\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
+										line = Arrays.stream(line.split("\\\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
                 		line = line.replace(this.spliter, ", ");
                 		queryHeader.append(line).append(") VALUES ");
                 		isFirst = false;
                 	} else {
                 		// Merge Query Body
-										line = Arrays.stream(line.split("\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
+										line = Arrays.stream(line.split("\\\\" + this.spliter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
                 		line = line.replace(this.spliter, "', '").replace("''", "null");
                 		queryBody.append(queryHeader).append("('").append(line.trim()).append("');\r\n");
                 	}

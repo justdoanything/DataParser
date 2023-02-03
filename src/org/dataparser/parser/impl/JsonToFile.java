@@ -12,20 +12,13 @@ import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
-import javax.xml.bind.ValidationException;
-
+import lombok.*;
 import org.dataparser.msg.MsgCode;
 import org.dataparser.parser.JsonToFileInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-
-@Getter
-@Setter
+@Data
 @Builder
 public class JsonToFile implements JsonToFileInterface {
 	
@@ -41,12 +34,12 @@ public class JsonToFile implements JsonToFileInterface {
 	 * @return
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
-	 * @throws ValidationException
+	 * @throws Exception
 	 * @throws NullPointerException
 	 * @throws FileNotFoundException
 	 * @throws FileSystemException
 	 */
-	public String parse() throws StringIndexOutOfBoundsException, DateTimeParseException, ValidationException, NullPointerException, FileNotFoundException, FileSystemException {
+	public String parse() throws StringIndexOutOfBoundsException, DateTimeParseException, Exception, NullPointerException, FileNotFoundException, FileSystemException {
 
 		this.validRequiredValues();
 		
@@ -55,14 +48,14 @@ public class JsonToFile implements JsonToFileInterface {
 
 	/**
 	 * 
-	 * @throws ValidationException
+	 * @throws Exception
 	 * @throws NullPointerException
 	 * @throws FileNotFoundException
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
 	 * @throws FileSystemException
 	 */
-	private void validRequiredValues() throws ValidationException, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
+	private void validRequiredValues() throws Exception, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
 		// if(!FileUtil.isFileExist(this.readFilePath))
 		// 	throw new FileNotFoundException("There is no file in " + this.readFilePath); 
 
@@ -76,13 +69,13 @@ public class JsonToFile implements JsonToFileInterface {
 		// 	throw new NullPointerException("A required value has an exception : tableName must be set.");
 		
 		// if(!this.isWriteFile && !this.isGetString)
-		// 	throw new ValidationException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+		// 	throw new Exception("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
 		// if(!this.isWriteFile && this.isOpenFile)
-		// 	throw new ValidationException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+		// 	throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
 
 		// if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
-		// 	throw new ValidationException("A required value has an exception : csv file must be ','.");	
+		// 	throw new Exception("A required value has an exception : csv file must be ','.");	
 	}
 
 	/**

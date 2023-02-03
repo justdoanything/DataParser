@@ -162,12 +162,12 @@ public class AttributeToFile implements AttributeToFileInterface {
 			if(index == 0)
 				throw new IOException("startWithLine over than the row there is in file");
 
-		  // Add entity to entityList
-		 	List<String> entityList = new ArrayList<>();
-		 	for(String entity : resultMap.keySet()) {
-		 		if(!entityList.contains(entity))
-		 			entityList.add(entity);
-		 	}
+			// Add entity to entityList
+			List<String> entityList = new ArrayList<>();
+			for(String entity : resultMap.keySet()) {
+				if(!entityList.contains(entity))
+					entityList.add(entity);
+			}
 
 			// Write attribute in first line
 			if(this.isWriteFile) bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
@@ -205,7 +205,7 @@ public class AttributeToFile implements AttributeToFileInterface {
 					bw.flush();
 				}
 
-		    // Set result if isGetString is true
+				// Set result if isGetString is true
 				if(this.isGetString) {
 					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
 				}
@@ -330,7 +330,7 @@ public class AttributeToFile implements AttributeToFileInterface {
 			// I/O Close
 			if(workbook != null) try { workbook.close(); } catch(IOException e) {throw new IOException(e);}
 		}
-	 	return resultString.toString();
+		return resultString.toString();
 	}
 
 	/**

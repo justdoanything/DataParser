@@ -17,6 +17,7 @@ public class AttributeToFileTest {
                                             .readFilePath(readFilePath)
                                             .isWriteFile(true)
                                             .isGetString(true)
+            .writeFilePath(writeFilePath)
                                             .spliter("|")
                                             .startWithLine(1)
                                             .build();
