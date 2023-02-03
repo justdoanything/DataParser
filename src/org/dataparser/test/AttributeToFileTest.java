@@ -1,8 +1,6 @@
 package org.dataparser.test;
 
-import org.dataparser.parser.impl.AttributeToFile;
-import org.dataparser.parser.template.FileTemplate;
-import org.dataparser.util.FileUtil;
+import org.dataparser.parser.template.ExcelFileTemplate;
 
 public class AttributeToFileTest {
 
@@ -28,7 +26,7 @@ public class AttributeToFileTest {
 //    System.out.println(atf.parse());
 //    System.out.println(FileUtil.compareFile(answerFilePath, atf.getWriteFilePath()));
 
-    FileTemplate fileTemplate = (FileTemplate) new FileTemplate.FileTemplateBuilder("test")
+    ExcelFileTemplate fileTemplate = (ExcelFileTemplate) new ExcelFileTemplate.FileTemplateBuilder("test")
             .splitter("test")
             .build();
   }

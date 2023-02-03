@@ -1,10 +1,10 @@
 package org.dataparser.parser.template;
 
-public class FileTemplate extends CommonTemplate {
+public class TextFileTemplate extends CommonTemplate {
     private String splitter = "\t";
     private int startWithLine = 0;
 
-    public FileTemplate(FileTemplateBuilder builder) {
+    public TextFileTemplate(FileTemplateBuilder builder) {
         this.readFilePath = builder.readFilePath;
         this.writeFilePath = builder.writeFilePath;
         this.isWriteFile = builder.isWriteFile;
@@ -47,8 +47,8 @@ public class FileTemplate extends CommonTemplate {
             return this;
         }
 
-        public FileTemplate build() {
-            return new FileTemplate(this);
+        public TextFileTemplate build() {
+            return new TextFileTemplate(this);
         }
     }
 }
