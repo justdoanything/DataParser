@@ -1,7 +1,22 @@
 DataParser
 ===
 ## Project Info
-I try to apply java design pattern I studied and tell you what I applied.  
+I try to apply java design pattern I studied and tell you what I applied.
+- Builder Patter
+  - 처리하는 객체는 크게 입력받는 객체가 File 타입인지, 결과값이 Query 향테인지에 따라 갖는 속성이 달랐다.
+  - 모든 객체가 갖는 필드는 CommonTemplate 객체로 만들고 File, Query에 따라 CommonTemplate를 상속받아 사용하도록 했다.
+  - FileTemplate, QueryTemplate 내부에 Builder Class를 만들어서 필수값은 생성자 인자값으로 받고 나머지 필드는 초기값을 부여하고 builder class에서 설정할 수 있도록 했다.
+
+First of all, I need to divide which field should be common, which method should be common for all classes. 
+I figured out it by input, output type 
+
+- What Common Field
+
+tpyes | fields
+--- | ---
+common | writeFilePath<br>isWriteFile<br>isOpenFile<br>isGetString<br>codeMap
+input == file | readFilePath<br>spliter<br>startWithLine
+output == query | tableName<br>bulkInsertCnt<br>isBulkInsert
 
 This program parses simple data to make your job easier.\
 You can run this after importing with jar file or refer to the code as it is.
