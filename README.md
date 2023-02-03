@@ -1,6 +1,8 @@
 DataParser
 ===
 ## Project Info
+I try to apply java design pattern I studied and tell you what I applied.  
+
 This program parses simple data to make your job easier.\
 You can run this after importing with jar file or refer to the code as it is.
 
