@@ -12,32 +12,12 @@ import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import org.dataparser.parser.ObjectToInsertQueryInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
-@Data
-@Builder
-public class ObjectToInsertQuery implements ObjectToInsertQueryInterface {
-    /**
-     * Initial Values
-     */
-    @NonNull
-    private String writeFilePath;
-    @NonNull
-    private String tableName;
-    @Builder.Default
-    private int bulkInsertCnt = 100;
-    @Builder.Default
-    private boolean isWriteFile = true;
-    @Builder.Default
-    private boolean isOpenFile = false;
-    @Builder.Default
-    private boolean isGetString = false;
-    @Builder.Default
-    private boolean isBulkInsert = true;
+public class ObjectToInsertQuery {
     /**
      * Write bulk insert query by using list object (VO, DTO, ...)
      *

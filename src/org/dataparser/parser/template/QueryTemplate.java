@@ -2,8 +2,8 @@ package org.dataparser.parser.template;
 
 public class QueryTemplate extends CommonTemplate {
     private String tableName;
-    private int bulkInsertCnt = 100;
-    private boolean isBulkInsert = true;
+    private int bulkInsertCnt;
+    private boolean isBulkInsert;
 
     public QueryTemplate(QueryTemplateBuilder builder) {
         this.readFilePath = builder.readFilePath;
@@ -11,6 +11,7 @@ public class QueryTemplate extends CommonTemplate {
         this.isWriteFile = builder.isWriteFile;
         this.isOpenFile = builder.isOpenFile;
         this.isGetString = builder.isGetString;
+
         this.tableName = builder.tableName;
         this.bulkInsertCnt = builder.bulkInsertCnt;
         this.isBulkInsert = builder.isBulkInsert;
@@ -21,7 +22,8 @@ public class QueryTemplate extends CommonTemplate {
         private int bulkInsertCnt = 100;
         private boolean isBulkInsert = true;
 
-        public QueryTemplateBuilder(String tableName) {
+        public QueryTemplateBuilder(String readFilePath, String tableName) {
+            this.readFilePath = readFilePath;
             this.tableName = tableName;
         }
 
@@ -30,13 +32,8 @@ public class QueryTemplate extends CommonTemplate {
             return this;
         }
 
-        public QueryTemplateBuilder readFilePath(boolean isBulkInsert) {
+        public QueryTemplateBuilder isBulkInsert(boolean isBulkInsert) {
             this.isBulkInsert = isBulkInsert;
-            return this;
-        }
-
-        public QueryTemplateBuilder readFilePath(String readFilePath) {
-            this.readFilePath = readFilePath;
             return this;
         }
 

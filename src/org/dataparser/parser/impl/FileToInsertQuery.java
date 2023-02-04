@@ -23,27 +23,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dataparser.msg.MsgCode;
-import org.dataparser.parser.FileToInsertQueryInterface;
 import org.dataparser.util.ExcelUtil;
 import org.dataparser.util.FileUtil;
 
-@Data
-@Builder
-public class FileToInsertQuery implements FileToInsertQueryInterface {
-	
-	/**
-	 * Initial Values
-	 */
-	@NonNull private String readFilePath;
-	@NonNull private String writeFilePath;
-	@NonNull private String tableName;
-	@Builder.Default private int bulkInsertCnt = 100;
-	@Builder.Default private String spliter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITER;
-	@Builder.Default private boolean isWriteFile = true;
-	@Builder.Default private boolean isOpenFile = false;
-	@Builder.Default private boolean isGetString = false;
-	@Builder.Default private boolean isBulkInsert = true;
-	
+public class FileToInsertQuery {
 	/**
 	 * Parse the data as a extension of your file
 	 * @throws Exception
@@ -55,9 +38,9 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	public String parse() throws Exception, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
 		String readFileExtension = FileUtil.getFileExtension(readFilePath);
-		
+
 		this.validRequiredValues();
-		
+
 		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
 				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
 				|| readFileExtension.equals(MsgCode.MSG_CODE_STRING_BLANK)){
@@ -70,7 +53,7 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 		}
 		return resultString;
 	}
-	
+
 	/**
 	 * Valid required private values
 	 * @throws Exception
@@ -82,27 +65,27 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	 */
 	private void validRequiredValues() throws Exception, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
 		if(!FileUtil.isFileExist(this.readFilePath))
-			throw new FileNotFoundException("There is no file in " + this.readFilePath); 
+			throw new FileNotFoundException("There is no file in " + this.readFilePath);
 
 		if(this.isWriteFile && (this.writeFilePath == null || this.writeFilePath.length() == 0))
 			this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
-			
+
 		if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.spliter == null || this.tableName == null)
 			throw new NullPointerException("A required value has an exception : all of values cannot be null");
-		
+
 		if(this.tableName.length() < 1)
 			throw new NullPointerException("A required value has an exception : tableName must be set.");
-		
+
 		if(!this.isWriteFile && !this.isGetString)
 			throw new Exception("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
 		if(!this.isWriteFile && this.isOpenFile)
-			throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+			throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
 
 		if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
-			throw new Exception("A required value has an exception : csv file must be ','.");	
+			throw new Exception("A required value has an exception : csv file must be ','.");
 	}
-	
+
 	/**
 	 * Parse text file (.txt, .csv)
 	 * @param readFileExtension
@@ -113,15 +96,15 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 	 */
 	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		StringBuilder resultString = new StringBuilder();
-		
+
         try (
 					BufferedReader br = new BufferedReader(new FileReader(readFilePath));
 					BufferedWriter bw = this.isWriteFile ? new BufferedWriter(new FileWriter(writeFilePath)) : null;
-				) {      	
+				) {
         	// spliter of csv should be ,
-     			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))	
+     			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
      				this.spliter = ",";
-        	
+
         	// Read Excel File and write queryHeader and queryBody
             String line;
             StringBuilder queryHeader = new StringBuilder("INSERT INTO " + this.tableName + " (");
@@ -167,37 +150,37 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
             // Replace last word ',' to ';'
             if(isBulkInsert)
             	queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
-            
+
             // Write result into file if isWirteFile is true
             if(this.isWriteFile) {
             	if(this.isBulkInsert) {
             		bw.write(queryHeader.toString());
             		bw.flush();
             	}
-            	
+
             	bw.write(queryBody.toString());
             	bw.flush();
-            	
-            	if(isOpenFile) 
+
+            	if(isOpenFile)
         			Desktop.getDesktop().edit(new File(writeFilePath));
             }
-            
+
             // Set result if isGetString is true
             if(this.isGetString) {
             	if(this.isBulkInsert) {
 								resultString.append(queryHeader);
             	}
-            	resultString.append(queryBody);            	
+            	resultString.append(queryBody);
             }
         } catch (FileNotFoundException e) {
 						throw new FileNotFoundException();
         } catch (IOException e) {
 						throw new IOException(e);
         }
-		
+
 		return resultString.toString();
 	}
-	
+
 	/**
 	 * Parse excel file (.xlsx, .xls)
 	 * @param readFileExtension
@@ -211,22 +194,22 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 		StringBuilder resultString = new StringBuilder();
 
 		try (
-			FileInputStream fis = new FileInputStream(this.readFilePath);	
+			FileInputStream fis = new FileInputStream(this.readFilePath);
 		){
 			// spliter of xls, xlsx should be \t
 			this.spliter = MsgCode.MSG_CODE_STRING_TAB;
-			
-			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)) 
+
+			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS))
 				workbook = new HSSFWorkbook(fis);
 			else
 				workbook = new XSSFWorkbook(fis);
 			fis.close();
-			
+
 			// Select first sheet
 			Sheet sheet = workbook.getSheetAt(0);
 			if(sheet == null)
 				throw new IOException("There is no sheet in file");
-			
+
 			// Read Excel File and write queryHeader and queryBody
 			StringBuilder queryHeader = new StringBuilder("INSERT INTO " + this.tableName + " (");
 			StringBuilder queryBody = new StringBuilder();
@@ -238,10 +221,10 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 				StringBuilder queryBodyLine = new StringBuilder();
 				row = sheet.getRow(rowNum);
 				int cellIndex = 0;
-				
+
 				// Write queryHeader
 				if(isFirst) {
-					// Write queryHeader and count header fields 
+					// Write queryHeader and count header fields
 					while(row.getCell(cellIndex) != null) {
 						// Write Query Header
 						queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
@@ -250,15 +233,15 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 					}
 					cellCount = cellIndex;
 				} else {
-					// Write queryBody as much as cellCount 
+					// Write queryBody as much as cellCount
 					while(cellIndex < cellCount) {
 						// Merge Query Body
 						queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
 						if(cellIndex + 1 != cellCount) queryBodyLine.append(", ");
 						cellIndex++;
 					}
-				} 
-				
+				}
+
 				// Write queryBody
 				if(isFirst && this.isBulkInsert) {
 					queryHeader.append(") VALUES \r\n");
@@ -277,14 +260,14 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 				} else if (!isFirst && !this.isBulkInsert) {
 					queryBody.append(queryHeader).append("('").append(queryBodyLine).append("');\r\n");
 				} else {
-					
+
 				}
 			}
-				
+
 			// Replace last word ',' to ';'
 			if(isBulkInsert)
 				queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
-			
+
 			// Write result into file if isWirteFile is true
 			if(this.isWriteFile) {
 				//Write txt file (not excel file_
@@ -294,32 +277,32 @@ public class FileToInsertQuery implements FileToInsertQueryInterface {
 						bw.write(queryHeader.toString());
 						bw.flush();
 					}
-					
+
 					bw.write(queryBody.toString());
 					bw.flush();
 				}catch(IOException e){
 					throw new IOException(e);
 				}
-            	
-        if(isOpenFile) 
+
+        if(isOpenFile)
     			Desktop.getDesktop().edit(new File(writeFilePath));
 			}
-			
+
 			// Set result if isGetString is true
 			if(this.isGetString) {
 				if(this.isBulkInsert) {
 					resultString.append(queryHeader);
 				}
-				resultString.append(queryBody);            	
+				resultString.append(queryBody);
 			}
-			
+
 		}catch (Exception e) {
 			throw new IOException(e);
 		} finally {
 			// I/O Close
 			if(workbook != null) try { workbook.close(); } catch(IOException e) {throw new IOException(e);}
 		}
-		
+
 		return resultString.toString();
 	}
 }

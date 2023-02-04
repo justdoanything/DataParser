@@ -14,23 +14,12 @@ import java.util.ArrayList;
 
 import lombok.*;
 import org.dataparser.msg.MsgCode;
-import org.dataparser.parser.JsonToFileInterface;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-@Data
-@Builder
-public class JsonToFile implements JsonToFileInterface {
-	
-	@NonNull private String readFilePath;
-	@NonNull private String writeFilePath;
-	@Builder.Default private boolean isWriteFile = true;
-	@Builder.Default private boolean isOpenFile = false;
-	@Builder.Default private boolean isGetString = false;
-	@Builder.Default private boolean isBulkInsert = true;
-	
+public class JsonToFile {
 	/**
-	 * 
+	 *
 	 * @return
 	 * @throws StringIndexOutOfBoundsException
 	 * @throws DateTimeParseException
@@ -42,12 +31,12 @@ public class JsonToFile implements JsonToFileInterface {
 	public String parse() throws StringIndexOutOfBoundsException, DateTimeParseException, Exception, NullPointerException, FileNotFoundException, FileSystemException {
 
 		this.validRequiredValues();
-		
+
 		return "";
 	}
 
 	/**
-	 * 
+	 *
 	 * @throws Exception
 	 * @throws NullPointerException
 	 * @throws FileNotFoundException
@@ -57,29 +46,29 @@ public class JsonToFile implements JsonToFileInterface {
 	 */
 	private void validRequiredValues() throws Exception, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
 		// if(!FileUtil.isFileExist(this.readFilePath))
-		// 	throw new FileNotFoundException("There is no file in " + this.readFilePath); 
+		// 	throw new FileNotFoundException("There is no file in " + this.readFilePath);
 
 		// if(this.isWriteFile && (this.writeFilePath == null || this.writeFilePath.length() == 0))
 		// 	this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
-			
+
 		// if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.spliter == null || this.tableName == null)
 		// 	throw new NullPointerException("A required value has an exception : all of values cannot be null");
-		
+
 		// if(this.tableName.length() < 1)
 		// 	throw new NullPointerException("A required value has an exception : tableName must be set.");
-		
+
 		// if(!this.isWriteFile && !this.isGetString)
 		// 	throw new Exception("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
 		// if(!this.isWriteFile && this.isOpenFile)
-		// 	throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");		
+		// 	throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
 
 		// if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
-		// 	throw new Exception("A required value has an exception : csv file must be ','.");	
+		// 	throw new Exception("A required value has an exception : csv file must be ','.");
 	}
 
 	/**
-	 * 
+	 *
 	 * @param filePath
 	 * @param autoFileOpen
 	 * @return
@@ -145,9 +134,9 @@ public class JsonToFile implements JsonToFileInterface {
 
 			bw.close();
 
-			if (autoFileOpen) 
+			if (autoFileOpen)
 				Desktop.getDesktop().edit(new File(writeFilePath));
-			
+
 				return writeFilePath;
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException();

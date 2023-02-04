@@ -1,8 +1,10 @@
 package org.dataparser.parser.template;
 
+import org.dataparser.msg.MsgCode;
+
 public class TextFileTemplate extends CommonTemplate {
-    private String splitter = "\t";
-    private int startWithLine = 0;
+    private String splitter;
+    private int startWithLine;
 
     public TextFileTemplate(FileTemplateBuilder builder) {
         this.readFilePath = builder.readFilePath;
@@ -10,13 +12,14 @@ public class TextFileTemplate extends CommonTemplate {
         this.isWriteFile = builder.isWriteFile;
         this.isOpenFile = builder.isOpenFile;
         this.isGetString = builder.isGetString;
+
         this.splitter = builder.splitter;
         this.startWithLine = builder.startWithLine;
     }
 
     public static class FileTemplateBuilder extends CommonTemplate {
-        private String splitter;
-        private int startWithLine;
+        private String splitter = MsgCode.MSG_CODE_FILE_DEFAULT_SPLITTER;
+        private int startWithLine = 0;
 
         public FileTemplateBuilder(String readFilePath) {
             this.readFilePath = readFilePath;
