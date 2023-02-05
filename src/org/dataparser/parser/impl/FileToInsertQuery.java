@@ -23,18 +23,33 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dataparser.msg.MsgCode;
+import org.dataparser.parser.CommonInterface;
+import org.dataparser.parser.builder.AttributeToFileBuilder;
+import org.dataparser.parser.builder.FileToInsertQueryBuilder;
+import org.dataparser.parser.template.FileTemplate;
+import org.dataparser.parser.template.QueryTemplate;
 import org.dataparser.util.ExcelUtil;
 import org.dataparser.util.FileUtil;
 
-public class FileToInsertQuery {
-	/**
-	 * Parse the data as a extension of your file
-	 * @throws Exception
-	 * @throws NullPointerException
-	 * @throws StringIndexOutOfBoundsException
-	 * @throws DateTimeParseException
-	 * @throws IOException
-	 */
+public class FileToInsertQuery extends QueryTemplate implements CommonInterface {
+	public FileToInsertQuery(FileToInsertQueryBuilder builder) {
+		this.readFilePath = builder.getReadFilePath();
+		this.writeFilePath = builder.getWriteFilePath();
+		this.isWriteFile = builder.isWriteFile();
+		this.isOpenFile = builder.isOpenFile();
+		this.isGetString = builder.isGetString();
+
+		this.tableName = builder.getTableName();
+		this.bulkInsertCnt = builder.getBulkInsertCnt();
+		this.isBulkInsert = builder.isBulkInsert();
+	}
+
+	@Override
+	public boolean filtering() {
+		return false;
+	}
+
+	@Override
 	public String parse() throws Exception, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
 		String readFileExtension = FileUtil.getFileExtension(readFilePath);
