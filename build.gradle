@@ -3,32 +3,19 @@
  */
 
 plugins {
-    id 'java-library'
-    id 'maven-publish'
+    id 'java'
 }
 
 repositories {
-    mavenLocal()
-    maven {
-        url = uri('https://repo.maven.apache.org/maven2/')
-    }
+    mavenCentral()
 }
 
 dependencies {
-    api 'org.json:json:20210307'
-    api 'org.apache.poi:poi-ooxml:4.1.2'
-    api 'com.google.code.gson:gson:2.9.0'
+    implementation 'org.json:json:20210307'
+    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    implementation 'com.google.code.gson:gson:2.9.0'
 }
 
 group = 'org.dataparser'
 version = '1.0.0'
 description = 'DataParser'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
