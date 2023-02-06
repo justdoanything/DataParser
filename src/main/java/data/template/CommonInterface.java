@@ -1,4 +1,4 @@
-package dataparser.template;
+package data.template;
 
 public interface CommonInterface {
     String parse();

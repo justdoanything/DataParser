@@ -1,15 +1,15 @@
-package dataparser.parser;
+package data.parser.atf;
 
-import dataparser.template.CommonInterface;
-import dataparser.template.FileTemplate;
+import data.template.CommonInterface;
+import data.template.FileTemplate;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import dataparser.msg.MsgCode;
-import dataparser.util.ExcelUtil;
-import dataparser.util.FileUtil;
+import data.constant.CommonConstant;
+import data.util.ExcelUtil;
+import data.util.FileUtil;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -45,21 +45,21 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 		String resultString = "";
 		String readFileExtension = FileUtil.getFileExtension(readFilePath);
 
-		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_STRING_BLANK)){
-		} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
+		if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_TXT)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_STRING_BLANK)){
+		} else if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLS)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLSX)){
 		} else {
 			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
 		}
 
-		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_STRING_BLANK)){
+		if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_TXT)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_STRING_BLANK)){
 			resultString = this.parseTextType(readFileExtension);
-		} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
+		} else if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLS)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLSX)){
 			resultString = this.parseExcelType(readFileExtension);
 		} else {
 			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
@@ -96,9 +96,9 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 				}
 
 				lineArray = line.split("\\" + this.spliter);
-				entityName = lineArray.length == 0 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[0].trim();
-				attributeName = lineArray.length == 1 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[1].trim();
-				attributeValue = lineArray.length == 2 ? MsgCode.MSG_CODE_STRING_SPACE : lineArray[2].trim();
+				entityName = lineArray.length == 0 ? CommonConstant.MSG_CODE_STRING_SPACE : lineArray[0].trim();
+				attributeName = lineArray.length == 1 ? CommonConstant.MSG_CODE_STRING_SPACE : lineArray[1].trim();
+				attributeValue = lineArray.length == 2 ? CommonConstant.MSG_CODE_STRING_SPACE : lineArray[2].trim();
 				this.createResultMap(resultMap, entityName, attributeName, attributeValue);
 				index = 1;
 			}
@@ -115,8 +115,8 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 			}
 
 			// Write attribute in first line
-			if(this.isWriteFile) bw.write(MsgCode.MSG_CODE_FIELD_NAME + this.spliter);
-			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_FIELD_NAME).append(this.spliter);
+			if(this.isWriteFile) bw.write(CommonConstant.MSG_CODE_FIELD_NAME + this.spliter);
+			if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_FIELD_NAME).append(this.spliter);
 			List<String> attributeList = new ArrayList<>();
 			for(String entity : entityList) {
 				for(String attribute : (resultMap.get(entity)).keySet()) {
@@ -127,8 +127,8 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 					}
 				}
 			}
-			if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
-			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			if(this.isWriteFile) { bw.write(CommonConstant.MSG_CODE_STRING_NEW_LINE); bw.flush(); }
+			if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_STRING_NEW_LINE);
 
 			// Write Attribute value as attribute and name
 			for(String entity : entityList) {
@@ -139,20 +139,20 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 						if(this.isWriteFile) { bw.write(resultMap.get(entity).get(attribute)); bw.write(this.spliter); bw.flush(); }
 						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(this.spliter);
 					} else {
-						if(this.isWriteFile) { bw.write(MsgCode.MSG_CODE_STRING_BLANK); bw.write(this.spliter); bw.flush(); }
-						if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK).append(this.spliter);
+						if(this.isWriteFile) { bw.write(CommonConstant.MSG_CODE_STRING_BLANK); bw.write(this.spliter); bw.flush(); }
+						if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_STRING_BLANK).append(this.spliter);
 					}
 				}
 
 				// Write result into file if isWirteFile is true
 				if(this.isWriteFile) {
-					bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
+					bw.write(CommonConstant.MSG_CODE_STRING_NEW_LINE);
 					bw.flush();
 				}
 
 				// Set result if isGetString is true
 				if(this.isGetString) {
-					resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+					resultString.append(CommonConstant.MSG_CODE_STRING_NEW_LINE);
 				}
 			}
 
@@ -179,11 +179,11 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
 		try (FileInputStream fis = new FileInputStream(this.readFilePath);) {
 			// spliter of xls, xlsx should be \t
-			this.spliter = MsgCode.MSG_CODE_STRING_TAB;
+			this.spliter = CommonConstant.MSG_CODE_STRING_TAB;
 
 			// Set FileInputStream and Open file
 
-			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS))
+			if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLS))
 				workbook = new HSSFWorkbook(fis);
 			else
 				workbook = new XSSFWorkbook(fis);
@@ -221,35 +221,35 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 			List<String> attributeList = new ArrayList<>();
 			int rowIndex = 0;
 			int cellIndex = 0;
-			Sheet resultSheet = workbook.createSheet(MsgCode.MSG_CODE_RESULT_SHEET_NAME);
+			Sheet resultSheet = workbook.createSheet(CommonConstant.MSG_CODE_RESULT_SHEET_NAME);
 			row = resultSheet.createRow(rowIndex++);
-			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_FIELD_NAME).append(this.spliter);
-			if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_FIELD_NAME);
+			if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_FIELD_NAME).append(this.spliter);
+			if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(CommonConstant.MSG_CODE_FIELD_NAME);
 			for(String entity : entityList) {
 				for(String attribute : (resultMap.get(entity)).keySet()) {
 					if(!attributeList.contains(attribute)) {
 						attributeList.add(attribute);
 						if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(attribute);
-						if(this.isGetString) resultString.append(attribute).append(MsgCode.MSG_CODE_STRING_TAB);
+						if(this.isGetString) resultString.append(attribute).append(CommonConstant.MSG_CODE_STRING_TAB);
 					}
 				}
 			}
-			if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_STRING_NEW_LINE);
 
 			// Write Attribute value as attribute and name
 			for(String entity : entityList) {
 				cellIndex = 0;
 				row = resultSheet.createRow(rowIndex++);
 				if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(entity);
-				if(this.isGetString) resultString.append(entity).append(MsgCode.MSG_CODE_STRING_TAB);
+				if(this.isGetString) resultString.append(entity).append(CommonConstant.MSG_CODE_STRING_TAB);
 
 				for(String attribute : attributeList) {
 					if((resultMap.get(entity)).containsKey(attribute)) {
 						if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(resultMap.get(entity).get(attribute));
-						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(MsgCode.MSG_CODE_STRING_TAB);
+						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(CommonConstant.MSG_CODE_STRING_TAB);
 					} else {
-						if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(MsgCode.MSG_CODE_STRING_BLANK);
-						if(this.isGetString) resultString.append(MsgCode.MSG_CODE_STRING_BLANK).append(MsgCode.MSG_CODE_STRING_TAB);
+						if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(CommonConstant.MSG_CODE_STRING_BLANK);
+						if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_STRING_BLANK).append(CommonConstant.MSG_CODE_STRING_TAB);
 					}
 				}
 			}
@@ -264,7 +264,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
 			// Set result if isGetString is true
 			if(this.isGetString) {
-				resultString.append(MsgCode.MSG_CODE_STRING_NEW_LINE);
+				resultString.append(CommonConstant.MSG_CODE_STRING_NEW_LINE);
 			}
 
 			if(this.isOpenFile)
@@ -293,7 +293,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 		if(attributeValue != null && codeMap.containsKey(attributeName))
 			attributeValue = this.changeCodeValue(attributeName, attributeValue);
 		// Put blank " " if the attribute value is empty.
-		resultMap.get(entityName).put(attributeName,  attributeValue.equals(MsgCode.MSG_CODE_STRING_SPACE) ? MsgCode.MSG_CODE_STRING_SPACE : attributeValue);
+		resultMap.get(entityName).put(attributeName,  attributeValue.equals(CommonConstant.MSG_CODE_STRING_SPACE) ? CommonConstant.MSG_CODE_STRING_SPACE : attributeValue);
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package dataparser.template;
+package data.template;
 
 import java.util.HashMap;
 import java.util.Map;

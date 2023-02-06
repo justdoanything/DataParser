@@ -1,4 +1,4 @@
-package dataparser.parser;
+package data.parser.ftiq;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -13,16 +13,16 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import dataparser.template.CommonInterface;
+import data.template.CommonInterface;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import dataparser.msg.MsgCode;
-import dataparser.template.QueryTemplate;
-import dataparser.util.ExcelUtil;
-import dataparser.util.FileUtil;
+import data.constant.CommonConstant;
+import data.template.QueryTemplate;
+import data.util.ExcelUtil;
+import data.util.FileUtil;
 
 public class FileToInsertQuery extends QueryTemplate implements CommonInterface {
 	public FileToInsertQuery(FileToInsertQueryBuilder builder) {
@@ -47,12 +47,12 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 		String resultString = "";
 		String readFileExtension = FileUtil.getFileExtension(readFilePath);
 
-		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_STRING_BLANK)){
+		if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_TXT)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_STRING_BLANK)){
 			resultString = this.parseTextType(readFileExtension);
-		} else if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS)
-				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLSX)){
+		} else if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLS)
+				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLSX)){
 			resultString = this.parseExcelType(readFileExtension);
 		} else {
 			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
@@ -76,7 +76,7 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 					BufferedWriter bw = this.isWriteFile ? new BufferedWriter(new FileWriter(writeFilePath)) : null;
 				) {
         	// spliter of csv should be ,
-     			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
+     			if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV))
      				this.spliter = ",";
 
         	// Read Excel File and write queryHeader and queryBody
@@ -171,9 +171,9 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 			FileInputStream fis = new FileInputStream(this.readFilePath);
 		){
 			// spliter of xls, xlsx should be \t
-			this.spliter = MsgCode.MSG_CODE_STRING_TAB;
+			this.spliter = CommonConstant.MSG_CODE_STRING_TAB;
 
-			if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_XLS))
+			if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLS))
 				workbook = new HSSFWorkbook(fis);
 			else
 				workbook = new XSSFWorkbook(fis);

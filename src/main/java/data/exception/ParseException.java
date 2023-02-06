@@ -1,4 +1,4 @@
-package dataparser.parser;
+package data.exception;
 
 public class ParseException extends RuntimeException {
     public ParseException(String message) {

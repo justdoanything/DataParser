@@ -1,4 +1,4 @@
-package dataparser.template;
+package data.template;
 
 public abstract class QueryTemplate extends CommonTemplate {
     protected String tableName;

@@ -1,4 +1,4 @@
-package dataparser.converter;
+package data.converter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TypeConverter {
-	
+
 	/*
 	 * VO -> Map
 	 */
@@ -16,7 +16,7 @@ public class TypeConverter {
 		if(obj == null) {
 			return Collections.emptyMap();
 		}
-		
+
 		Map<String, Object> convertMap = new HashMap<>();
 		Field[] fileds = obj.getClass().getDeclaredFields();
 		for(Field field : fileds) {
@@ -25,7 +25,7 @@ public class TypeConverter {
 		}
 		return convertMap;
 	}
-	
+
 	/*
 	 * Map -> VO
 	 */
@@ -33,20 +33,20 @@ public class TypeConverter {
 		if(type == null || map == null || map.isEmpty()) {
 			throw new NullPointerException("Parameter must be not null");
 		}
-		
+
 		T instance = type.getConstructor().newInstance();
 
 		for(Map.Entry<String, Object> entrySet : map.entrySet()) {
 			Field[] fields = type.getDeclaredFields();
-			
+
 			for(Field field : fields) {
 				field.setAccessible(true);
-				
+
 				String fieldName = field.getName();
-				
+
 				boolean isSameType = entrySet.getValue().getClass().equals(field.getType());
 				boolean isSameName = entrySet.getKey().equals(fieldName);
-				
+
 				if(isSameType && isSameName) {
 					field.set(instance, map.get(fieldName));
 				}
@@ -54,7 +54,7 @@ public class TypeConverter {
 		}
 		return instance;
 	}
-	
+
 	/*
 	 * List<VO> -> Map<String, Object>
 	 */
@@ -62,15 +62,15 @@ public class TypeConverter {
 		if(list == null || list.isEmpty()) {
 			return Collections.emptyList();
 		}
-		
+
 		List<Map<String, Object>> convertList = new ArrayList<>();
-		
+
 		for(Object obj : list) {
 			convertList.add(convertObjectToMap(obj));
 		}
 		return convertList;
 	}
-	
+
 	/*
 	 * Map<String, Object> -> List<VO>
 	 */
@@ -78,9 +78,9 @@ public class TypeConverter {
 		if(type == null || list == null || list.isEmpty()) {
 			throw new NullPointerException("Parameter must be not null");
 		}
-		
+
 		List<T> convertList = new ArrayList<>();
-		
+
 		for(Map<String, Object> map : list) {
 			convertList.add(convertMapToObject(map, type));
 		}

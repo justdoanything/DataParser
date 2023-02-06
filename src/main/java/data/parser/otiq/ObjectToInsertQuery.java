@@ -1,4 +1,4 @@
-package dataparser.parser;
+package data.parser.otiq;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

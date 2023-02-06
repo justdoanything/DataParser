@@ -1,4 +1,4 @@
-package dataparser.template;
+package data.template;
 
 public class FileTemplate extends CommonTemplate {
     protected String splitter;

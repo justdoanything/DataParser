@@ -1,4 +1,4 @@
-package dataparser.util;
+package data.util;
 
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -17,7 +17,7 @@ public class ExcelUtil {
 				msg = cell.getCellFormula();
 				break;
 			case NUMERIC:
-				msg = cell.getNumericCellValue() == (int) cell.getNumericCellValue() ? 
+				msg = cell.getNumericCellValue() == (int) cell.getNumericCellValue() ?
 						String.valueOf((int) cell.getNumericCellValue()) : String.valueOf(cell.getNumericCellValue());
 				break;
 			case STRING:
@@ -39,5 +39,5 @@ public class ExcelUtil {
 		}
 		return msg.trim();
 	}
-	
+
 }

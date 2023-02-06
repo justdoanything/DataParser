@@ -1,11 +1,11 @@
-package dataparser.util;
+package data.util;
 
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 
 public class DateUtil {
-	
+
 	/**
 	 * Return date like dateformat you want
 	 * @param dateformat

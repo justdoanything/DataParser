@@ -1,6 +1,6 @@
-package dataparser.msg;
+package data.constant;
 
-public class MsgCode {
+public class CommonConstant {
 	public static String MSG_VALUE_DATE_FORMAT = "yyyyMMddHHmmss";
 
 	public static String MSG_CODE_FIELD_NAME = "NAME";

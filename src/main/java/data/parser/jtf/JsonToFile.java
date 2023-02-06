@@ -1,4 +1,4 @@
-package dataparser.parser;
+package data.parser.jtf;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -13,7 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 import lombok.*;
-import dataparser.msg.MsgCode;
+import data.constant.CommonConstant;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -110,7 +110,7 @@ public class JsonToFile {
 				}
 			}
 			System.out.println();
-			bw.write(MsgCode.MSG_CODE_STRING_NEW_LINE);
+			bw.write(CommonConstant.MSG_CODE_STRING_NEW_LINE);
 
 			for (Object data : dataList) {
 				JSONObject json = new JSONObject(data.toString());

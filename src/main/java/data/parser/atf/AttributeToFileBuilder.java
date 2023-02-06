@@ -1,8 +1,9 @@
-package dataparser.parser;
+package data.parser.atf;
 
-import dataparser.msg.MsgCode;
-import dataparser.template.FileTemplate;
-import dataparser.util.FileUtil;
+import data.constant.CommonConstant;
+import data.exception.ParseException;
+import data.template.FileTemplate;
+import data.util.FileUtil;
 
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;
@@ -99,7 +100,7 @@ public class AttributeToFileBuilder extends FileTemplate {
         if(!this.isWriteFile && this.isOpenFile)
             throw new ParseException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
 
-        if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.splitter.equals(","))
+        if(FileUtil.getFileExtension(this.readFilePath).equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV) && !this.splitter.equals(","))
             throw new ParseException("A required value has an exception : csv file must be ','.");
     }
 }

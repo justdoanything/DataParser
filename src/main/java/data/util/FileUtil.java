@@ -1,4 +1,4 @@
-package dataparser.util;
+package data.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
 
-import dataparser.msg.MsgCode;
+import data.constant.CommonConstant;
 
 public class FileUtil {
 
@@ -18,7 +18,7 @@ public class FileUtil {
 	public static String getFileExtension(String filePath) {
 		File file = new File(filePath);
 		String fileName = file.getName();
-		String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf("."), fileName.length()) : MsgCode.MSG_CODE_STRING_BLANK;
+		String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf("."), fileName.length()) : CommonConstant.MSG_CODE_STRING_BLANK;
 		return fileExtension;
 	}
 
@@ -35,9 +35,9 @@ public class FileUtil {
 	public static String setDefaultWriteFilePath(String readFilePath) throws StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
 		//if do not set writeFilePath, this should be readFilePath_{dateformat}
 		String writeFilePath = "";
-		if(writeFilePath == null || writeFilePath.equals(MsgCode.MSG_CODE_STRING_BLANK)) {
+		if(writeFilePath == null || writeFilePath.equals(CommonConstant.MSG_CODE_STRING_BLANK)) {
 			String readFileName = FileUtil.getFileName(readFilePath);
-			String writeFileName = readFileName + "_" + DateUtil.getDate(MsgCode.MSG_VALUE_DATE_FORMAT, 0);
+			String writeFileName = readFileName + "_" + DateUtil.getDate(CommonConstant.MSG_VALUE_DATE_FORMAT, 0);
 
 			if(!FileUtil.getFileExtension(readFilePath).equals(""))
 				writeFileName += "." + FileUtil.getFileExtension(readFilePath);

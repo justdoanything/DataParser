@@ -1,13 +1,13 @@
-package dataparser.util;
+package data.util;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 
 public class CommonUtil {
-	
+
 	/**
-	 * Copy to Clipboard 
+	 * Copy to Clipboard
 	 * @param str
 	 */
 	public void copyClipboard(String str) {

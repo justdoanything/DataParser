@@ -1,8 +1,9 @@
-package dataparser.parser;
+package data.parser.ftiq;
 
-import dataparser.msg.MsgCode;
-import dataparser.template.QueryTemplate;
-import dataparser.util.FileUtil;
+import data.constant.CommonConstant;
+import data.exception.ParseException;
+import data.template.QueryTemplate;
+import data.util.FileUtil;
 
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;
@@ -103,7 +104,7 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
         if(!this.isWriteFile && this.isOpenFile)
             throw new ParseException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
 
-        if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
+        if(FileUtil.getFileExtension(this.readFilePath).equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV))
             throw new ParseException("A required value has an exception : csv file must be ','.");
     }
 }
