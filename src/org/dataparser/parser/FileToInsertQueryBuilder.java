@@ -1,43 +1,44 @@
-package org.dataparser.parser.builder;
+package org.dataparser.parser;
 
-import org.dataparser.parser.impl.AttributeToFile;
-import org.dataparser.parser.impl.FileToInsertQuery;
-import org.dataparser.parser.template.FileTemplate;
 import org.dataparser.parser.template.QueryTemplate;
 import org.dataparser.util.FileUtil;
 
 import java.nio.file.FileSystemException;
 
 public class FileToInsertQueryBuilder extends QueryTemplate {
-    public String getReadFilePath() {
+    protected String tableName;
+    protected int bulkInsertCnt;
+    protected boolean isBulkInsert;
+
+    protected String getReadFilePath() {
         return readFilePath;
     }
 
-    public String getWriteFilePath() {
+    protected String getWriteFilePath() {
         return writeFilePath;
     }
 
-    public boolean isWriteFile() {
+    protected boolean isWriteFile() {
         return isWriteFile;
     }
 
-    public boolean isOpenFile() {
+    protected boolean isOpenFile() {
         return isOpenFile;
     }
 
-    public boolean isGetString() {
+    protected boolean isGetString() {
         return isGetString;
     }
 
-    public String getTableName() {
+    protected String getTableName() {
         return tableName;
     }
 
-    public int getBulkInsertCnt() {
+    protected int getBulkInsertCnt() {
         return bulkInsertCnt;
     }
 
-    public boolean isBulkInsert() { return isBulkInsert; }
+    protected boolean isBulkInsert() { return isBulkInsert; }
 
     public FileToInsertQueryBuilder(String readFilePath, String tableName) {
         this.readFilePath = readFilePath;
@@ -61,11 +62,6 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
 
     public FileToInsertQueryBuilder isGetString(boolean isGetString){
         this.isGetString = isGetString;
-        return this;
-    }
-
-    public FileToInsertQueryBuilder tableName(String  tableName) {
-        this.tableName = tableName;
         return this;
     }
 

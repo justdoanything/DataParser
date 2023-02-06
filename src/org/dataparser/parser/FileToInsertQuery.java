@@ -1,4 +1,4 @@
-package org.dataparser.parser.impl;
+package org.dataparser.parser;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -14,19 +14,12 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-
-
-import lombok.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dataparser.msg.MsgCode;
-import org.dataparser.parser.CommonInterface;
-import org.dataparser.parser.builder.AttributeToFileBuilder;
-import org.dataparser.parser.builder.FileToInsertQueryBuilder;
-import org.dataparser.parser.template.FileTemplate;
 import org.dataparser.parser.template.QueryTemplate;
 import org.dataparser.util.ExcelUtil;
 import org.dataparser.util.FileUtil;
@@ -50,11 +43,9 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 	}
 
 	@Override
-	public String parse() throws Exception, NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
+	public String parse() throws NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		String resultString = "";
 		String readFileExtension = FileUtil.getFileExtension(readFilePath);
-
-		this.validRequiredValues();
 
 		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
 				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)

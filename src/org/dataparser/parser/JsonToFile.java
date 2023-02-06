@@ -1,4 +1,4 @@
-package org.dataparser.parser.impl;
+package org.dataparser.parser;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;

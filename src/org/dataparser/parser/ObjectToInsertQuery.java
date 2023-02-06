@@ -1,4 +1,4 @@
-package org.dataparser.parser.impl;
+package org.dataparser.parser;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
