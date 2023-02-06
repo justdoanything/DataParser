@@ -1,4 +1,4 @@
-package org.dataparser.parser;
+package dataparser.parser;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -13,7 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 import lombok.*;
-import org.dataparser.msg.MsgCode;
+import dataparser.msg.MsgCode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

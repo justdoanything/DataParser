@@ -1,8 +1,10 @@
-package org.dataparser.parser;
+package dataparser.parser;
 
-import org.dataparser.parser.template.QueryTemplate;
-import org.dataparser.util.FileUtil;
+import dataparser.msg.MsgCode;
+import dataparser.template.QueryTemplate;
+import dataparser.util.FileUtil;
 
+import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;
 
 public class FileToInsertQueryBuilder extends QueryTemplate {
@@ -80,6 +82,29 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
             writeFilePath = FileUtil.setDefaultWriteFilePath(readFilePath);
         }
         return new FileToInsertQuery(this);
+    }
+
+    private void filtering() throws FileNotFoundException, FileSystemException {
+        if(!FileUtil.isFileExist(this.readFilePath))
+            throw new FileNotFoundException("There is no file in " + this.readFilePath);
+
+        if(this.isWriteFile && (this.writeFilePath == null || this.writeFilePath.length() == 0))
+            this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
+
+        if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.tableName == null)
+            throw new NullPointerException("A required value has an exception : all of values cannot be null");
+
+        if(this.tableName.length() < 1)
+            throw new NullPointerException("A required value has an exception : tableName must be set.");
+
+        if(!this.isWriteFile && !this.isGetString)
+            throw new ParseException("A required value has an exception : Either isWriteFile or isGetString must be true.");
+
+        if(!this.isWriteFile && this.isOpenFile)
+            throw new ParseException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
+
+        if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV))
+            throw new ParseException("A required value has an exception : csv file must be ','.");
     }
 }
 

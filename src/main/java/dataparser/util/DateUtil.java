@@ -1,4 +1,4 @@
-package org.dataparser.util;
+package dataparser.util;
 
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;

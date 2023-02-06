@@ -1,4 +1,4 @@
-package org.dataparser.parser;
+package dataparser.parser;
 
 public class CheckingJson {
 

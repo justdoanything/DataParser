@@ -1,4 +1,4 @@
-package org.dataparser.util;
+package dataparser.util;
 
 import org.apache.poi.ss.usermodel.Cell;
 

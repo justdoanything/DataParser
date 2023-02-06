@@ -1,4 +1,4 @@
-package org.dataparser.util;
+package dataparser.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
 
-import org.dataparser.msg.MsgCode;
+import dataparser.msg.MsgCode;
 
 public class FileUtil {
 

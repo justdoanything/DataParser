@@ -1,4 +1,4 @@
-package org.dataparser.converter;
+package dataparser.converter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

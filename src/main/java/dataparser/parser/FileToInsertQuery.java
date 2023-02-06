@@ -1,4 +1,4 @@
-package org.dataparser.parser;
+package dataparser.parser;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -9,20 +9,20 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import dataparser.template.CommonInterface;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.dataparser.msg.MsgCode;
-import org.dataparser.parser.template.QueryTemplate;
-import org.dataparser.util.ExcelUtil;
-import org.dataparser.util.FileUtil;
+import dataparser.msg.MsgCode;
+import dataparser.template.QueryTemplate;
+import dataparser.util.ExcelUtil;
+import dataparser.util.FileUtil;
 
 public class FileToInsertQuery extends QueryTemplate implements CommonInterface {
 	public FileToInsertQuery(FileToInsertQueryBuilder builder) {
@@ -58,38 +58,6 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
 		}
 		return resultString;
-	}
-
-	/**
-	 * Valid required private values
-	 * @throws Exception
-	 * @throws NullPointerException
-	 * @throws FileNotFoundException
-	 * @throws StringIndexOutOfBoundsException
-	 * @throws DateTimeParseException
-	 * @throws FileSystemException
-	 */
-	private void validRequiredValues() throws Exception, NullPointerException, FileNotFoundException, StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
-		if(!FileUtil.isFileExist(this.readFilePath))
-			throw new FileNotFoundException("There is no file in " + this.readFilePath);
-
-		if(this.isWriteFile && (this.writeFilePath == null || this.writeFilePath.length() == 0))
-			this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
-
-		if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.spliter == null || this.tableName == null)
-			throw new NullPointerException("A required value has an exception : all of values cannot be null");
-
-		if(this.tableName.length() < 1)
-			throw new NullPointerException("A required value has an exception : tableName must be set.");
-
-		if(!this.isWriteFile && !this.isGetString)
-			throw new Exception("A required value has an exception : Either isWriteFile or isGetString must be true.");
-
-		if(!this.isWriteFile && this.isOpenFile)
-			throw new Exception("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
-
-		if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
-			throw new Exception("A required value has an exception : csv file must be ','.");
 	}
 
 	/**

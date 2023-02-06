@@ -1,4 +1,4 @@
-package org.dataparser.util;
+package dataparser.util;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;

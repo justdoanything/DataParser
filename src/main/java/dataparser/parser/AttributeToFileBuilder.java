@@ -1,7 +1,8 @@
-package org.dataparser.parser;
+package dataparser.parser;
 
-import org.dataparser.msg.MsgCode;
-import org.dataparser.util.FileUtil;
+import dataparser.msg.MsgCode;
+import dataparser.template.FileTemplate;
+import dataparser.util.FileUtil;
 
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;
@@ -89,7 +90,7 @@ public class AttributeToFileBuilder extends FileTemplate {
         if(this.startWithLine < 0)
             throw new ParseException("A required value has an exception : startWithLine should be over 0.");
 
-        if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.spliter == null || this.codeMap == null)
+        if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.splitter == null || this.codeMap == null)
             throw new NullPointerException("A required value has an exception : All of values cannot be null.");
 
         if(!this.isWriteFile && !this.isGetString)
@@ -98,7 +99,7 @@ public class AttributeToFileBuilder extends FileTemplate {
         if(!this.isWriteFile && this.isOpenFile)
             throw new ParseException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
 
-        if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.spliter.equals(","))
+        if(FileUtil.getFileExtension(this.readFilePath).equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV) && !this.splitter.equals(","))
             throw new ParseException("A required value has an exception : csv file must be ','.");
     }
 }

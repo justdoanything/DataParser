@@ -1,16 +1,20 @@
-package org.dataparser.parser;
+package dataparser.parser;
 
+import dataparser.template.CommonInterface;
+import dataparser.template.FileTemplate;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.dataparser.msg.MsgCode;
-import org.dataparser.util.ExcelUtil;
-import org.dataparser.util.FileUtil;
+import dataparser.msg.MsgCode;
+import dataparser.util.ExcelUtil;
+import dataparser.util.FileUtil;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -49,8 +53,6 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 		} else {
 			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
 		}
-
-		this.validRequiredValues();
 
 		if(readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_CSV)
 				|| readFileExtension.equals(MsgCode.MSG_CODE_FILE_EXTENSION_TXT)
