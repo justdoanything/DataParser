@@ -13,7 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import data.template.CommonInterface;
+import data.template.inf.CommonInterface;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,7 +24,14 @@ import data.template.QueryTemplate;
 import data.util.ExcelUtil;
 import data.util.FileUtil;
 
+import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
+import static data.constant.FileConstant.FILE_EXTENSION_CSV;
+import static data.constant.FileConstant.FILE_EXTENSION_TXT;
+import static data.constant.FileConstant.FILE_EXTENSION_XLS;
+import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
+
 public class FileToInsertQuery extends QueryTemplate implements CommonInterface {
+
 	public FileToInsertQuery(FileToInsertQueryBuilder builder) {
 		this.readFilePath = builder.getReadFilePath();
 		this.writeFilePath = builder.getWriteFilePath();
@@ -38,26 +45,34 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 	}
 
 	@Override
-	public boolean filtering() {
-		return false;
+	public String parse() throws FileNotFoundException {
+		String resultString;
+		String readFileExtension = FileUtil.getFileExtension(readFilePath).toLowerCase();
+
+		switch (readFileExtension) {
+			case FILE_EXTENSION_TXT:
+			case FILE_EXTENSION_BLANK:
+			case FILE_EXTENSION_CSV:
+				resultString = parseTextFile();
+				break;
+			case FILE_EXTENSION_XLS:
+			case FILE_EXTENSION_XLSX:
+				resultString = parseExcelFile();
+				break;
+			default:
+				throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
+		}
+		return resultString;
 	}
 
 	@Override
-	public String parse() throws NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException, IOException {
-		String resultString = "";
-		String readFileExtension = FileUtil.getFileExtension(readFilePath);
+	protected String parseTextFile() {
+		return null;
+	}
 
-		if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_TXT)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_STRING_BLANK)){
-			resultString = this.parseTextType(readFileExtension);
-		} else if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLS)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLSX)){
-			resultString = this.parseExcelType(readFileExtension);
-		} else {
-			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
-		}
-		return resultString;
+	@Override
+	protected String parseExcelFile() {
+		return null;
 	}
 
 	/**

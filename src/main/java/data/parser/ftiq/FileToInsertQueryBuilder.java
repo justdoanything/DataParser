@@ -8,10 +8,9 @@ import data.util.FileUtil;
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;
 
+import static data.constant.FileConstant.FILE_EXTENSION_CSV;
+
 public class FileToInsertQueryBuilder extends QueryTemplate {
-    protected String tableName;
-    protected int bulkInsertCnt;
-    protected boolean isBulkInsert;
 
     protected String getReadFilePath() {
         return readFilePath;
@@ -104,7 +103,7 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
         if(!this.isWriteFile && this.isOpenFile)
             throw new ParseException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
 
-        if(FileUtil.getFileExtension(this.readFilePath).equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV))
+        if(FileUtil.getFileExtension(this.readFilePath).equals(FILE_EXTENSION_CSV))
             throw new ParseException("A required value has an exception : csv file must be ','.");
     }
 }

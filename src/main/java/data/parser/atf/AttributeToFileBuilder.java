@@ -1,6 +1,5 @@
 package data.parser.atf;
 
-import data.constant.CommonConstant;
 import data.exception.ParseException;
 import data.template.FileTemplate;
 import data.util.FileUtil;
@@ -8,7 +7,10 @@ import data.util.FileUtil;
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;
 
+import static data.constant.FileConstant.FILE_EXTENSION_CSV;
+
 public class AttributeToFileBuilder extends FileTemplate {
+
     String getReadFilePath() {
         return readFilePath;
     }
@@ -56,12 +58,12 @@ public class AttributeToFileBuilder extends FileTemplate {
         return this;
     }
 
-    public AttributeToFileBuilder isGetString(boolean isGetString){
+    public AttributeToFileBuilder isGetString(boolean isGetString) {
         this.isGetString = isGetString;
         return this;
     }
 
-    public AttributeToFileBuilder splitter(String  splitter) {
+    public AttributeToFileBuilder splitter(String splitter) {
         this.splitter = splitter;
         return this;
     }
@@ -72,7 +74,7 @@ public class AttributeToFileBuilder extends FileTemplate {
     }
 
     public AttributeToFile build() throws FileSystemException, FileNotFoundException {
-        if(writeFilePath == null || writeFilePath.length() < 1){
+        if (writeFilePath == null || writeFilePath.length() < 1) {
             writeFilePath = FileUtil.setDefaultWriteFilePath(readFilePath);
         }
 
@@ -82,25 +84,25 @@ public class AttributeToFileBuilder extends FileTemplate {
     }
 
     private void filtering() throws FileNotFoundException, FileSystemException {
-        if(!FileUtil.isFileExist(this.readFilePath))
+        if (!FileUtil.isFileExist(this.readFilePath))
             throw new FileNotFoundException("There is no file in " + this.readFilePath);
 
-        if(this.isWriteFile && (this.writeFilePath == null || this.writeFilePath.length() == 0))
+        if (this.isWriteFile && (this.writeFilePath == null || this.writeFilePath.length() == 0))
             this.writeFilePath = FileUtil.setDefaultWriteFilePath(this.readFilePath);
 
-        if(this.startWithLine < 0)
+        if (this.startWithLine < 0)
             throw new ParseException("A required value has an exception : startWithLine should be over 0.");
 
-        if(this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.splitter == null || this.codeMap == null)
+        if (this.readFilePath == null || (this.isWriteFile && this.writeFilePath == null) || this.splitter == null || this.codeMap == null)
             throw new NullPointerException("A required value has an exception : All of values cannot be null.");
 
-        if(!this.isWriteFile && !this.isGetString)
+        if (!this.isWriteFile && !this.isGetString)
             throw new ParseException("A required value has an exception : Either isWriteFile or isGetString must be true.");
 
-        if(!this.isWriteFile && this.isOpenFile)
+        if (!this.isWriteFile && this.isOpenFile)
             throw new ParseException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
 
-        if(FileUtil.getFileExtension(this.readFilePath).equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV) && !this.splitter.equals(","))
+        if (FileUtil.getFileExtension(this.readFilePath).equals(FILE_EXTENSION_CSV) && !this.splitter.equals(","))
             throw new ParseException("A required value has an exception : csv file must be ','.");
     }
 }

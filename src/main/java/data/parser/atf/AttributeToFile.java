@@ -1,6 +1,6 @@
 package data.parser.atf;
 
-import data.template.CommonInterface;
+import data.template.inf.CommonInterface;
 import data.template.FileTemplate;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -27,6 +27,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
+import static data.constant.FileConstant.FILE_EXTENSION_CSV;
+import static data.constant.FileConstant.FILE_EXTENSION_TXT;
+import static data.constant.FileConstant.FILE_EXTENSION_XLS;
+import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
+
 public class AttributeToFile extends FileTemplate implements CommonInterface {
 
 	public AttributeToFile(AttributeToFileBuilder builder) {
@@ -41,40 +47,36 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 	}
 
 	@Override
-	public String parse() throws NullPointerException, StringIndexOutOfBoundsException, DateTimeParseException {
-		String resultString = "";
-		String readFileExtension = FileUtil.getFileExtension(readFilePath);
+	public String parse() throws FileNotFoundException {
+		String resultString;
+		String readFileExtension = FileUtil.getFileExtension(readFilePath).toLowerCase();
 
-		if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_TXT)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_STRING_BLANK)){
-		} else if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLS)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLSX)){
-		} else {
-			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
-		}
-
-		if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_CSV)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_TXT)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_STRING_BLANK)){
-			resultString = this.parseTextType(readFileExtension);
-		} else if(readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLS)
-				|| readFileExtension.equals(CommonConstant.MSG_CODE_FILE_EXTENSION_XLSX)){
-			resultString = this.parseExcelType(readFileExtension);
-		} else {
-			throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
+		switch (readFileExtension) {
+			case FILE_EXTENSION_TXT:
+			case FILE_EXTENSION_BLANK:
+			case FILE_EXTENSION_CSV:
+				resultString = parseTextFile();
+				break;
+			case FILE_EXTENSION_XLS:
+			case FILE_EXTENSION_XLSX:
+				resultString = parseExcelFile();
+				break;
+			default:
+				throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
 		}
 		return resultString;
 	}
 
-	/**
-	 * Parse text file (.txt, .csv)
-	 * @param readFileExtension
-	 * @return
-	 * @throws StringIndexOutOfBoundsException
-	 * @throws DateTimeParseException
-	 * @throws IOException
-	 */
+	@Override
+	protected String parseTextFile() {
+		return null;
+	}
+
+	@Override
+	protected String parseExcelFile() {
+		return null;
+	}
+
 	private String parseTextType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		StringBuilder resultString = new StringBuilder();
@@ -95,7 +97,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 					continue;
 				}
 
-				lineArray = line.split("\\" + this.spliter);
+				lineArray = line.split("\\" + this.splitter);
 				entityName = lineArray.length == 0 ? CommonConstant.MSG_CODE_STRING_SPACE : lineArray[0].trim();
 				attributeName = lineArray.length == 1 ? CommonConstant.MSG_CODE_STRING_SPACE : lineArray[1].trim();
 				attributeValue = lineArray.length == 2 ? CommonConstant.MSG_CODE_STRING_SPACE : lineArray[2].trim();
@@ -115,15 +117,15 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 			}
 
 			// Write attribute in first line
-			if(this.isWriteFile) bw.write(CommonConstant.MSG_CODE_FIELD_NAME + this.spliter);
-			if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_FIELD_NAME).append(this.spliter);
+			if(this.isWriteFile) bw.write(CommonConstant.MSG_CODE_FIELD_NAME + this.splitter);
+			if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_FIELD_NAME).append(this.splitter);
 			List<String> attributeList = new ArrayList<>();
 			for(String entity : entityList) {
 				for(String attribute : (resultMap.get(entity)).keySet()) {
 					if(!attributeList.contains(attribute)) {
 						attributeList.add(attribute);
-						if(this.isWriteFile) { bw.write(attribute); bw.write(this.spliter); bw.flush(); }
-						if(this.isGetString) resultString.append(attribute).append(this.spliter);
+						if(this.isWriteFile) { bw.write(attribute); bw.write(this.splitter); bw.flush(); }
+						if(this.isGetString) resultString.append(attribute).append(this.splitter);
 					}
 				}
 			}
@@ -132,15 +134,15 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
 			// Write Attribute value as attribute and name
 			for(String entity : entityList) {
-				if(this.isWriteFile) { bw.write(entity); bw.write(this.spliter); }
-				if(this.isGetString) resultString.append(entity).append(this.spliter);
+				if(this.isWriteFile) { bw.write(entity); bw.write(this.splitter); }
+				if(this.isGetString) resultString.append(entity).append(this.splitter);
 				for(String attribute : attributeList) {
 					if((resultMap.get(entity)).containsKey(attribute)) {
-						if(this.isWriteFile) { bw.write(resultMap.get(entity).get(attribute)); bw.write(this.spliter); bw.flush(); }
-						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(this.spliter);
+						if(this.isWriteFile) { bw.write(resultMap.get(entity).get(attribute)); bw.write(this.splitter); bw.flush(); }
+						if(this.isGetString) resultString.append(resultMap.get(entity).get(attribute)).append(this.splitter);
 					} else {
-						if(this.isWriteFile) { bw.write(CommonConstant.MSG_CODE_STRING_BLANK); bw.write(this.spliter); bw.flush(); }
-						if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_STRING_BLANK).append(this.spliter);
+						if(this.isWriteFile) { bw.write(CommonConstant.MSG_CODE_STRING_BLANK); bw.write(this.splitter); bw.flush(); }
+						if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_STRING_BLANK).append(this.splitter);
 					}
 				}
 
@@ -164,22 +166,14 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 		return resultString.toString();
 	}
 
-	/**
-	 * Parse excel file (.xlsx, .xls)
-	 * @param readFileExtension
-	 * @return
-	 * @throws StringIndexOutOfBoundsException
-	 * @throws DateTimeParseException
-	 * @throws IOException
-	 */
-	private String parseExcelType(String readFileExtension) throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
+	private String parseTextType() throws StringIndexOutOfBoundsException, DateTimeParseException, IOException {
 		Map<String, Map<String, String>> resultMap = new HashMap<>();
 		StringBuilder resultString = new StringBuilder();
 		Workbook workbook = null;
 
 		try (FileInputStream fis = new FileInputStream(this.readFilePath);) {
-			// spliter of xls, xlsx should be \t
-			this.spliter = CommonConstant.MSG_CODE_STRING_TAB;
+			// splitter of xls, xlsx should be \t
+			this.splitter = CommonConstant.MSG_CODE_STRING_TAB;
 
 			// Set FileInputStream and Open file
 
@@ -223,7 +217,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 			int cellIndex = 0;
 			Sheet resultSheet = workbook.createSheet(CommonConstant.MSG_CODE_RESULT_SHEET_NAME);
 			row = resultSheet.createRow(rowIndex++);
-			if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_FIELD_NAME).append(this.spliter);
+			if(this.isGetString) resultString.append(CommonConstant.MSG_CODE_FIELD_NAME).append(this.splitter);
 			if(this.isWriteFile) row.createCell(cellIndex++).setCellValue(CommonConstant.MSG_CODE_FIELD_NAME);
 			for(String entity : entityList) {
 				for(String attribute : (resultMap.get(entity)).keySet()) {

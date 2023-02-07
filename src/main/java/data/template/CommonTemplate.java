@@ -17,4 +17,7 @@ public abstract class CommonTemplate {
 		}
 		codeMap.get(name).put(code, value);
     }
+
+    protected abstract String parseTextFile();
+    protected abstract String parseExcelFile();
 }
