@@ -8,6 +8,8 @@ import java.time.format.DateTimeParseException;
 
 import data.constant.CommonConstant;
 
+import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
+
 public class FileUtil {
 
 	public static boolean isFileExist(String filePath) {
@@ -18,7 +20,7 @@ public class FileUtil {
 	public static String getFileExtension(String filePath) {
 		File file = new File(filePath);
 		String fileName = file.getName();
-		String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf("."), fileName.length()) : CommonConstant.MSG_CODE_STRING_BLANK;
+		String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf("."), fileName.length()) : FILE_EXTENSION_BLANK;
 		return fileExtension;
 	}
 
@@ -35,7 +37,7 @@ public class FileUtil {
 	public static String setDefaultWriteFilePath(String readFilePath) throws StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
 		//if do not set writeFilePath, this should be readFilePath_{dateformat}
 		String writeFilePath = "";
-		if(writeFilePath == null || writeFilePath.equals(CommonConstant.MSG_CODE_STRING_BLANK)) {
+		if(writeFilePath == null || writeFilePath.equals(FILE_EXTENSION_BLANK)) {
 			String readFileName = FileUtil.getFileName(readFilePath);
 			String writeFileName = readFileName + "_" + DateUtil.getDate(CommonConstant.MSG_VALUE_DATE_FORMAT, 0);
 

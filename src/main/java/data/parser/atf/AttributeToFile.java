@@ -289,14 +289,4 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 		// Put blank " " if the attribute value is empty.
 		resultMap.get(entityName).put(attributeName,  attributeValue.equals(CommonConstant.MSG_CODE_STRING_SPACE) ? CommonConstant.MSG_CODE_STRING_SPACE : attributeValue);
 	}
-
-	/**
-	 * Change an attribute value if there is mapped code
-	 * @param attributeName
-	 * @param attributeValue
-	 * @return
-	 */
-	private String changeCodeValue(String attributeName, String attributeValue) {
-		return codeMap.get(attributeName).get(attributeValue) != null ? codeMap.get(attributeName).get(attributeValue) : attributeValue;
-	}
 }
