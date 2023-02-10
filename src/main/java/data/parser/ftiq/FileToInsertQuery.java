@@ -78,6 +78,11 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 			boolean isFirst = true;
 			int index = 0;
 			while ((line = br.readLine()) != null) {
+				if(startWithLine != 0){
+					startWithLine -= 1;
+					continue;
+				}
+
 				if(isBulkInsert) {
 					if(isFirst) {
 						line = line.replace(splitter, ", ");
@@ -108,6 +113,10 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 					}
 				}
 			}
+
+			if(startWithLine != 0)
+				throw new ParseException("startWithLine over than the row there is in file.");
+
 			if(isBulkInsert)
 				queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
 

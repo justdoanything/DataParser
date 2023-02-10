@@ -1,5 +1,6 @@
 package data.parser.ftiq;
 
+import data.parser.atf.AttributeToFileBuilder;
 import data.template.QueryTemplate;
 
 import java.io.FileNotFoundException;
@@ -25,6 +26,14 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
 
     protected boolean isGetString() {
         return isGetString;
+    }
+
+    String getSplitter() {
+        return splitter;
+    }
+
+    int getStartWithLine() {
+        return startWithLine;
     }
 
     protected String getTableName() {
@@ -59,6 +68,16 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
 
     public FileToInsertQueryBuilder isGetString(boolean isGetString){
         this.isGetString = isGetString;
+        return this;
+    }
+
+    public FileToInsertQueryBuilder splitter(String splitter) {
+        this.splitter = splitter;
+        return this;
+    }
+
+    public FileToInsertQueryBuilder startWithLine(int startWithLine) {
+        this.startWithLine = startWithLine;
         return this;
     }
 
