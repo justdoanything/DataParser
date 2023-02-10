@@ -37,7 +37,7 @@ public class FileUtil {
 		String writeFilePath = "";
 		if(writeFilePath == null || writeFilePath.equals(FILE_EXTENSION_BLANK)) {
 			String readFileName = FileUtil.getFileName(readFilePath);
-			String writeFileName = readFileName + "_" + DateUtil.getDate(CommonConstant.MSG_VALUE_DATE_FORMAT, 0);
+			String writeFileName = readFileName + "_" + DateUtil.getDate("yyyyMMddHHmmss", 0);
 
 			if(!FileUtil.getFileExtension(readFilePath).equals(""))
 				writeFileName += "." + FileUtil.getFileExtension(readFilePath);
