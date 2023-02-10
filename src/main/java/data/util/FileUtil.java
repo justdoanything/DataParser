@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
 
-import data.constant.CommonConstant;
-
 import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
 
 public class FileUtil {

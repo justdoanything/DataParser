@@ -13,13 +13,13 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import data.exception.ParseException;
 import data.template.inf.CommonInterface;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import data.constant.CommonConstant;
 import data.template.QueryTemplate;
 import data.util.ExcelUtil;
 import data.util.FileUtil;
@@ -60,7 +60,7 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 				resultString = parseExcelFile();
 				break;
 			default:
-				throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
+				throw new ParseException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
 		}
 		return resultString;
 	}

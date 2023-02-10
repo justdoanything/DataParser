@@ -13,7 +13,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 import lombok.*;
-import data.constant.CommonConstant;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

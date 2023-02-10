@@ -43,7 +43,7 @@ public class QueryTemplate extends CommonTemplate {
         if (bulkInsertCnt < 10)
             throw new ParseException("A required value has an exception : bulkInsertCnt should be over 10.");
 
-        if(tableName.length() < 1)
+        if (tableName.length() < 1)
             throw new ParseException("A required value has an exception : tableName must be set.");
 
         if (FileUtil.getFileExtension(readFilePath).equals(FILE_EXTENSION_CSV) && !splitter.equals(","))

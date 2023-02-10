@@ -1,5 +1,6 @@
 package data.parser.atf;
 
+import data.exception.ParseException;
 import data.template.inf.CommonInterface;
 import data.template.FileTemplate;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -7,7 +8,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import data.constant.CommonConstant;
 import data.util.ExcelUtil;
 import data.util.FileUtil;
 
@@ -62,14 +62,52 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 				resultString = parseExcelFile();
 				break;
 			default:
-				throw new FileNotFoundException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
+				throw new ParseException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
 		}
 		return resultString;
 	}
 
 	@Override
 	protected String parseTextFile() {
-		return null;
+		Map<String, Map<String, String>> resultMap = new HashMap<>();
+		StringBuilder resultString = new StringBuilder();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(readFilePath));
+			 BufferedWriter bw = this.isWriteFile ? new BufferedWriter(new FileWriter(writeFilePath)) : null;) {
+
+			String line;
+			String[] lineArray;
+			String entityName, attributeName, attributeValue;
+			while ((line = br.readLine()) != null){
+				if(startWithLine != 0){
+					startWithLine -= 1;
+					continue;
+				}
+
+				lineArray = line.split("\\" + splitter);
+				entityName = lineArray.length == 0 ? " " : lineArray[0].trim();
+				attributeName = lineArray.length == 1 ? " " : lineArray[1].trim();
+				attributeValue = lineArray.length == 2 ? " " : lineArray[2].trim();
+
+				createResultMap(resultMap, entityName, attributeName, attributeValue);
+			}
+
+			if(startWithLine != 0)
+				throw new ParseException("startWithLine over than the row there is in file.");
+
+			List<String> entityList = new ArrayList<>();
+			for(String entity : resultMap.keySet()) {
+				if(!entityList.contains(entity))
+					entityList.add(entity);
+			}
+
+
+
+		}catch (Exception e) {
+			throw new ParseException(e.getMessage());
+		}
+
+		return resultString.toString();
 	}
 
 	@Override
@@ -270,23 +308,5 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 			if(workbook != null) try { workbook.close(); } catch(IOException e) {throw new IOException(e);}
 		}
 		return resultString.toString();
-	}
-
-	/**
-	 * Put lines in file to resultMap
-	 * @param resultMap
-	 * @param entityName
-	 * @param attributeName
-	 * @param attributeValue
-	 */
-	private void createResultMap(Map<String, Map<String, String>> resultMap, String entityName, String attributeName, String attributeValue) {
-		if(!resultMap.containsKey(entityName))
-			resultMap.put(entityName, new HashMap<String, String>());
-
-		// Change value if there is code in codeMap
-		if(attributeValue != null && codeMap.containsKey(attributeName))
-			attributeValue = this.changeCodeValue(attributeName, attributeValue);
-		// Put blank " " if the attribute value is empty.
-		resultMap.get(entityName).put(attributeName,  attributeValue.equals(CommonConstant.MSG_CODE_STRING_SPACE) ? CommonConstant.MSG_CODE_STRING_SPACE : attributeValue);
 	}
 }

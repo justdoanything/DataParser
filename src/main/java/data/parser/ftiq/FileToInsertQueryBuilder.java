@@ -1,14 +1,9 @@
 package data.parser.ftiq;
 
-import data.constant.CommonConstant;
-import data.exception.ParseException;
 import data.template.QueryTemplate;
-import data.util.FileUtil;
 
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;
-
-import static data.constant.FileConstant.FILE_EXTENSION_CSV;
 
 public class FileToInsertQueryBuilder extends QueryTemplate {
 
