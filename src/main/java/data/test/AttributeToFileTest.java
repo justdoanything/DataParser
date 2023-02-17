@@ -8,7 +8,7 @@ import data.parser.ftiq.FileToInsertQueryBuilder;
 public class AttributeToFileTest {
 
   public static void main(String[] args) throws Exception {
-    AttributeToFile atf = new AttributeToFileBuilder("")
+    AttributeToFile atf = AttributeToFile.builder("")
                                         .writeFilePath("")
                                         .isWriteFile(true)
                                         .isOpenFile(true)
@@ -19,7 +19,7 @@ public class AttributeToFileTest {
     atf.addCodeMap("name", "code", "value");
     atf.parse();
 
-    FileToInsertQuery ftiq = new FileToInsertQueryBuilder("", "")
+    FileToInsertQuery ftiq = FileToInsertQuery.builder("", "")
                                       .writeFilePath("")
                                       .isWriteFile(true)
                                       .isOpenFile(true)

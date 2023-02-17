@@ -36,6 +36,10 @@ import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
 
 public class AttributeToFile extends FileTemplate implements CommonInterface {
 
+	public static AttributeToFileBuilder builder(String readFilePath) {
+		return new AttributeToFileBuilder(readFilePath);
+	}
+
 	public AttributeToFile(AttributeToFileBuilder builder) {
 		this.readFilePath = builder.getReadFilePath();
 		this.writeFilePath = builder.getWriteFilePath();

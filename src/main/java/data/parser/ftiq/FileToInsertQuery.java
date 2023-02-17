@@ -32,6 +32,10 @@ import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
 
 public class FileToInsertQuery extends QueryTemplate implements CommonInterface {
 
+	public static FileToInsertQueryBuilder builder(String readFilePath, String tableName) {
+		return new FileToInsertQueryBuilder(readFilePath, tableName);
+	}
+
 	public FileToInsertQuery(FileToInsertQueryBuilder builder) {
 		this.readFilePath = builder.getReadFilePath();
 		this.writeFilePath = builder.getWriteFilePath();
