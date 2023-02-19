@@ -1,6 +1,7 @@
 package data.parser.atf;
 
 import data.exception.ParseException;
+import data.factory.FileTask;
 import data.template.inf.CommonInterface;
 import data.template.FileTemplate;
 import data.util.DateUtil;
@@ -36,10 +37,9 @@ import static data.constant.FileConstant.FILE_EXTENSION_XLS;
 import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
 
 public class AttributeToFile extends FileTemplate implements CommonInterface {
-
 	private final Map<String, Map<String, String>> resultMap;
-	private List<String> entityList;
-	private final List<String> attributeList;
+	private java.util.List<String> entityList;
+	private final java.util.List<String> attributeList;
 	private final List<String> valueList;
 
 	public static AttributeToFileBuilder builder(String readFilePath) {
@@ -71,10 +71,12 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 			case FILE_EXTENSION_TXT:
 			case FILE_EXTENSION_BLANK:
 			case FILE_EXTENSION_CSV:
+				preTextTask();
 				resultString = parseTextFile();
 				break;
 			case FILE_EXTENSION_XLS:
 			case FILE_EXTENSION_XLSX:
+				preExcelTask();
 				resultString = parseExcelFile();
 				break;
 			default:
@@ -84,13 +86,15 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 	}
 
 	@Override
-	protected String parseTextFile() {
+	public String parseTextFile() {
 		preTextTask();
-		handleTextTask();
-		return doTextTask();
+		FileTask ft = new FileTask();
+//		handleTextTask();
+//		return doTextTask();
+		return "";
 	}
 
-	protected void preTextTask() {
+	private void preTextTask() {
 		try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))){
 			String line;
 			String[] lineArray;
@@ -101,7 +105,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 					continue;
 				}
 
-				lineArray = line.split("\\" + splitter);
+				lineArray = line.split("\\\\" + splitter);
 				entityName = lineArray.length == 0 ? " " : lineArray[0].trim();
 				attributeName = lineArray.length == 1 ? " " : lineArray[1].trim();
 				attributeValue = lineArray.length == 2 ? " " : lineArray[2].trim();
@@ -116,74 +120,8 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 		}
 	}
 
-	protected void handleTextTask() {
-		for(String entity : resultMap.keySet()) {
-			if(!entityList.contains(entity))
-				entityList.add(entity);
+	private void preExcelTask() {
 
-			for(String attribute : (resultMap.get(entity)).keySet()) {
-				if(!attributeList.contains(attribute)) {
-					attributeList.add(attribute);
-				}
-				if((resultMap.get(entity)).containsKey(attribute)) {
-					valueList.add(resultMap.get(entity).get(attribute));
-				} else {
-					valueList.add("");
-				}
-			}
-		}
-	}
-
-	protected String doTextTask() {
-		String resultString = null;
-		if(isWriteFile)
-			writeResultFile();
-		if(isGetString)
-			resultString = writeResultString();
-		return resultString;
-	}
-
-	protected void writeResultFile() {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath))) {
-			for(String attribute : attributeList){
-				bw.write(attribute); bw.write(splitter); bw.flush();
-			}
-
-			bw.flush();
-			bw.write("\r\n");
-
-			for (String entity : entityList) {
-				bw.write(entity);
-				bw.write(splitter);
-				for(String value : valueList){
-					bw.write(value);
-					bw.write(splitter);
-				}
-				bw.flush();
-				bw.write("\r\n");
-			}
-
-			if(isOpenFile) Desktop.getDesktop().edit(new File(writeFilePath));
-		}catch (Exception e) {
-			throw new ParseException(e.getMessage());
-		}
-	}
-
-	protected String writeResultString() {
-		StringBuilder resultString = new StringBuilder();
-		for(String attribute : attributeList){
-			resultString.append(attribute).append(splitter);
-		}
-		resultString.append("\r\n");
-
-		for (String entity : entityList) {
-			resultString.append(entity).append(splitter);
-			for(String value : valueList){
-				resultString.append(value).append(splitter);
-			}
-			resultString.append("\r\n");
-		}
-		return resultString.toString();
 	}
 
 	@Override
