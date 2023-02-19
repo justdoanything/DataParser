@@ -11,31 +11,31 @@ import static data.constant.FileConstant.FILE_EXTENSION_CSV;
 
 public class AttributeToFileBuilder extends FileTemplate {
 
-    String getReadFilePath() {
+    protected String getReadFilePath() {
         return readFilePath;
     }
 
-    String getWriteFilePath() {
+    protected String getWriteFilePath() {
         return writeFilePath;
     }
 
-    boolean isWriteFile() {
+    protected boolean isWriteFile() {
         return isWriteFile;
     }
 
-    boolean isOpenFile() {
+    protected boolean isOpenFile() {
         return isOpenFile;
     }
 
-    boolean isGetString() {
+    protected boolean isGetString() {
         return isGetString;
     }
 
-    String getSplitter() {
+    protected String getSplitter() {
         return splitter;
     }
 
-    int getStartWithLine() {
+    protected int getStartWithLine() {
         return startWithLine;
     }
 

@@ -1,14 +1,55 @@
-package data.factory;
+package data.parser.atf;
 
 import data.exception.ParseException;
+import data.factory.AbstractFactoryTask;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-public class FileTask {
-    private void handleTextTask() {
+class FileTask extends AbstractFactoryTask {
+    public FileTask(String splitter) {
+        resultMap = new HashMap<>();
+        entityList = new ArrayList<>();
+        attributeList = Arrays.asList("Entity");
+        valueList = new ArrayList<>();
+        this.splitter = splitter;
+    }
+
+    protected void preTextTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
+        try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))){
+            String line;
+            String[] lineArray;
+            String entityName, attributeName, attributeValue;
+            while ((line = br.readLine()) != null){
+                if(startWithLine != 0){
+                    startWithLine -= 1;
+                    continue;
+                }
+
+                lineArray = line.split("\\\\" + splitter);
+                entityName = lineArray.length == 0 ? " " : lineArray[0].trim();
+                attributeName = lineArray.length == 1 ? " " : lineArray[1].trim();
+                attributeValue = lineArray.length == 2 ? " " : lineArray[2].trim();
+
+                createResultMap(codeMap, resultMap, entityName, attributeName, attributeValue);
+            }
+
+            if(startWithLine != 0)
+                throw new ParseException("startWithLine over than the row there is in file.");
+        }catch (Exception e) {
+            throw new ParseException(e.getMessage());
+        }
+    }
+
+    protected void handleTextTask() {
         for(String entity : resultMap.keySet()) {
             if(!entityList.contains(entity))
                 entityList.add(entity);
@@ -26,16 +67,16 @@ public class FileTask {
         }
     }
 
-    private String doTextTask() {
+    protected String doTextTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
         String resultString = null;
         if(isWriteFile)
-            writeResultFile();
+            writeResultFile(writeFilePath, isOpenFile);
         if(isGetString)
             resultString = writeResultString();
         return resultString;
     }
 
-    private void writeResultFile() {
+    protected void writeResultFile(String writeFilePath, boolean isOpenFile) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath))) {
             for(String attribute : attributeList){
                 bw.write(attribute); bw.write(splitter); bw.flush();
@@ -61,7 +102,7 @@ public class FileTask {
         }
     }
 
-    private String writeResultString() {
+    protected String writeResultString() {
         StringBuilder resultString = new StringBuilder();
         for(String attribute : attributeList){
             resultString.append(attribute).append(splitter);

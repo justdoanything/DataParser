@@ -23,20 +23,6 @@ public abstract class CommonTemplate {
 		codeMap.get(name).put(code, value);
     }
 
-    protected void createResultMap(Map<String, Map<String, String>> resultMap, String entityName, String attributeName, String attributeValue) {
-        if(!resultMap.containsKey(entityName))
-            resultMap.put(entityName, new HashMap<>());
-
-        if(attributeValue != null && codeMap.containsKey(attributeName))
-            attributeValue = changeCodeValue(attributeName, attributeValue);
-
-        resultMap.get(entityName).put(attributeName,  attributeValue.equals(" ") ? " " : attributeValue);
-    }
-
-    protected String changeCodeValue(String attributeName, String attributeValue) {
-        return codeMap.get(attributeName).containsKey(attributeValue) ? codeMap.get(attributeName).get(attributeValue) : attributeValue;
-    }
-
     protected abstract String parseTextFile();
     protected abstract String parseExcelFile();
 
