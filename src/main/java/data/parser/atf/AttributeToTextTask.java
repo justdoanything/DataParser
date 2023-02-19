@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-class FileTask extends AbstractFactoryTask {
-    public FileTask(String splitter) {
+class AttributeToTextTask extends AbstractFactoryTask {
+    public AttributeToTextTask(String splitter) {
         resultMap = new HashMap<>();
         entityList = new ArrayList<>();
         attributeList = Arrays.asList("Entity");

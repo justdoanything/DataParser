@@ -1,4 +1,4 @@
-package data.template.inf;
+package data.template;
 
 import java.io.FileNotFoundException;
 

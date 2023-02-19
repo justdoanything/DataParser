@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExcelTask extends AbstractFactoryTask {
-    public ExcelTask(String splitter) {
+class AttributeToExcelTask extends AbstractFactoryTask {
+    public AttributeToExcelTask(String splitter) {
         resultMap = new HashMap<>();
         entityList = new ArrayList<>();
         attributeList = Arrays.asList("Entity");

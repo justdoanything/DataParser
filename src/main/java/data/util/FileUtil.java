@@ -9,7 +9,6 @@ import java.time.format.DateTimeParseException;
 import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
 
 public class FileUtil {
-
 	public static boolean isFileExist(String filePath) {
 		File file = new File(filePath);
 		return file.exists();

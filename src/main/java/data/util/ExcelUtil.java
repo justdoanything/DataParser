@@ -3,12 +3,6 @@ package data.util;
 import org.apache.poi.ss.usermodel.Cell;
 
 public class ExcelUtil {
-
-	/**
-	 * Check cell type and return cell value as String type
-	 * @param cell
-	 * @return
-	 */
 	public static String getCellValue(Cell cell) {
 		String msg = "";
 		if (cell != null) {

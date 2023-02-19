@@ -1,23 +1,10 @@
 package data.parser.atf;
 
 import data.exception.ParseException;
-import data.factory.AbstractFactoryTask;
-import data.template.inf.CommonInterface;
+import data.template.CommonInterface;
 import data.template.FileTemplate;
-import data.util.DateUtil;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import data.util.ExcelUtil;
 import data.util.FileUtil;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -79,7 +66,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
 	@Override
 	protected String parseTextFile() {
-		FileTask ft = new FileTask(splitter);
+		AttributeToTextTask ft = new AttributeToTextTask(splitter);
 		ft.preTextTask(codeMap, readFilePath, startWithLine);
 		ft.handleTextTask();
 		return ft.doTextTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
@@ -87,7 +74,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
 	@Override
 	protected String parseExcelFile() {
-		ExcelTask et = new ExcelTask(splitter);
+		AttributeToExcelTask et = new AttributeToExcelTask(splitter);
 		et.preTextTask(codeMap, readFilePath, startWithLine);
 		et.handleTextTask();
 		return et.doTextTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
