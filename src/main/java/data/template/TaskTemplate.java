@@ -11,24 +11,24 @@ public abstract class TaskTemplate {
     protected List<String> valueList;
     protected String splitter;
 
-    protected abstract void preTextTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine);
+    protected abstract void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine);
 
-    protected abstract void handleTextTask();
+    protected abstract void handleTask();
 
-    protected abstract String doTextTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath);
+    protected abstract String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath);
 
     protected abstract void writeResultFile(String writeFilePath, boolean isOpenFile);
 
     protected abstract String writeResultString();
 
     protected void createResultMap(Map<String, Map<String, String>> codeMap, Map<String, Map<String, String>> resultMap, String entityName, String attributeName, String attributeValue) {
-        if(!resultMap.containsKey(entityName))
+        if (!resultMap.containsKey(entityName))
             resultMap.put(entityName, new HashMap<>());
 
-        if(attributeValue != null && codeMap.containsKey(attributeName))
+        if (attributeValue != null && codeMap.containsKey(attributeName))
             attributeValue = changeCodeValue(codeMap, attributeName, attributeValue);
 
-        resultMap.get(entityName).put(attributeName,  attributeValue.equals(" ") ? " " : attributeValue);
+        resultMap.get(entityName).put(attributeName, attributeValue.equals(" ") ? " " : attributeValue);
     }
 
     protected String changeCodeValue(Map<String, Map<String, String>> codeMap, String attributeName, String attributeValue) {

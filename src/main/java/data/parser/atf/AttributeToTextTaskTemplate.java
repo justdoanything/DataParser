@@ -23,13 +23,13 @@ public class AttributeToTextTaskTemplate extends TaskTemplate {
         this.splitter = splitter;
     }
 
-    protected void preTextTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
-        try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))){
+    protected void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
+        try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))) {
             String line;
             String[] lineArray;
             String entityName, attributeName, attributeValue;
-            while ((line = br.readLine()) != null){
-                if(startWithLine != 0){
+            while ((line = br.readLine()) != null) {
+                if (startWithLine != 0) {
                     startWithLine -= 1;
                     continue;
                 }
@@ -42,23 +42,23 @@ public class AttributeToTextTaskTemplate extends TaskTemplate {
                 createResultMap(codeMap, resultMap, entityName, attributeName, attributeValue);
             }
 
-            if(startWithLine != 0)
+            if (startWithLine != 0)
                 throw new ParseException("startWithLine over than the row there is in file.");
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new ParseException(e.getMessage());
         }
     }
 
-    protected void handleTextTask() {
-        for(String entity : resultMap.keySet()) {
-            if(!entityList.contains(entity))
+    protected void handleTask() {
+        for (String entity : resultMap.keySet()) {
+            if (!entityList.contains(entity))
                 entityList.add(entity);
 
-            for(String attribute : (resultMap.get(entity)).keySet()) {
-                if(!attributeList.contains(attribute)) {
+            for (String attribute : (resultMap.get(entity)).keySet()) {
+                if (!attributeList.contains(attribute)) {
                     attributeList.add(attribute);
                 }
-                if((resultMap.get(entity)).containsKey(attribute)) {
+                if ((resultMap.get(entity)).containsKey(attribute)) {
                     valueList.add(resultMap.get(entity).get(attribute));
                 } else {
                     valueList.add("");
@@ -67,19 +67,21 @@ public class AttributeToTextTaskTemplate extends TaskTemplate {
         }
     }
 
-    protected String doTextTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
+    protected String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
         String resultString = null;
-        if(isWriteFile)
+        if (isWriteFile)
             writeResultFile(writeFilePath, isOpenFile);
-        if(isGetString)
+        if (isGetString)
             resultString = writeResultString();
         return resultString;
     }
 
     protected void writeResultFile(String writeFilePath, boolean isOpenFile) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath))) {
-            for(String attribute : attributeList){
-                bw.write(attribute); bw.write(splitter); bw.flush();
+            for (String attribute : attributeList) {
+                bw.write(attribute);
+                bw.write(splitter);
+                bw.flush();
             }
 
             bw.flush();
@@ -88,7 +90,7 @@ public class AttributeToTextTaskTemplate extends TaskTemplate {
             for (String entity : entityList) {
                 bw.write(entity);
                 bw.write(splitter);
-                for(String value : valueList){
+                for (String value : valueList) {
                     bw.write(value);
                     bw.write(splitter);
                 }
@@ -96,22 +98,22 @@ public class AttributeToTextTaskTemplate extends TaskTemplate {
                 bw.write("\r\n");
             }
 
-            if(isOpenFile) Desktop.getDesktop().edit(new File(writeFilePath));
-        }catch (Exception e) {
+            if (isOpenFile) Desktop.getDesktop().edit(new File(writeFilePath));
+        } catch (Exception e) {
             throw new ParseException(e.getMessage());
         }
     }
 
     protected String writeResultString() {
         StringBuilder resultString = new StringBuilder();
-        for(String attribute : attributeList){
+        for (String attribute : attributeList) {
             resultString.append(attribute).append(splitter);
         }
         resultString.append("\r\n");
 
         for (String entity : entityList) {
             resultString.append(entity).append(splitter);
-            for(String value : valueList){
+            for (String value : valueList) {
                 resultString.append(value).append(splitter);
             }
             resultString.append("\r\n");
