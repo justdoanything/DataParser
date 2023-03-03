@@ -1,6 +1,8 @@
 package data.parser.atf;
 
+import data.constant.TypeEnum;
 import data.exception.ParseException;
+import data.factory.ParserFactory;
 import data.template.CommonInterface;
 import data.template.FileTemplate;
 import data.util.FileUtil;
@@ -66,7 +68,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
 	@Override
 	protected String parseTextFile() {
-		AttributeToTextTask ft = new AttributeToTextTask(splitter);
+		AttributeToTextTaskTemplate ft = (AttributeToTextTaskTemplate) ParserFactory.createTask(TypeEnum.ParseType.TEXT, splitter);
 		ft.preTextTask(codeMap, readFilePath, startWithLine);
 		ft.handleTextTask();
 		return ft.doTextTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
@@ -74,7 +76,7 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
 	@Override
 	protected String parseExcelFile() {
-		AttributeToExcelTask et = new AttributeToExcelTask(splitter);
+		AttributeToExcelTaskTemplate et = (AttributeToExcelTaskTemplate) ParserFactory.createTask(TypeEnum.ParseType.EXCEL, splitter);
 		et.preTextTask(codeMap, readFilePath, startWithLine);
 		et.handleTextTask();
 		return et.doTextTask(isWriteFile, isGetString, isOpenFile, writeFilePath);

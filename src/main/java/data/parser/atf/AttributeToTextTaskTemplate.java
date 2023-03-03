@@ -1,7 +1,7 @@
 package data.parser.atf;
 
 import data.exception.ParseException;
-import data.factory.AbstractFactoryTask;
+import data.template.TaskTemplate;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-class AttributeToTextTask extends AbstractFactoryTask {
-    public AttributeToTextTask(String splitter) {
+public class AttributeToTextTaskTemplate extends TaskTemplate {
+    public AttributeToTextTaskTemplate(String splitter) {
         resultMap = new HashMap<>();
         entityList = new ArrayList<>();
         attributeList = Arrays.asList("Entity");

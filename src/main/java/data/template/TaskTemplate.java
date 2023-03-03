@@ -1,10 +1,10 @@
-package data.factory;
+package data.template;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractFactoryTask {
+public abstract class TaskTemplate {
     protected Map<String, Map<String, String>> resultMap;
     protected List<String> entityList;
     protected List<String> attributeList;

@@ -1,9 +1,7 @@
 package data.test;
 
-import data.factory.AbstractFactoryTask;
 import data.parser.atf.AttributeToFile;
 import data.parser.ftiq.FileToInsertQuery;
-import data.parser.ftiq.FileToInsertQueryBuilder;
 
 public class AttributeToFileTest {
 
