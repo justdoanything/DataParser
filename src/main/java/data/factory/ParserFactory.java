@@ -8,7 +8,7 @@ import data.template.TaskTemplate;
 
 public class ParserFactory {
     public static TaskTemplate createTask(TypeEnum.ParseType type, String splitter) {
-        switch (type){
+        switch (type) {
             case TEXT:
                 return new AttributeToTextTaskTemplate(splitter);
             case EXCEL:

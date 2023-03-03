@@ -30,7 +30,7 @@ public class FileTemplate extends CommonTemplate {
         if (!isWriteFile && isOpenFile)
             throw new ParseException("A required value has an exception : isOpenFile must be false if isWriteFile is true.");
 
-        if(readFilePath == null || (isWriteFile && writeFilePath == null) || splitter == null || codeMap == null)
+        if (readFilePath == null || (isWriteFile && writeFilePath == null) || splitter == null || codeMap == null)
             throw new ParseException("A required value has an exception : Required fields must be not null.");
 
         if (startWithLine < 0)
