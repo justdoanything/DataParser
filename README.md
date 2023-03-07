@@ -4,14 +4,14 @@ DataParser
 This program parses simple data to make your job easier.\
 You can run this after importing with jar file or refer to the code as it is.
 
-It will be registered in maven dependency.
+It will be registered in maven repository.
 
 ---
 
 ## Logs
-I studied [java design pattern](https://github.com/justdoanything/self-study/blob/main/WIS/03%20ApplicationModernization.md#5%EF%B8%8F⃣-java-design-pattern) and tried to apply into the code.
+I studied [java design pattern](https://github.com/justdoanything/self-study/blob/main/WIS/03%20ApplicationModernization.md#5%EF%B8%8F⃣-java-design-pattern) and tried to apply into this project.
 
-First of all, I need to divide which field should be common, which method should be common for all classes. I figured out it by input, output type.\
+First of all, I need to divide which field and method should be common for all classes. I figured out it by input, output type.\
 After that, I thought about how to implement these common fields/methods.
 
 - Builder Pattern
@@ -26,7 +26,7 @@ After that, I thought about how to implement these common fields/methods.
 
 ---
 
-## Used Classes 
+## What Classes Do 
 - ### TypeConverter.java
   This class converts an object that has setter/getter to map.
   - (1) Map → Object (VO)
@@ -111,6 +111,10 @@ After that, I thought about how to implement these common fields/methods.
 	('test1', 'test2', '111'),
 	('test1', 'test2', '111');
 	```
+
+---
+
+## How To Use Classes
 
 ---
 
