@@ -1,7 +1,7 @@
 package data.template.task.atf;
 
 import data.exception.ParseException;
-import data.template.TaskTemplate;
+import data.template.task.FileTaskTemplate;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -14,16 +14,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AttributeToTextTask extends TaskTemplate {
-    public AttributeToTextTask(String splitter) {
+public class AttributeToTextTask extends FileTaskTemplate {
+    public AttributeToTextTask() {
         resultMap = new HashMap<>();
         entityList = new ArrayList<>();
         attributeList = Arrays.asList("Entity");
         valueList = new ArrayList<>();
-        this.splitter = splitter;
     }
 
-    public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
+    public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter) {
         try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))) {
             String line;
             String[] lineArray;
@@ -67,16 +66,16 @@ public class AttributeToTextTask extends TaskTemplate {
         }
     }
 
-    public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
+    public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath, String splitter) {
         String resultString = null;
         if (isWriteFile)
-            writeResultFile(writeFilePath, isOpenFile);
+            writeResultFile(writeFilePath, isOpenFile, splitter);
         if (isGetString)
-            resultString = writeResultString();
+            resultString = writeResultString(splitter);
         return resultString;
     }
 
-    protected void writeResultFile(String writeFilePath, boolean isOpenFile) {
+    protected void writeResultFile(String writeFilePath, boolean isOpenFile, String splitter) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath))) {
             for (String attribute : attributeList) {
                 bw.write(attribute);
@@ -98,13 +97,14 @@ public class AttributeToTextTask extends TaskTemplate {
                 bw.write("\r\n");
             }
 
-            if (isOpenFile) Desktop.getDesktop().edit(new File(writeFilePath));
+            if (isOpenFile)
+                Desktop.getDesktop().edit(new File(writeFilePath));
         } catch (Exception e) {
             throw new ParseException(e.getMessage());
         }
     }
 
-    protected String writeResultString() {
+    protected String writeResultString(String splitter) {
         StringBuilder resultString = new StringBuilder();
         for (String attribute : attributeList) {
             resultString.append(attribute).append(splitter);

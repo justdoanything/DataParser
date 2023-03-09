@@ -1,7 +1,7 @@
 package data.template.task.atf;
 
 import data.exception.ParseException;
-import data.template.TaskTemplate;
+import data.template.task.FileTaskTemplate;
 import data.util.DateUtil;
 import data.util.ExcelUtil;
 import data.util.FileUtil;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static data.constant.FileConstant.FILE_EXTENSION_XLS;
 
-public class AttributeToExcelTask extends TaskTemplate {
+public class AttributeToExcelTask extends FileTaskTemplate {
 
     private Workbook workbook = null;
 
@@ -32,11 +32,10 @@ public class AttributeToExcelTask extends TaskTemplate {
         entityList = new ArrayList<>();
         attributeList = Arrays.asList("Entity");
         valueList = new ArrayList<>();
-        this.splitter = "\t";
     }
 
     @Override
-    public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
+    public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter) {
         try (FileInputStream fis = new FileInputStream(readFilePath);) {
             workbook = FileUtil.getFileExtension(readFilePath).equals(FILE_EXTENSION_XLS) ? new HSSFWorkbook(fis) : new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheetAt(0);
@@ -81,12 +80,12 @@ public class AttributeToExcelTask extends TaskTemplate {
     }
 
     @Override
-    public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
+    public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath, String splitter) {
         String resultString = null;
         if (isWriteFile)
-            writeResultFile(writeFilePath, isOpenFile);
+            writeResultFile(writeFilePath, isOpenFile, splitter);
         if (isGetString)
-            resultString = writeResultString();
+            resultString = writeResultString(splitter);
 
         if (workbook != null) {
             try {
@@ -99,7 +98,7 @@ public class AttributeToExcelTask extends TaskTemplate {
     }
 
     @Override
-    protected void writeResultFile(String writeFilePath, boolean isOpenFile) {
+    protected void writeResultFile(String writeFilePath, boolean isOpenFile, String splitter) {
         try {
             Sheet resultSheet = workbook.createSheet("result" + "_" + DateUtil.getDate("yyyyMMddHHmmss", 0));
             int rowIndex = 0;
@@ -125,14 +124,15 @@ public class AttributeToExcelTask extends TaskTemplate {
             fos.flush();
             fos.close();
 
-            if (isOpenFile) Desktop.getDesktop().edit(new File(writeFilePath));
+            if (isOpenFile)
+                Desktop.getDesktop().edit(new File(writeFilePath));
         } catch (Exception e) {
             throw new ParseException(e.getMessage());
         }
     }
 
     @Override
-    protected String writeResultString() {
+    protected String writeResultString(String splitter) {
         StringBuilder resultString = new StringBuilder();
         for (String attribute : attributeList) {
             resultString.append(attribute).append(splitter);

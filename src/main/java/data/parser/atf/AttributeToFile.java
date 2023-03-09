@@ -71,18 +71,19 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
     @Override
     protected String parseTextFile() {
-        AttributeToTextTask textTask = (AttributeToTextTask) ParserFactory.createTask(ParseType.ATF, FileType.TEXT, splitter);
-        textTask.preTask(codeMap, readFilePath, startWithLine);
+        AttributeToTextTask textTask = (AttributeToTextTask) ParserFactory.createTask(ParseType.ATF, FileType.TEXT);
+        textTask.preTask(codeMap, readFilePath, startWithLine, splitter);
         textTask.handleTask();
-        return textTask.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
+        return textTask.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath, splitter);
     }
 
     @Override
     protected String parseExcelFile() {
-        AttributeToExcelTask excelTask = (AttributeToExcelTask) ParserFactory.createTask(ParseType.ATF, FileType.EXCEL, splitter);
-        excelTask.preTask(codeMap, readFilePath, startWithLine);
+        splitter = "\t";
+        AttributeToExcelTask excelTask = (AttributeToExcelTask) ParserFactory.createTask(ParseType.ATF, FileType.EXCEL);
+        excelTask.preTask(codeMap, readFilePath, startWithLine, splitter);
         excelTask.handleTask();
-        return excelTask.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
+        return excelTask.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath, splitter);
     }
 
 }

@@ -38,7 +38,7 @@ public class FileTemplate extends CommonTemplate {
             throw new ParseException("A required value has an exception : startWithLine should be over 0.");
 
         if (FileUtil.getFileExtension(readFilePath).equals(FILE_EXTENSION_CSV) && !splitter.equals(","))
-            throw new ParseException("A required value has an exception : csv file must be ','.");
+            throw new ParseException("A required value has an exception : the splitter of csv file must be ','.");
 
         if (!FileUtil.isFileExist(readFilePath))
             throw new FileNotFoundException("The file to read is not existed in [" + readFilePath + "]");
