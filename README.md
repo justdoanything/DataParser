@@ -74,24 +74,6 @@ After that, I thought about how to implement these common fields/methods.
 	```
 
 ---
- 
-- #### JsonToFile.java
-  - ###### 🔰 Input
-  - ###### 🔰 Output
-
----
-
-- #### FileToJson.java
-  - ###### 🔰 Input
-  - ###### 🔰 Output
-
----
-
-- #### CheckingJson.java
-  - ###### 🔰 Input
-  - ###### 🔰 Output
-
----
 
 - #### ObjectToInsertQuery.java
   This class creates a bulk insert query using an object with local variables.  This is a old way to convert a value object to insert query but you can use if you like old fashion :P
@@ -99,17 +81,17 @@ After that, I thought about how to implement these common fields/methods.
 	```java
 	// input parameter is List<sampleVO> of size 3
 	public class sampleVO {
-		private String value1;
-		private String value2;
-		private String value3;
+		private String name;
+		private String age;
+		private String country;
 	}
 	```
   - ###### 🔰 Output
   	```sql
-	INSERT INTO test_table (value1, value2, value3) VALUES
-	('test1', 'test2', '111'),
-	('test1', 'test2', '111'),
-	('test1', 'test2', '111');
+	INSERT INTO test_table (name, age, country) VALUES
+	('Kally', '20', 'Korea'),
+	('John', '30', 'US'),
+	('Dany', '40', 'France');
 	```
 
 ---

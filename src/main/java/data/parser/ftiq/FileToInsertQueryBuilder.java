@@ -1,6 +1,5 @@
 package data.parser.ftiq;
 
-import data.parser.atf.AttributeToFileBuilder;
 import data.template.QueryTemplate;
 
 import java.io.FileNotFoundException;
@@ -8,23 +7,23 @@ import java.nio.file.FileSystemException;
 
 public class FileToInsertQueryBuilder extends QueryTemplate {
 
-    protected String getReadFilePath() {
+    String getReadFilePath() {
         return readFilePath;
     }
 
-    protected String getWriteFilePath() {
+    String getWriteFilePath() {
         return writeFilePath;
     }
 
-    protected boolean isWriteFile() {
+    boolean isWriteFile() {
         return isWriteFile;
     }
 
-    protected boolean isOpenFile() {
+    boolean isOpenFile() {
         return isOpenFile;
     }
 
-    protected boolean isGetString() {
+    boolean isGetString() {
         return isGetString;
     }
 
@@ -36,17 +35,17 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
         return startWithLine;
     }
 
-    protected String getTableName() {
+    String getTableName() {
         return tableName;
     }
 
-    protected int getBulkInsertCnt() {
+    int getBulkInsertCnt() {
         return bulkInsertCnt;
     }
 
-    protected boolean isBulkInsert() { return isBulkInsert; }
+    boolean isBulkInsert() { return isBulkInsert; }
 
-    public FileToInsertQueryBuilder(String readFilePath, String tableName) {
+    FileToInsertQueryBuilder(String readFilePath, String tableName) {
         this.readFilePath = readFilePath;
         this.tableName = tableName;
     }

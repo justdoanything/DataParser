@@ -1,45 +1,41 @@
 package data.parser.atf;
 
-import data.exception.ParseException;
 import data.template.FileTemplate;
-import data.util.FileUtil;
 
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;
 
-import static data.constant.FileConstant.FILE_EXTENSION_CSV;
-
 public class AttributeToFileBuilder extends FileTemplate {
 
-    protected String getReadFilePath() {
+    String getReadFilePath() {
         return readFilePath;
     }
 
-    protected String getWriteFilePath() {
+    String getWriteFilePath() {
         return writeFilePath;
     }
 
-    protected boolean isWriteFile() {
+    boolean isWriteFile() {
         return isWriteFile;
     }
 
-    protected boolean isOpenFile() {
+    boolean isOpenFile() {
         return isOpenFile;
     }
 
-    protected boolean isGetString() {
+    boolean isGetString() {
         return isGetString;
     }
 
-    protected String getSplitter() {
+    String getSplitter() {
         return splitter;
     }
 
-    protected int getStartWithLine() {
+    int getStartWithLine() {
         return startWithLine;
     }
 
-    public AttributeToFileBuilder(String readFilePath) {
+    AttributeToFileBuilder(String readFilePath) {
         this.readFilePath = readFilePath;
     }
 

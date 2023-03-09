@@ -1,10 +1,13 @@
 package data.parser.atf;
 
-import data.constant.TypeEnum;
+import data.constant.TypeEnum.FileType;
+import data.constant.TypeEnum.ParseType;
 import data.exception.ParseException;
 import data.factory.ParserFactory;
-import data.template.CommonInterface;
 import data.template.FileTemplate;
+import data.template.common.CommonInterface;
+import data.template.task.atf.AttributeToExcelTask;
+import data.template.task.atf.AttributeToTextTask;
 import data.util.FileUtil;
 
 import java.util.ArrayList;
@@ -68,18 +71,18 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
     @Override
     protected String parseTextFile() {
-        AttributeToTextTaskTemplate ft = (AttributeToTextTaskTemplate) ParserFactory.createTask(TypeEnum.ParseType.TEXT, splitter);
-        ft.preTask(codeMap, readFilePath, startWithLine);
-        ft.handleTask();
-        return ft.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
+        AttributeToTextTask textTask = (AttributeToTextTask) ParserFactory.createTask(ParseType.ATF, FileType.TEXT, splitter);
+        textTask.preTask(codeMap, readFilePath, startWithLine);
+        textTask.handleTask();
+        return textTask.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
     }
 
     @Override
     protected String parseExcelFile() {
-        AttributeToExcelTaskTemplate et = (AttributeToExcelTaskTemplate) ParserFactory.createTask(TypeEnum.ParseType.EXCEL, splitter);
-        et.preTask(codeMap, readFilePath, startWithLine);
-        et.handleTask();
-        return et.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
+        AttributeToExcelTask excelTask = (AttributeToExcelTask) ParserFactory.createTask(ParseType.ATF, FileType.EXCEL, splitter);
+        excelTask.preTask(codeMap, readFilePath, startWithLine);
+        excelTask.handleTask();
+        return excelTask.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath);
     }
 
 }

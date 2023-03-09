@@ -1,9 +1,9 @@
-package data.parser.atf;
+package data.template.task.atf;
 
 import data.exception.ParseException;
 import data.template.TaskTemplate;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AttributeToTextTaskTemplate extends TaskTemplate {
-    public AttributeToTextTaskTemplate(String splitter) {
+public class AttributeToTextTask extends TaskTemplate {
+    public AttributeToTextTask(String splitter) {
         resultMap = new HashMap<>();
         entityList = new ArrayList<>();
         attributeList = Arrays.asList("Entity");
@@ -23,7 +23,7 @@ public class AttributeToTextTaskTemplate extends TaskTemplate {
         this.splitter = splitter;
     }
 
-    protected void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
+    public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
         try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))) {
             String line;
             String[] lineArray;
@@ -49,7 +49,7 @@ public class AttributeToTextTaskTemplate extends TaskTemplate {
         }
     }
 
-    protected void handleTask() {
+    public void handleTask() {
         for (String entity : resultMap.keySet()) {
             if (!entityList.contains(entity))
                 entityList.add(entity);
@@ -67,7 +67,7 @@ public class AttributeToTextTaskTemplate extends TaskTemplate {
         }
     }
 
-    protected String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
+    public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
         String resultString = null;
         if (isWriteFile)
             writeResultFile(writeFilePath, isOpenFile);

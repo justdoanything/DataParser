@@ -1,4 +1,4 @@
-package data.template;
+package data.template.common;
 
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystemException;

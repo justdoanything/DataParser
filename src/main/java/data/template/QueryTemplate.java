@@ -1,6 +1,7 @@
 package data.template;
 
 import data.exception.ParseException;
+import data.template.common.CommonTemplate;
 import data.util.FileUtil;
 
 import java.io.FileNotFoundException;

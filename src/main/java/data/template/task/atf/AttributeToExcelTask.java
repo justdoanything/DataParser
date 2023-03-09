@@ -1,4 +1,4 @@
-package data.parser.atf;
+package data.template.task.atf;
 
 import data.exception.ParseException;
 import data.template.TaskTemplate;
@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,11 +23,11 @@ import java.util.Map;
 
 import static data.constant.FileConstant.FILE_EXTENSION_XLS;
 
-public class AttributeToExcelTaskTemplate extends TaskTemplate {
+public class AttributeToExcelTask extends TaskTemplate {
 
     private Workbook workbook = null;
 
-    public AttributeToExcelTaskTemplate() {
+    public AttributeToExcelTask() {
         resultMap = new HashMap<>();
         entityList = new ArrayList<>();
         attributeList = Arrays.asList("Entity");
@@ -36,7 +36,7 @@ public class AttributeToExcelTaskTemplate extends TaskTemplate {
     }
 
     @Override
-    protected void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
+    public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine) {
         try (FileInputStream fis = new FileInputStream(readFilePath);) {
             workbook = FileUtil.getFileExtension(readFilePath).equals(FILE_EXTENSION_XLS) ? new HSSFWorkbook(fis) : new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheetAt(0);
@@ -62,7 +62,7 @@ public class AttributeToExcelTaskTemplate extends TaskTemplate {
     }
 
     @Override
-    protected void handleTask() {
+    public void handleTask() {
         for (String entity : resultMap.keySet()) {
             if (!entityList.contains(entity))
                 entityList.add(entity);
@@ -81,7 +81,7 @@ public class AttributeToExcelTaskTemplate extends TaskTemplate {
     }
 
     @Override
-    protected String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
+    public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath) {
         String resultString = null;
         if (isWriteFile)
             writeResultFile(writeFilePath, isOpenFile);
