@@ -74,7 +74,6 @@ public class TextToInsertQueryTask extends QueryTaskTemplate {
     private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter) {
         try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))) {
             boolean isFirst = true;
-            int index = 0;
             String line;
             while ((line = br.readLine()) != null) {
                 if (startWithLine != 0) {
