@@ -58,16 +58,16 @@ public class FileToInsertQuery extends QueryTemplate implements CommonInterface 
 	@Override
 	protected String parseTextFile() {
 		TextToInsertQueryTask textTask = (TextToInsertQueryTask) ParserFactory.createTask(ParseType.FTIQ, FileType.TEXT);
-		textTask.preTask(codeMap, readFilePath, startWithLine, tableName, isBulkInsert, splitter, bulkInsertCnt);
-		textTask.handleTask();
+		textTask.preTask(tableName);
+		textTask.handleTask(codeMap, readFilePath, startWithLine, isBulkInsert, splitter, bulkInsertCnt);
 		return textTask.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath, isBulkInsert);
 	}
 
 	@Override
 	protected String parseExcelFile() {
 		ExcelToInsertQueryTask excelTask = (ExcelToInsertQueryTask) ParserFactory.createTask(ParseType.FTIQ, FileType.EXCEL);
-		excelTask.preTask(codeMap, readFilePath, startWithLine, tableName, isBulkInsert, splitter, bulkInsertCnt);
-		excelTask.handleTask();
+		excelTask.preTask(tableName);
+		excelTask.handleTask(codeMap, readFilePath, startWithLine, isBulkInsert, splitter, bulkInsertCnt);
 		return excelTask.doTask(isWriteFile, isGetString, isOpenFile, writeFilePath, isBulkInsert);
 	}
 }

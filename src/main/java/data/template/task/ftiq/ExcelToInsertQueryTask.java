@@ -6,13 +6,23 @@ import java.util.Map;
 
 public class ExcelToInsertQueryTask extends QueryTaskTemplate {
     @Override
-    public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String tableName, boolean isBulkInsert, String splitter, int bulkInsertCnt) {
-
+    public void preTask(String tableName) {
+        queryHeader = new StringBuilder("INSERT INTO " + tableName + " (");
+        queryBody = new StringBuilder();
     }
 
     @Override
-    public void handleTask() {
+    public void handleTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, boolean isBulkInsert, String splitter, int bulkInsertCnt) {
+        if (isBulkInsert)
+            handleBulkTask(codeMap, readFilePath, startWithLine, splitter, bulkInsertCnt);
+        else
+            handleNonBulkTask(codeMap, readFilePath, startWithLine, splitter);
+    }
 
+    private void handleBulkTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter, int bulkInsertCnt) {
+    }
+
+    private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter) {
     }
 
     @Override

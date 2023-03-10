@@ -8,9 +8,9 @@ public abstract class QueryTaskTemplate extends TaskTemplate {
     protected StringBuilder queryHeader;
     protected StringBuilder queryBody;
 
-    protected abstract void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String tableName, boolean isBulkInsert, String splitter, int bulkInsertCnt);
+    protected abstract void preTask(String tableName);
 
-    protected abstract void handleTask();
+    protected abstract void handleTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, boolean isBulkInsert, String splitter, int bulkInsertCnt);
 
     protected abstract String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath, boolean isBulkInsert);
 

@@ -16,14 +16,24 @@ import java.util.stream.Collectors;
 public class TextToInsertQueryTask extends QueryTaskTemplate {
 
     @Override
-    public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String tableName, boolean isBulkInsert, String splitter, int bulkInsertCnt) {
+    public void preTask(String tableName) {
         queryHeader = new StringBuilder("INSERT INTO " + tableName + " (");
         queryBody = new StringBuilder();
+    }
 
+    @Override
+    public void handleTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, boolean isBulkInsert, String splitter, int bulkInsertCnt) {
+        if (isBulkInsert)
+            handleBulkTask(codeMap, readFilePath, startWithLine, splitter, bulkInsertCnt);
+        else
+            handleNonBulkTask(codeMap, readFilePath, startWithLine, splitter);
+    }
+
+    private void handleBulkTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter, int bulkInsertCnt) {
         try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))) {
-            String line;
             boolean isFirst = true;
             int index = 0;
+            String line;
             while ((line = br.readLine()) != null) {
                 if (startWithLine != 0) {
                     startWithLine -= 1;
@@ -31,41 +41,27 @@ public class TextToInsertQueryTask extends QueryTaskTemplate {
                 }
 
                 if (isFirst) {
-                    if (isBulkInsert) {
-                        line = line.replace(splitter, ", ");
-                        line = Arrays.stream(line.split("\\\\" + splitter))
-                                .map(word -> word.trim())
-                                .collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
-                        queryHeader.append(line).append(") VALUES \r\n");
-                    } else {
-                        line = Arrays.stream(line.split("\\\\" + splitter))
-                                .map(word -> word.trim())
-                                .collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
-                        line = line.replace(splitter, ", ");
-                        queryHeader.append(line).append(") VALUES ");
-                    }
+                    line = Arrays.stream(line.split(splitter))
+                            .map(word -> word.trim())
+                            .collect(Collectors.joining(","));
+                    queryHeader.append(line).append(") VALUES \r\n");
                     isFirst = false;
                 }
 
-                if (isBulkInsert) {
-                    line = line.replace(splitter, "', '").replace("''", "null");
-                    line = Arrays.stream(line.split("\\\\" + splitter))
-                            .map(word -> word.trim())
-                            .collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
-                    if (index > 0 && index % bulkInsertCnt == 0) {
-                        queryBody.append("('").append(line.trim()).append("');\r\n\r\n");
-                        queryBody.append(queryHeader);
-                    } else {
-                        queryBody.append("('").append(line.trim()).append("'),\r\n");
-                    }
-                    index++;
+                line = Arrays.stream(line.split(splitter))
+                        .map(word -> word.trim())
+                        .collect(Collectors.joining("','", "('", "')"));
+
+                // null 처리 및 chageCodeValue 처리
+                line = line.replace("''", "null");
+
+                if (index > 0 && index % bulkInsertCnt == 0) {
+                    queryBody.append(line.trim()).append(";\r\n\r\n");
+                    queryBody.append(queryHeader);
                 } else {
-                    line = Arrays.stream(line.split("\\\\" + splitter))
-                            .map(word -> word.trim())
-                            .collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
-                    line = line.replace(splitter, "', '").replace("''", "null");
-                    queryBody.append(queryHeader).append("('").append(line.trim()).append("');\r\n");
+                    queryBody.append(line.trim()).append(";\r\n");
                 }
+                index++;
             }
 
             if (startWithLine != 0)
@@ -75,8 +71,40 @@ public class TextToInsertQueryTask extends QueryTaskTemplate {
         }
     }
 
-    @Override
-    public void handleTask() {
+    private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter) {
+        try (BufferedReader br = new BufferedReader(new FileReader(readFilePath))) {
+            boolean isFirst = true;
+            int index = 0;
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (startWithLine != 0) {
+                    startWithLine -= 1;
+                    continue;
+                }
+
+                if (isFirst) {
+                    line = Arrays.stream(line.split(splitter))
+                            .map(word -> word.trim())
+                            .collect(Collectors.joining(","));
+                    queryHeader.append(line).append(") VALUES ");
+                    isFirst = false;
+                }
+
+                line = Arrays.stream(line.split(splitter))
+                        .map(word -> word.trim())
+                        .collect(Collectors.joining("','", "('", "')"));
+
+                // null 처리 및 chageCodeValue 처리
+                line = line.replace("''", "null");
+
+                queryBody.append(queryHeader).append(line.trim()).append(";\r\n");
+            }
+
+            if (startWithLine != 0)
+                throw new ParseException("startWithLine over than the row there is in file.");
+        } catch (Exception e) {
+            throw new ParseException(e.getMessage());
+        }
 
     }
 
@@ -118,80 +146,3 @@ public class TextToInsertQueryTask extends QueryTaskTemplate {
         return resultString.toString();
     }
 }
-
-//		StringBuilder resultString = new StringBuilder();
-//
-//		try (BufferedReader br = new BufferedReader(new FileReader(readFilePath));
-//			 BufferedWriter bw = isWriteFile ? new BufferedWriter(new FileWriter(writeFilePath)) : null;) {
-//
-//			String line;
-//			StringBuilder queryHeader = new StringBuilder("INSERT INTO " + tableName + " (");
-//			StringBuilder queryBody = new StringBuilder();
-//			boolean isFirst = true;
-//			int index = 0;
-//			while ((line = br.readLine()) != null) {
-//				if(startWithLine != 0){
-//					startWithLine -= 1;
-//					continue;
-//				}
-//
-//				if(isBulkInsert) {
-//					if(isFirst) {
-//						line = line.replace(splitter, ", ");
-//						line = Arrays.stream(line.split("\\\\" + splitter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
-//						queryHeader.append(line).append(") VALUES \r\n");;
-//						isFirst = false;
-//					} else {
-//						line = line.replace(splitter, "', '").replace("''", "null");
-//						line = Arrays.stream(line.split("\\\\" + splitter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
-//						if(index > 0 && index % bulkInsertCnt == 0) {
-//							queryBody.append("('").append(line.trim()).append("');\r\n\r\n");
-//							queryBody.append(queryHeader);
-//						} else {
-//							queryBody.append("('").append(line.trim()).append("'),\r\n");
-//						}
-//					}
-//					index++;
-//				} else {
-//					if(isFirst) {
-//						line = Arrays.stream(line.split("\\\\" + splitter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
-//						line = line.replace(splitter, ", ");
-//						queryHeader.append(line).append(") VALUES ");
-//						isFirst = false;
-//					} else {
-//						line = Arrays.stream(line.split("\\\\" + splitter)).map(word -> word.trim()).collect(Collectors.toList()).toString().replace("[", "").replace("]", "");
-//						line = line.replace(splitter, "', '").replace("''", "null");
-//						queryBody.append(queryHeader).append("('").append(line.trim()).append("');\r\n");
-//					}
-//				}
-//			}
-//
-//			if(startWithLine != 0)
-//				throw new ParseException("startWithLine over than the row there is in file.");
-//
-//			if(isBulkInsert)
-//				queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
-//
-//			if(isWriteFile) {
-//				if(isBulkInsert) {
-//					bw.write(queryHeader.toString());
-//					bw.flush();
-//				}
-//
-//				bw.write(queryBody.toString());
-//				bw.flush();
-//
-//				if(isOpenFile)
-//					Desktop.getDesktop().edit(new File(writeFilePath));
-//			}
-//
-//			if(isGetString) {
-//				if(isBulkInsert) {
-//					resultString.append(queryHeader);
-//				}
-//				resultString.append(queryBody);
-//			}
-//		} catch (Exception e) {
-//			throw new ParseException(e.getMessage());
-//		}
-//		return resultString.toString();
