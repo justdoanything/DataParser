@@ -31,13 +31,6 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
 
     @Override
     public void handleTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, boolean isBulkInsert, String splitter, int bulkInsertCnt) {
-        if (isBulkInsert)
-            handleBulkTask(codeMap, readFilePath, startWithLine, splitter, bulkInsertCnt);
-        else
-            handleNonBulkTask(codeMap, readFilePath, startWithLine, splitter);
-    }
-
-    private void handleBulkTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter, int bulkInsertCnt) {
         try (FileInputStream fis = new FileInputStream(readFilePath)) {
             workbook = FileUtil.getFileExtension(readFilePath).equals(FILE_EXTENSION_XLS) ? new HSSFWorkbook(fis) : new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheetAt(0);
@@ -47,96 +40,93 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
             if (sheet.getRow(startWithLine - 1) == null)
                 throw new ParseException("startWithLine over than the row range.");
 
-            boolean isFirst = true;
-            Row row = null;
-            int cellCount = -1;
-            int index = 0;
-
-            for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
-                StringBuilder queryBodyLine = new StringBuilder();
-                row = sheet.getRow(rowNum);
-                int cellIndex = 0;
-
-                if (isFirst) {
-                    while (row.getCell(cellIndex) != null) {
-                        queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
-                        if (row.getCell(cellIndex + 1) != null) queryHeader.append(", ");
-                        cellIndex++;
-                    }
-                    cellCount = cellIndex;
-                } else {
-                    while (cellIndex < cellCount) {
-                        queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
-                        if (cellIndex + 1 != cellCount) queryBodyLine.append(", ");
-                        cellIndex++;
-                    }
-                }
-
-                if (isFirst) {
-                    queryHeader.append(") VALUES \r\n");
-                    isFirst = false;
-                } else {
-                    if (index > 0 && (index + 1) % bulkInsertCnt == 0) {
-                        queryBody.append("(").append(queryBodyLine).append(");\r\n\r\n");
-                        queryBody.append(queryHeader);
-                    } else {
-                        queryBody.append("(").append(queryBodyLine).append("),\r\n");
-                    }
-                    index++;
-                }
-            }
-
-            queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
-
+            if (isBulkInsert)
+                handleBulkTask(codeMap, sheet, bulkInsertCnt);
+            else
+                handleNonBulkTask(codeMap, sheet);
         } catch (Exception e) {
             throw new ParseException(e.getMessage());
         }
+
     }
 
-    private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter) {
-        try (FileInputStream fis = new FileInputStream(readFilePath)) {
-            workbook = FileUtil.getFileExtension(readFilePath).equals(FILE_EXTENSION_XLS) ? new HSSFWorkbook(fis) : new XSSFWorkbook(fis);
-            Sheet sheet = workbook.getSheetAt(0);
-            if (sheet == null)
-                throw new ParseException("There is no sheet in file");
+    /**
+     * IsFirst 문제 해결 필요 !!
+     */
+    private void handleBulkTask(Map<String, Map<String, String>> codeMap, Sheet sheet, int bulkInsertCnt) {
+        boolean isFirst = true;
+        Row row;
+        int cellCount = -1;
+        int index = 0;
 
-            if (sheet.getRow(startWithLine - 1) == null)
-                throw new ParseException("startWithLine over than the row range.");
+        for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
+            StringBuilder queryBodyLine = new StringBuilder();
+            row = sheet.getRow(rowNum);
+            int cellIndex = 0;
 
-            boolean isFirst = true;
-            Row row = null;
-            int cellCount = -1;
-            int index = 0;
-
-            for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
-                StringBuilder queryBodyLine = new StringBuilder();
-                row = sheet.getRow(rowNum);
-                int cellIndex = 0;
-
-                if (isFirst) {
-                    while (row.getCell(cellIndex) != null) {
-                        queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
-                        if (row.getCell(cellIndex + 1) != null) queryHeader.append(", ");
-                        cellIndex++;
-                    }
-                    cellCount = cellIndex;
-                } else {
-                    while (cellIndex < cellCount) {
-                        queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
-                        if (cellIndex + 1 != cellCount) queryBodyLine.append(", ");
-                        cellIndex++;
-                    }
+            if (isFirst) {
+                while (row.getCell(cellIndex) != null) {
+                    queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
+                    if (row.getCell(cellIndex + 1) != null) queryHeader.append(", ");
+                    cellIndex++;
                 }
-
-                if (isFirst) {
-                    queryHeader.append(") VALUES ");
-                    isFirst = false;
-                } else {
-                    queryBody.append(queryHeader).append("('").append(queryBodyLine).append("');\r\n");
+                cellCount = cellIndex;
+            } else {
+                while (cellIndex < cellCount) {
+                    queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
+                    if (cellIndex + 1 != cellCount) queryBodyLine.append(", ");
+                    cellIndex++;
                 }
             }
-        } catch (Exception e) {
-            throw new ParseException(e.getMessage());
+
+            if (isFirst) {
+                queryHeader.append(") VALUES \r\n");
+                isFirst = false;
+            } else {
+                if (index > 0 && (index + 1) % bulkInsertCnt == 0) {
+                    queryBody.append("(").append(queryBodyLine).append(");\r\n\r\n");
+                    queryBody.append(queryHeader);
+                } else {
+                    queryBody.append("(").append(queryBodyLine).append("),\r\n");
+                }
+                index++;
+            }
+        }
+
+        queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
+    }
+
+    private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, Sheet sheet) {
+        boolean isFirst = true;
+        Row row;
+        int cellCount = -1;
+
+        for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
+            StringBuilder queryBodyLine = new StringBuilder();
+            row = sheet.getRow(rowNum);
+            int cellIndex = 0;
+
+            if (isFirst) {
+                while (row.getCell(cellIndex) != null) {
+                    queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
+                    if (row.getCell(cellIndex + 1) != null) queryHeader.append(", ");
+                    cellIndex++;
+                }
+                cellCount = cellIndex;
+            } else {
+                while (cellIndex < cellCount) {
+                    queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
+                    if (cellIndex + 1 != cellCount) queryBodyLine.append(", ");
+                    cellIndex++;
+                }
+            }
+
+            if (isFirst) {
+                queryHeader.append(") VALUES ");
+                isFirst = false;
+            } else {
+                queryBody.append(queryHeader).append("('").append(queryBodyLine).append("');\r\n");
+            }
         }
     }
 
@@ -171,11 +161,6 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
 
     @Override
     protected String writeResultString(boolean isBulkInsert) {
-        StringBuilder resultString = new StringBuilder();
-        if (isBulkInsert) {
-            resultString.append(queryHeader);
-        }
-        resultString.append(queryBody);
-        return resultString.toString();
+        return isBulkInsert ? queryBody.append(queryBody).toString() : queryBody.toString();
     }
 }
