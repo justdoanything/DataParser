@@ -1,11 +1,11 @@
 package data.parser.ftiq;
 
+import data.FileToInsertQuery;
 import data.constant.TypeEnum.FileType;
 import data.constant.TypeEnum.ParseType;
 import data.exception.ParseException;
 import data.factory.ParserFactory;
 import data.template.QueryTemplate;
-import data.template.common.CommonInterface;
 import data.template.task.ftiq.ExcelToInsertQueryTask;
 import data.template.task.ftiq.TextToInsertQueryTask;
 import data.util.FileUtil;
@@ -16,18 +16,24 @@ import static data.constant.FileConstant.FILE_EXTENSION_TXT;
 import static data.constant.FileConstant.FILE_EXTENSION_XLS;
 import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
 
-public class FileToInsertQuery extends QueryTemplate implements CommonInterface {
+public class FileToInsertQueryImpl extends QueryTemplate implements FileToInsertQuery {
 
-	public static FileToInsertQueryBuilder builder(String readFilePath, String tableName) {
-		return new FileToInsertQueryBuilder(readFilePath, tableName);
-	}
+	/**
+	 * Todo
+	 * codeMap 처리
+	 * splitter, startWithLine
+	 * isFitst 처확인
+	 *
+	 */
 
-	public FileToInsertQuery(FileToInsertQueryBuilder builder) {
+	public FileToInsertQueryImpl(FileToInsertQueryBuilder builder) {
 		this.readFilePath = builder.getReadFilePath();
 		this.writeFilePath = builder.getWriteFilePath();
 		this.isWriteFile = builder.isWriteFile();
 		this.isOpenFile = builder.isOpenFile();
 		this.isGetString = builder.isGetString();
+		this.splitter = builder.getSplitter();
+		this.startWithLine = builder.getStartWithLine();
 
 		this.tableName = builder.getTableName();
 		this.bulkInsertCnt = builder.getBulkInsertCnt();

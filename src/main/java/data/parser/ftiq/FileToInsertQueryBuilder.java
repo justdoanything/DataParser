@@ -45,7 +45,7 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
 
     boolean isBulkInsert() { return isBulkInsert; }
 
-    FileToInsertQueryBuilder(String readFilePath, String tableName) {
+    public FileToInsertQueryBuilder(String readFilePath, String tableName) {
         this.readFilePath = readFilePath;
         this.tableName = tableName;
     }
@@ -90,11 +90,11 @@ public class FileToInsertQueryBuilder extends QueryTemplate {
         return this;
     }
 
-    public FileToInsertQuery build() throws FileSystemException, FileNotFoundException {
+    public FileToInsertQueryImpl build() throws FileSystemException, FileNotFoundException {
 
         validParameter();
 
-        return new FileToInsertQuery(this);
+        return new FileToInsertQueryImpl(this);
     }
 }
 
