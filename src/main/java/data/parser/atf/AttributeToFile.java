@@ -10,12 +10,6 @@ import data.template.task.atf.AttributeToExcelTask;
 import data.template.task.atf.AttributeToTextTask;
 import data.util.FileUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
 import static data.constant.FileConstant.FILE_EXTENSION_CSV;
 import static data.constant.FileConstant.FILE_EXTENSION_TXT;
@@ -23,11 +17,6 @@ import static data.constant.FileConstant.FILE_EXTENSION_XLS;
 import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
 
 public class AttributeToFile extends FileTemplate implements CommonInterface {
-    private final Map<String, Map<String, String>> resultMap;
-    private java.util.List<String> entityList;
-    private final java.util.List<String> attributeList;
-    private final List<String> valueList;
-
     public static AttributeToFileBuilder builder(String readFilePath) {
         return new AttributeToFileBuilder(readFilePath);
     }
@@ -41,11 +30,10 @@ public class AttributeToFile extends FileTemplate implements CommonInterface {
 
         this.splitter = builder.getSplitter();
         this.startWithLine = builder.getStartWithLine();
+    }
 
-        resultMap = new HashMap<>();
-        entityList = new ArrayList<>();
-        attributeList = Arrays.asList("Entity");
-        valueList = new ArrayList<>();
+    public String getWriteFilePath() {
+        return writeFilePath;
     }
 
     @Override

@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,22 +29,22 @@ public class AttributeToExcelTask extends FileTaskTemplate {
     public AttributeToExcelTask() {
         resultMap = new HashMap<>();
         entityList = new ArrayList<>();
-        attributeList = Arrays.asList("Entity");
-        valueList = new ArrayList<>();
+        attributeList = new ArrayList<>();
+        valueList = new HashMap<>();
     }
 
     @Override
     public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter) {
-        try (FileInputStream fis = new FileInputStream(readFilePath);) {
+        try (FileInputStream fis = new FileInputStream(readFilePath)) {
             workbook = FileUtil.getFileExtension(readFilePath).equals(FILE_EXTENSION_XLS) ? new HSSFWorkbook(fis) : new XSSFWorkbook(fis);
             Sheet sheet = workbook.getSheetAt(0);
             if (sheet == null)
                 throw new ParseException("There is no sheet in file");
 
-            if (sheet.getRow(startWithLine - 1) == null)
+            if (sheet.getRow(startWithLine) == null)
                 throw new ParseException("startWithLine over than the row range.");
 
-            Row row = null;
+            Row row;
             String entityName, attributeName, attributeValue;
             for (int index = startWithLine; index < sheet.getPhysicalNumberOfRows(); index++) {
                 row = sheet.getRow(index);
@@ -63,20 +62,29 @@ public class AttributeToExcelTask extends FileTaskTemplate {
     @Override
     public void handleTask() {
         for (String entity : resultMap.keySet()) {
-            if (!entityList.contains(entity))
-                entityList.add(entity);
-
             for (String attribute : (resultMap.get(entity)).keySet()) {
                 if (!attributeList.contains(attribute)) {
                     attributeList.add(attribute);
                 }
+            }
+        }
+
+        for(String entity : resultMap.keySet()){
+            if (!entityList.contains(entity)) {
+                entityList.add(entity);
+                valueList.put(entity, new ArrayList<>());
+            }
+
+            for(String attribute : attributeList){
                 if ((resultMap.get(entity)).containsKey(attribute)) {
-                    valueList.add(resultMap.get(entity).get(attribute));
+                    valueList.get(entity).add(resultMap.get(entity).get(attribute));
                 } else {
-                    valueList.add("");
+                    valueList.get(entity).add("");
                 }
             }
         }
+
+        attributeList.add(0, "Entity");
     }
 
     @Override
@@ -104,7 +112,6 @@ public class AttributeToExcelTask extends FileTaskTemplate {
             int rowIndex = 0;
             int cellIndex = 0;
             Row row = resultSheet.createRow(rowIndex++);
-            row.createCell(cellIndex++).setCellValue("NAME");
 
             for (String attribute : attributeList) {
                 row.createCell(cellIndex++).setCellValue(attribute);
@@ -114,7 +121,7 @@ public class AttributeToExcelTask extends FileTaskTemplate {
                 cellIndex = 0;
                 row = resultSheet.createRow(rowIndex++);
                 row.createCell(cellIndex++).setCellValue(entity);
-                for (String value : valueList) {
+                for (String value : valueList.get(entity)) {
                     row.createCell(cellIndex++).setCellValue(value);
                 }
             }
@@ -141,7 +148,7 @@ public class AttributeToExcelTask extends FileTaskTemplate {
 
         for (String entity : entityList) {
             resultString.append(entity).append(splitter);
-            for (String value : valueList) {
+            for (String value : valueList.get(entity)) {
                 resultString.append(value).append(splitter);
             }
             resultString.append("\r\n");

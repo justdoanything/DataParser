@@ -10,16 +10,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class AttributeToTextTask extends FileTaskTemplate {
     public AttributeToTextTask() {
         resultMap = new HashMap<>();
         entityList = new ArrayList<>();
-        attributeList = Arrays.asList("Entity");
-        valueList = new ArrayList<>();
+        attributeList = new ArrayList<>();
+        valueList = new HashMap<>();
     }
 
     public void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter) {
@@ -33,10 +33,10 @@ public class AttributeToTextTask extends FileTaskTemplate {
                     continue;
                 }
 
-                lineArray = line.split("\\\\" + splitter);
-                entityName = lineArray.length == 0 ? " " : lineArray[0].trim();
-                attributeName = lineArray.length == 1 ? " " : lineArray[1].trim();
-                attributeValue = lineArray.length == 2 ? " " : lineArray[2].trim();
+                lineArray = line.split(Pattern.quote(splitter));
+                entityName = lineArray.length > 0 ? lineArray[0].trim() : "";
+                attributeName = lineArray.length > 1 ? lineArray[1].trim() : "";
+                attributeValue = lineArray.length > 2 ? lineArray[2].trim() : "";
 
                 createResultMap(codeMap, resultMap, entityName, attributeName, attributeValue);
             }
@@ -50,20 +50,29 @@ public class AttributeToTextTask extends FileTaskTemplate {
 
     public void handleTask() {
         for (String entity : resultMap.keySet()) {
-            if (!entityList.contains(entity))
-                entityList.add(entity);
-
             for (String attribute : (resultMap.get(entity)).keySet()) {
                 if (!attributeList.contains(attribute)) {
                     attributeList.add(attribute);
                 }
+            }
+        }
+
+        for(String entity : resultMap.keySet()){
+            if (!entityList.contains(entity)) {
+                entityList.add(entity);
+                valueList.put(entity, new ArrayList<>());
+            }
+
+            for(String attribute : attributeList){
                 if ((resultMap.get(entity)).containsKey(attribute)) {
-                    valueList.add(resultMap.get(entity).get(attribute));
+                    valueList.get(entity).add(resultMap.get(entity).get(attribute));
                 } else {
-                    valueList.add("");
+                    valueList.get(entity).add("");
                 }
             }
         }
+
+        attributeList.add(0, "Entity");
     }
 
     public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath, String splitter) {
@@ -89,7 +98,7 @@ public class AttributeToTextTask extends FileTaskTemplate {
             for (String entity : entityList) {
                 bw.write(entity);
                 bw.write(splitter);
-                for (String value : valueList) {
+                for (String value : valueList.get(entity)) {
                     bw.write(value);
                     bw.write(splitter);
                 }
@@ -113,7 +122,7 @@ public class AttributeToTextTask extends FileTaskTemplate {
 
         for (String entity : entityList) {
             resultString.append(entity).append(splitter);
-            for (String value : valueList) {
+            for (String value : valueList.get(entity)) {
                 resultString.append(value).append(splitter);
             }
             resultString.append("\r\n");

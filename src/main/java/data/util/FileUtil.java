@@ -3,7 +3,6 @@ package data.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.time.format.DateTimeParseException;
 
 import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
@@ -17,13 +16,17 @@ public class FileUtil {
     public static String getFileExtension(String filePath) {
         File file = new File(filePath);
         String fileName = file.getName();
-        String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf("."), fileName.length()) : FILE_EXTENSION_BLANK;
+        String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".") + 1) : FILE_EXTENSION_BLANK;
         return fileExtension;
     }
 
     public static String getFileName(String filePath) {
         File file = new File(filePath);
-        return file.getName();
+        String fileName = file.getName();
+        if(file.getName().contains("."))
+            return fileName.substring(0, fileName.lastIndexOf('.'));
+        else
+            return fileName;
     }
 
     public static String getFilePath(String filePath) {
@@ -31,17 +34,13 @@ public class FileUtil {
         return file.getPath();
     }
 
-    public static String setDefaultWriteFilePath(String readFilePath) throws StringIndexOutOfBoundsException, DateTimeParseException, FileSystemException {
-        //if do not set writeFilePath, this should be readFilePath_{dateformat}
+    public static String setDefaultWriteFilePath(String readFilePath) throws StringIndexOutOfBoundsException, DateTimeParseException {
         String writeFilePath = "";
         if (writeFilePath == null || writeFilePath.equals(FILE_EXTENSION_BLANK)) {
-            String readFileName = FileUtil.getFileName(readFilePath);
+            String readFileName = getFileName(readFilePath);
             String writeFileName = readFileName + "_" + DateUtil.getDate("yyyyMMddHHmmss", 0);
 
-            if (!FileUtil.getFileExtension(readFilePath).equals(""))
-                writeFileName += "." + FileUtil.getFileExtension(readFilePath);
-
-            writeFilePath = FileUtil.getFilePath(readFilePath).replace(readFileName, writeFileName);
+            writeFilePath = getFilePath(readFilePath).replace(readFileName, writeFileName);
         }
         return writeFilePath;
     }

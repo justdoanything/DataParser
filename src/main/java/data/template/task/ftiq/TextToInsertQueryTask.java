@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class TextToInsertQueryTask extends QueryTaskTemplate {
@@ -49,14 +50,14 @@ public class TextToInsertQueryTask extends QueryTaskTemplate {
         int index = 0;
 
         if (isFirst) {
-            line = Arrays.stream(line.split(splitter))
+            line = Arrays.stream(line.split(Pattern.quote(splitter)))
                     .map(word -> word.trim())
                     .collect(Collectors.joining(","));
             queryHeader.append(line).append(") VALUES \r\n");
             isFirst = false;
         }
 
-        line = Arrays.stream(line.split(splitter))
+        line = Arrays.stream(line.split(Pattern.quote(splitter)))
                 .map(word -> word.trim())
                 .collect(Collectors.joining("','", "('", "')"));
 
@@ -75,14 +76,14 @@ public class TextToInsertQueryTask extends QueryTaskTemplate {
     private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, String line, String splitter) {
         boolean isFirst = true;
         if (isFirst) {
-            line = Arrays.stream(line.split(splitter))
+            line = Arrays.stream(line.split(Pattern.quote(splitter)))
                     .map(word -> word.trim())
                     .collect(Collectors.joining(","));
             queryHeader.append(line).append(") VALUES ");
             isFirst = false;
         }
 
-        line = Arrays.stream(line.split(splitter))
+        line = Arrays.stream(line.split(Pattern.quote(splitter)))
                 .map(word -> word.trim())
                 .collect(Collectors.joining("','", "('", "')"));
 

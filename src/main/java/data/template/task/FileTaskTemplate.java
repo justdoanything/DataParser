@@ -10,7 +10,7 @@ public abstract class FileTaskTemplate extends TaskTemplate {
     protected Map<String, Map<String, String>> resultMap;
     protected List<String> entityList;
     protected List<String> attributeList;
-    protected List<String> valueList;
+    protected Map<String, List<String>> valueList;
 
     protected abstract void preTask(Map<String, Map<String, String>> codeMap, String readFilePath, int startWithLine, String splitter);
 
@@ -29,6 +29,6 @@ public abstract class FileTaskTemplate extends TaskTemplate {
         if (attributeValue != null && codeMap.containsKey(attributeName))
             attributeValue = changeCodeValue(codeMap, attributeName, attributeValue);
 
-        resultMap.get(entityName).put(attributeName, attributeValue.equals(" ") ? " " : attributeValue);
+        resultMap.get(entityName).put(attributeName, attributeValue.equals("") ? "" : attributeValue);
     }
 }

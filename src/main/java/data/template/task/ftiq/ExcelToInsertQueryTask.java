@@ -37,7 +37,7 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
             if (sheet == null)
                 throw new ParseException("There is no sheet in file");
 
-            if (sheet.getRow(startWithLine - 1) == null)
+            if (sheet.getRow(startWithLine) == null)
                 throw new ParseException("startWithLine over than the row range.");
 
             if (isBulkInsert)
