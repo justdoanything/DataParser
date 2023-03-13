@@ -60,34 +60,6 @@ public class AttributeToExcelTask extends FileTaskTemplate {
     }
 
     @Override
-    public void handleTask() {
-        for (String entity : resultMap.keySet()) {
-            for (String attribute : (resultMap.get(entity)).keySet()) {
-                if (!attributeList.contains(attribute)) {
-                    attributeList.add(attribute);
-                }
-            }
-        }
-
-        for(String entity : resultMap.keySet()){
-            if (!entityList.contains(entity)) {
-                entityList.add(entity);
-                valueList.put(entity, new ArrayList<>());
-            }
-
-            for(String attribute : attributeList){
-                if ((resultMap.get(entity)).containsKey(attribute)) {
-                    valueList.get(entity).add(resultMap.get(entity).get(attribute));
-                } else {
-                    valueList.get(entity).add("");
-                }
-            }
-        }
-
-        attributeList.add(0, "Entity");
-    }
-
-    @Override
     public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath, String splitter) {
         String resultString = null;
         if (isWriteFile)
@@ -107,7 +79,7 @@ public class AttributeToExcelTask extends FileTaskTemplate {
 
     @Override
     protected void writeResultFile(String writeFilePath, boolean isOpenFile, String splitter) {
-        try {
+        try (FileOutputStream fos = new FileOutputStream(writeFilePath, false)) {
             Sheet resultSheet = workbook.createSheet("result" + "_" + DateUtil.getDate("yyyyMMddHHmmss", 0));
             int rowIndex = 0;
             int cellIndex = 0;
@@ -126,33 +98,13 @@ public class AttributeToExcelTask extends FileTaskTemplate {
                 }
             }
 
-            FileOutputStream fos = new FileOutputStream(writeFilePath, false);
             workbook.write(fos);
             fos.flush();
-            fos.close();
 
             if (isOpenFile)
                 Desktop.getDesktop().edit(new File(writeFilePath));
         } catch (Exception e) {
             throw new ParseException(e.getMessage());
         }
-    }
-
-    @Override
-    protected String writeResultString(String splitter) {
-        StringBuilder resultString = new StringBuilder();
-        for (String attribute : attributeList) {
-            resultString.append(attribute).append(splitter);
-        }
-        resultString.append("\r\n");
-
-        for (String entity : entityList) {
-            resultString.append(entity).append(splitter);
-            for (String value : valueList.get(entity)) {
-                resultString.append(value).append(splitter);
-            }
-            resultString.append("\r\n");
-        }
-        return resultString.toString();
     }
 }
