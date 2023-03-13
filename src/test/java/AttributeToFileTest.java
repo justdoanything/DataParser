@@ -1,4 +1,5 @@
-import data.parser.atf.AttributeToFile;
+import data.AttributeToFile;
+import data.parser.atf.AttributeToFileBuilder;
 
 public class AttributeToFileTest {
 
@@ -10,6 +11,12 @@ public class AttributeToFileTest {
                     .splitter("|")
                     .build();
             System.out.println(atf.parse());
+
+            AttributeToFile atfBuilder = new AttributeToFileBuilder("src/test/resources/question/ATF")
+                    .isWriteFile(true)
+                    .isGetString(true)
+                    .splitter("|")
+                    .build();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

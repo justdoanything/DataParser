@@ -4,8 +4,8 @@ import data.constant.TypeEnum.FileType;
 import data.constant.TypeEnum.ParseType;
 import data.exception.ParseException;
 import data.factory.ParserFactory;
+import data.AttributeToFile;
 import data.template.FileTemplate;
-import data.template.common.CommonInterface;
 import data.template.task.atf.AttributeToExcelTask;
 import data.template.task.atf.AttributeToTextTask;
 import data.util.FileUtil;
@@ -16,12 +16,9 @@ import static data.constant.FileConstant.FILE_EXTENSION_TXT;
 import static data.constant.FileConstant.FILE_EXTENSION_XLS;
 import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
 
-public class AttributeToFile extends FileTemplate implements CommonInterface {
-    public static AttributeToFileBuilder builder(String readFilePath) {
-        return new AttributeToFileBuilder(readFilePath);
-    }
+public class AttributeToFileImpl extends FileTemplate implements AttributeToFile {
 
-    public AttributeToFile(AttributeToFileBuilder builder) {
+    public AttributeToFileImpl(AttributeToFileBuilder builder) {
         this.readFilePath = builder.getReadFilePath();
         this.writeFilePath = builder.getWriteFilePath();
         this.isWriteFile = builder.isWriteFile();

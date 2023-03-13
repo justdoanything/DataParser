@@ -3,7 +3,6 @@ package data.parser.atf;
 import data.template.FileTemplate;
 
 import java.io.FileNotFoundException;
-import java.nio.file.FileSystemException;
 
 public class AttributeToFileBuilder extends FileTemplate {
 
@@ -35,7 +34,7 @@ public class AttributeToFileBuilder extends FileTemplate {
         return startWithLine;
     }
 
-    AttributeToFileBuilder(String readFilePath) {
+    public AttributeToFileBuilder(String readFilePath) {
         this.readFilePath = readFilePath;
     }
 
@@ -69,11 +68,11 @@ public class AttributeToFileBuilder extends FileTemplate {
         return this;
     }
 
-    public AttributeToFile build() throws FileSystemException, FileNotFoundException {
+    public AttributeToFileImpl build() throws FileNotFoundException {
 
         validParameter();
 
-        return new AttributeToFile(this);
+        return new AttributeToFileImpl(this);
     }
 }
 

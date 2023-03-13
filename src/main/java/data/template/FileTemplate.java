@@ -5,7 +5,6 @@ import data.template.common.CommonTemplate;
 import data.util.FileUtil;
 
 import java.io.FileNotFoundException;
-import java.nio.file.FileSystemException;
 
 import static data.constant.FileConstant.FILE_EXTENSION_CSV;
 
@@ -21,7 +20,7 @@ public class FileTemplate extends CommonTemplate {
     }
 
     @Override
-    protected void validParameter() throws FileNotFoundException, FileSystemException {
+    protected void validParameter() throws FileNotFoundException {
         if (isWriteFile && (writeFilePath == null || writeFilePath.length() < 1))
             writeFilePath = FileUtil.setDefaultWriteFilePath(readFilePath);
 
