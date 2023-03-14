@@ -10,11 +10,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.awt.Desktop;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.util.Map;
 
 import static data.constant.FileConstant.FILE_EXTENSION_XLS;
@@ -27,6 +23,7 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
     public void preTask(String tableName) {
         queryHeader = new StringBuilder("INSERT INTO " + tableName + " (");
         queryBody = new StringBuilder();
+        isFirst = true;
     }
 
     @Override
@@ -44,20 +41,18 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
                 handleBulkTask(codeMap, sheet, bulkInsertCnt);
             else
                 handleNonBulkTask(codeMap, sheet);
+
+            workbook.close();
         } catch (Exception e) {
             throw new ParseException(e.getMessage());
         }
 
     }
 
-    /**
-     * IsFirst 문제 해결 필요 !!
-     */
     private void handleBulkTask(Map<String, Map<String, String>> codeMap, Sheet sheet, int bulkInsertCnt) {
-        boolean isFirst = true;
         Row row;
         int cellCount = -1;
-        int index = 0;
+        int lineCnt = 0;
 
         for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
             StringBuilder queryBodyLine = new StringBuilder();
@@ -83,13 +78,13 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
                 queryHeader.append(") VALUES \r\n");
                 isFirst = false;
             } else {
-                if (index > 0 && (index + 1) % bulkInsertCnt == 0) {
+                if (lineCnt > 0 && (lineCnt + 1) % bulkInsertCnt == 0) {
                     queryBody.append("(").append(queryBodyLine).append(");\r\n\r\n");
                     queryBody.append(queryHeader);
                 } else {
                     queryBody.append("(").append(queryBodyLine).append("),\r\n");
                 }
-                index++;
+                lineCnt++;
             }
         }
 
@@ -97,7 +92,6 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
     }
 
     private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, Sheet sheet) {
-        boolean isFirst = true;
         Row row;
         int cellCount = -1;
 
@@ -128,39 +122,5 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
                 queryBody.append(queryHeader).append("('").append(queryBodyLine).append("');\r\n");
             }
         }
-    }
-
-    @Override
-    public String doTask(boolean isWriteFile, boolean isGetString, boolean isOpenFile, String writeFilePath, boolean isBulkInsert) {
-        String resultString = null;
-        if (isWriteFile)
-            writeResultFile(writeFilePath, isOpenFile, isBulkInsert);
-        if (isGetString)
-            resultString = writeResultString(isBulkInsert);
-        return resultString;
-    }
-
-    @Override
-    protected void writeResultFile(String writeFilePath, boolean isOpenFile, boolean isBulkInsert) {
-        writeFilePath = writeFilePath.replace("xlsx", "txt").replace("xls", "txt");
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(writeFilePath))) {
-            if (isBulkInsert) {
-                bw.write(queryHeader.toString());
-                bw.flush();
-            }
-
-            bw.write(queryBody.toString());
-            bw.flush();
-
-            if (isOpenFile)
-                Desktop.getDesktop().edit(new File(writeFilePath));
-        } catch (Exception e) {
-            throw new ParseException(e.getMessage());
-        }
-    }
-
-    @Override
-    protected String writeResultString(boolean isBulkInsert) {
-        return isBulkInsert ? queryBody.append(queryBody).toString() : queryBody.toString();
     }
 }
