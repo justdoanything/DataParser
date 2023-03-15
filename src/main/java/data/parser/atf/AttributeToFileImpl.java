@@ -1,20 +1,12 @@
 package data.parser.atf;
 
+import data.AttributeToFile;
 import data.constant.TypeEnum.FileType;
 import data.constant.TypeEnum.ParseType;
-import data.exception.ParseException;
 import data.factory.ParserFactory;
-import data.AttributeToFile;
 import data.template.FileTemplate;
 import data.template.task.atf.AttributeToExcelTask;
 import data.template.task.atf.AttributeToTextTask;
-import data.util.FileUtil;
-
-import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
-import static data.constant.FileConstant.FILE_EXTENSION_CSV;
-import static data.constant.FileConstant.FILE_EXTENSION_TXT;
-import static data.constant.FileConstant.FILE_EXTENSION_XLS;
-import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
 
 public class AttributeToFileImpl extends FileTemplate implements AttributeToFile {
 
@@ -31,27 +23,6 @@ public class AttributeToFileImpl extends FileTemplate implements AttributeToFile
 
     public String getWriteFilePath() {
         return writeFilePath;
-    }
-
-    @Override
-    public String parse() {
-        String resultString;
-        String readFileExtension = FileUtil.getFileExtension(readFilePath).toLowerCase();
-
-        switch (readFileExtension) {
-            case FILE_EXTENSION_TXT:
-            case FILE_EXTENSION_BLANK:
-            case FILE_EXTENSION_CSV:
-                resultString = parseTextFile();
-                break;
-            case FILE_EXTENSION_XLS:
-            case FILE_EXTENSION_XLSX:
-                resultString = parseExcelFile();
-                break;
-            default:
-                throw new ParseException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
-        }
-        return resultString;
     }
 
     @Override

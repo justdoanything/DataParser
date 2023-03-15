@@ -3,18 +3,10 @@ package data.parser.ftiq;
 import data.FileToInsertQuery;
 import data.constant.TypeEnum.FileType;
 import data.constant.TypeEnum.ParseType;
-import data.exception.ParseException;
 import data.factory.ParserFactory;
 import data.template.QueryTemplate;
 import data.template.task.ftiq.ExcelToInsertQueryTask;
 import data.template.task.ftiq.TextToInsertQueryTask;
-import data.util.FileUtil;
-
-import static data.constant.FileConstant.FILE_EXTENSION_BLANK;
-import static data.constant.FileConstant.FILE_EXTENSION_CSV;
-import static data.constant.FileConstant.FILE_EXTENSION_TXT;
-import static data.constant.FileConstant.FILE_EXTENSION_XLS;
-import static data.constant.FileConstant.FILE_EXTENSION_XLSX;
 
 public class FileToInsertQueryImpl extends QueryTemplate implements FileToInsertQuery {
 
@@ -38,27 +30,6 @@ public class FileToInsertQueryImpl extends QueryTemplate implements FileToInsert
 		this.tableName = builder.getTableName();
 		this.bulkInsertCnt = builder.getBulkInsertCnt();
 		this.isBulkInsert = builder.isBulkInsert();
-	}
-
-	@Override
-	public String parse() {
-		String resultString;
-		String readFileExtension = FileUtil.getFileExtension(readFilePath).toLowerCase();
-
-		switch (readFileExtension) {
-			case FILE_EXTENSION_TXT:
-			case FILE_EXTENSION_BLANK:
-			case FILE_EXTENSION_CSV:
-				resultString = parseTextFile();
-				break;
-			case FILE_EXTENSION_XLS:
-			case FILE_EXTENSION_XLSX:
-				resultString = parseExcelFile();
-				break;
-			default:
-				throw new ParseException("A extension of file must be '.csv', '.xls', '.xlsx', '.txt' or empty");
-		}
-		return resultString;
 	}
 
 	@Override
