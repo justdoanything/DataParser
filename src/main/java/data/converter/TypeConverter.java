@@ -9,9 +9,6 @@ import java.util.Map;
 
 public class TypeConverter {
 
-    /*
-     * VO -> Map
-     */
     public static Map<String, Object> convertObjectToMap(Object obj) throws Exception {
         if (obj == null) {
             return Collections.emptyMap();
@@ -26,9 +23,6 @@ public class TypeConverter {
         return convertMap;
     }
 
-    /*
-     * Map -> VO
-     */
     public static <T> T convertMapToObject(Map<String, Object> map, Class<T> type) throws Exception {
         if (type == null || map == null || map.isEmpty()) {
             throw new NullPointerException("Parameter must be not null");
@@ -55,9 +49,6 @@ public class TypeConverter {
         return instance;
     }
 
-    /*
-     * List<VO> -> Map<String, Object>
-     */
     public static List<Map<String, Object>> convertListObjectToListMap(List<?> list) throws Exception {
         if (list == null || list.isEmpty()) {
             return Collections.emptyList();
@@ -71,9 +62,6 @@ public class TypeConverter {
         return convertList;
     }
 
-    /*
-     * Map<String, Object> -> List<VO>
-     */
     public static <T> List<T> convertListMapToListObject(List<Map<String, Object>> list, Class<T> type) throws Exception {
         if (type == null || list == null || list.isEmpty()) {
             throw new NullPointerException("Parameter must be not null");
