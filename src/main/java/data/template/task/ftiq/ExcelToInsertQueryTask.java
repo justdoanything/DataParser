@@ -11,7 +11,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static data.constant.FileConstant.FILE_EXTENSION_XLS;
 
@@ -38,9 +41,9 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
                 throw new ParseException("startWithLine over than the row range.");
 
             if (isBulkInsert)
-                handleBulkTask(codeMap, sheet, bulkInsertCnt);
+                handleBulkTask(codeMap, sheet, startWithLine, bulkInsertCnt);
             else
-                handleNonBulkTask(codeMap, sheet);
+                handleNonBulkTask(codeMap, sheet, startWithLine);
 
             workbook.close();
         } catch (Exception e) {
@@ -49,78 +52,79 @@ public class ExcelToInsertQueryTask extends QueryTaskTemplate {
 
     }
 
-    private void handleBulkTask(Map<String, Map<String, String>> codeMap, Sheet sheet, int bulkInsertCnt) {
+    private void handleBulkTask(Map<String, Map<String, String>> codeMap, Sheet sheet, int startWithLine, int bulkInsertCnt) {
         Row row;
-        int cellCount = -1;
-        int lineCnt = 0;
-
-        for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
-            StringBuilder queryBodyLine = new StringBuilder();
-            row = sheet.getRow(rowNum);
-            int cellIndex = 0;
-
-            if (isFirst) {
-                while (row.getCell(cellIndex) != null) {
-                    queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
-                    if (row.getCell(cellIndex + 1) != null) queryHeader.append(", ");
-                    cellIndex++;
-                }
-                cellCount = cellIndex;
-            } else {
-                while (cellIndex < cellCount) {
-                    queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
-                    if (cellIndex + 1 != cellCount) queryBodyLine.append(", ");
-                    cellIndex++;
-                }
+        StringBuilder queryBodyLine = null;
+        int maxCellCount = 0, lineCnt = 0;
+        Iterator<Row> rowIterator = sheet.rowIterator();
+        while (rowIterator.hasNext()) {
+            if (startWithLine != 0) {
+                rowIterator.next();
+                startWithLine -= 1;
+                continue;
             }
 
+            row = rowIterator.next();
             if (isFirst) {
-                queryHeader.append(") VALUES \r\n");
-                isFirst = false;
+                writeQueryHeader(row);
+                queryHeader.append(") VALUES\r\n");
+                maxCellCount = row.getPhysicalNumberOfCells();
             } else {
-                if (lineCnt > 0 && (lineCnt + 1) % bulkInsertCnt == 0) {
+                queryBodyLine = this.writeQueryBody(row, maxCellCount);
+                if ((++lineCnt) % bulkInsertCnt == 0) {
                     queryBody.append("(").append(queryBodyLine).append(");\r\n\r\n");
                     queryBody.append(queryHeader);
                 } else {
                     queryBody.append("(").append(queryBodyLine).append("),\r\n");
                 }
-                lineCnt++;
             }
         }
+
+        if (startWithLine != 0)
+            throw new ParseException("startWithLine over than the row there is in file.");
 
         queryBody.replace(queryBody.lastIndexOf(","), queryBody.lastIndexOf(",") + 1, ";");
     }
 
-    private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, Sheet sheet) {
+    private void handleNonBulkTask(Map<String, Map<String, String>> codeMap, Sheet sheet, int startWithLine) {
         Row row;
-        int cellCount = -1;
-
-        for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
-            StringBuilder queryBodyLine = new StringBuilder();
-            row = sheet.getRow(rowNum);
-            int cellIndex = 0;
-
-            if (isFirst) {
-                while (row.getCell(cellIndex) != null) {
-                    queryHeader.append(ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", ""));
-                    if (row.getCell(cellIndex + 1) != null) queryHeader.append(", ");
-                    cellIndex++;
-                }
-                cellCount = cellIndex;
-            } else {
-                while (cellIndex < cellCount) {
-                    queryBodyLine.append(("'" + ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "") + "'").replace("''", "null"));
-                    if (cellIndex + 1 != cellCount) queryBodyLine.append(", ");
-                    cellIndex++;
-                }
+        StringBuilder queryBodyLine = null;
+        int maxCellCount = 0;
+        Iterator<Row> rowIterator = sheet.rowIterator();
+        while (rowIterator.hasNext()) {
+            if (startWithLine != 0) {
+                rowIterator.next();
+                startWithLine -= 1;
+                continue;
             }
 
+            row = rowIterator.next();
             if (isFirst) {
+                this.writeQueryHeader(row);
                 queryHeader.append(") VALUES ");
-                isFirst = false;
+                maxCellCount = row.getPhysicalNumberOfCells();
             } else {
-                queryBody.append(queryHeader).append("('").append(queryBodyLine).append("');\r\n");
+                queryBodyLine = this.writeQueryBody(row, maxCellCount);
+                queryBody.append(queryHeader).append("(").append(queryBodyLine).append(");\r\n");
             }
         }
+    }
+
+    private void writeQueryHeader(Row row) {
+        queryHeader.append(StreamSupport.stream(row.spliterator(), false)
+                .map(cell -> ExcelUtil.getCellValue(cell))
+                .collect(Collectors.joining(",")));
+        isFirst = false;
+    }
+
+    private StringBuilder writeQueryBody(Row row, int maxCellCount) {
+        int cellIndex = 0;
+        StringBuilder queryBodyLine = new StringBuilder();
+        while (cellIndex < maxCellCount) {
+            queryBodyLine.append(("'" + (ExcelUtil.getCellValue(row.getCell(cellIndex)).replace("'", "")) + "'").replace("''", "null"));
+            if (++cellIndex < maxCellCount)
+                queryBodyLine.append(",");
+        }
+        return queryBodyLine;
     }
 }
