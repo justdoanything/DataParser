@@ -98,6 +98,94 @@ After that, I thought about how to implement these common fields/methods.
 
 ## How To Use Classes
 
+- ### AttributeToFile.java
+  ```java
+  public class AttributeToFileTest {
+    public static void main(String[] args) {
+        try {
+            AttributeToFile atf = AttributeToFile.builder("src/test/resources/question/ATF")
+                    .splitter("|")
+                    .startWithLine(0)
+                    .isWriteFile(true)
+                    .isOpenFile(true)
+                    .writeFilePath("src/test/resources/question/ATF_2023.txt")
+                    .isGetString(true)
+                    .build();
+            atf.addCodeMap("name", "code", "value");
+            System.out.println(atf.parse());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+  }
+  ```
+  ```java
+  public class AttributeToFileTest {
+    public static void main(String[] args) {
+        try {
+            AttributeToFile atfBuilder = new AttributeToFileBuilder("src/test/resources/question/ATF.xlsx")
+                    .splitter("\t")
+                    .startWithLine(0)
+                    .isWriteFile(true)
+                    .isOpenFile(false)
+                    .writeFilePath("src/test/resources/question/ATF_2023.xlsx")
+                    .isGetString(true)
+                    .build();
+            atfBuilder.addCodeMap("name", "code", "value");
+            System.out.println(atfBuilder.parse());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+  }
+
+  ```
+
+- ### FileToInsertQuery.java
+  ```java
+  public class FileToInsertQueryTest {
+    public static void main(String[] args) {
+      try {
+        FileToInsertQuery ftiq = FileToInsertQuery.builder("src/test/resources/question/FTIQ", "TEMP_TABLE")
+                .splitter("|")
+                .startWithLine(0)
+                .isWriteFile(true)
+                .isOpenFile(true)
+                .writeFilePath("src/test/resources/question/FTIQ_2023")
+                .isGetString(true)
+                .isBulkInsert(true)
+                .bulkInsertCnt(100)
+                .build();
+        System.out.println(ftiq.parse());
+      }catch (Exception e) {
+        System.out.println("Error : " + e.getMessage());
+      }
+    }
+  }
+  ```
+  ```java
+  public class FileToInsertQueryTest {
+    public static void main(String[] args) {
+      try {
+        FileToInsertQuery ftiqBuilder = new FileToInsertQueryBuilder("src/test/resources/question/FTIQ.xlsx", "TEMP_TABLE")
+                .splitter("\t")
+                .startWithLine(0)
+                .isWriteFile(true)
+                .isOpenFile(false)
+                .writeFilePath("src/test/resources/question/FTIQ_2023.xlsx")
+                .isGetString(true)
+                .isBulkInsert(false)
+                .build();
+        System.out.println(ftiqBuilder.parse());
+      }catch (Exception e) {
+        System.out.println("Error : " + e.getMessage());
+      }
+    }
+  }
+  ```
+
 ---
 
 ## Unit From
