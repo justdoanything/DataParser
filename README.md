@@ -28,54 +28,59 @@ After that, I thought about how to implement these common fields/methods.
 
 ## What Classes Do 
 - ### TypeConverter.java
-  This class converts an object that has setter/getter to map.
-  - (1) Map → Object (VO)
-  - (2) Object (VO) → Map
-
----
+  - This class converts an object that has setter/getter to map (POJO) and an object to map.
+  - You can use methods as below. All methods are static.
+    - `Map<String, Object> convertObjectToMap(Object obj);`
+    - `<T> T convertMapToObject(Map<String, Object> map, Class<T> type);`
+    - `List<Map<String, Object>> convertListObjectToListMap(List<?> list);`
+    - `<T> List<T> convertListMapToListObject(List<Map<String, Object>> list, Class<T> type);`
 
 - ### AttributeToFile.java
-  This class reads a file and makes table structure data like Excel.
-  - ###### 🔰 Input
-	Name | Attribute Name | Attribute Value
-	---|---|---
-	TV | Size | 65 inch
-	TV | Company | LG
-	TV | Quality | HIGH
-	Audio | Size | 32
-	Audio | Company | Apple
-	Audio | Channel	| Dual
-  - ###### 🔰 Output
-    Name | Size	| Company | Quality	| Channel
-    ---|---|---|---|---
-    TV | 65 inch | LG | HIGH |
-    Audio | 32	| Apple	| | Dual
-
----
+  - You can use methods as below. 
+    - `String parse();`
+    - `void addCodeMap(String name, String code, String value);`
+    - You can make this class by static mathod or builder class.
+  - This class reads a file and makes table structure data like Excel.
+    - ###### 🔰 Input
+      Name | Attribute Name | Attribute Value
+      ---|---|---
+      TV | Size | 65 inch
+      TV | Company | LG
+      TV | Quality | HIGH
+      Audio | Size | 32
+      Audio | Company | Apple
+      Audio | Channel	| Dual
+    - ###### 🔰 Output
+      Name | Size	| Company | Quality	| Channel
+      ---|---|---|---|---
+      TV | 65 inch | LG | HIGH |
+      Audio | 32	| Apple	| | Dual
  
 - ### FileToInsertQuery.java
-  This class reads a file and makes insert query format like below.
-  - ###### 🔰 Input
-    Name | Size | Company | Quality | Channel
-	---|---|---|---|---
-	 TV | 65 inch | LG | HIGH |
-	 Audio | 32	| Apple	| | Dual
-  - ###### 🔰 Output
-    1. Bulk Insert Type
-	```sql
-	INSERT INTO test_table ( Name, Size, Company, Quality, Channel ) VALUES
-	('TV', '65 inch', 'LG', 'HIGH' null)
-	,('Audio', '32', 'Apple', null, 'Dual'); 
-	```
-	2. Non-Bulk Insert Type
-	```sql
-	INSERT INTO test_table ( Name, Size, Company, Quality, Channel ) VALUES ('TV', '65 inch', 'LG', 'HIGH' null);
-	INSERT INTO test_table ( Name, Size, Company, Quality, Channel ) VALUES ('Audio', '32', 'Apple', null, 'Dual');
-	```
+  - You can use methods as below.
+    - `String parse();`
+    - `void addCodeMap(String name, String code, String value);`
+    - You can make this class by static mathod or builder class.
+  - This class reads a file and makes insert query format like below.
+    - ###### 🔰 Input
+      Name | Size | Company | Quality | Channel
+      ---|---|---|---|---
+       TV | 65 inch | LG | HIGH |
+       Audio | 32	| Apple	| | Dual
+    - ###### 🔰 Output
+      1. Bulk Insert Type
+      ```sql
+      INSERT INTO test_table ( Name, Size, Company, Quality, Channel ) VALUES
+      ('TV', '65 inch', 'LG', 'HIGH' null)
+      ,('Audio', '32', 'Apple', null, 'Dual'); 
+      ```
+      2. Non-Bulk Insert Type
+      ```sql
+      INSERT INTO test_table ( Name, Size, Company, Quality, Channel ) VALUES ('TV', '65 inch', 'LG', 'HIGH' null);
+      INSERT INTO test_table ( Name, Size, Company, Quality, Channel ) VALUES ('Audio', '32', 'Apple', null, 'Dual');
+      ```
 
----
-
-- #### ObjectToInsertQuery.java
+- ### ObjectToInsertQuery.java
   This class creates a bulk insert query using an object with local variables.  This is a old way to convert a value object to insert query but you can use if you like old fashion :P
   - ###### 🔰 Input
 	```java
