@@ -1,6 +1,33 @@
 package data.parser.otiq;
 
-public class ObjectToInsertQuery {
+import data.ObjectToInsertQuery;
+import data.template.QueryTemplate;
+
+public class ObjectToInsertQueryImpl extends QueryTemplate implements ObjectToInsertQuery {
+
+    public ObjectToInsertQueryImpl(ObjectToInsertQueryBuilder builder) {
+        this.writeFilePath = builder.getWriteFilePath();
+        this.isWriteFile = builder.isWriteFile();
+        this.isOpenFile = builder.isOpenFile();
+        this.isGetString = builder.isGetString();
+        this.startWithLine = builder.getStartWithLine();
+
+        this.tableName = builder.getTableName();
+        this.bulkInsertCnt = builder.getBulkInsertCnt();
+        this.isBulkInsert = builder.isBulkInsert();
+    }
+
+    @Override
+    protected String parseTextFile() {
+        return "";
+    }
+
+    @Override
+    protected String parseExcelFile() {
+        return "";
+    }
+
+
     /**
      * Write bulk insert query by using list object (VO, DTO, ...)
      *
