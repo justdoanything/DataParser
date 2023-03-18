@@ -12,6 +12,12 @@ import java.util.stream.Collectors;
 
 public class TextToInsertQueryTask extends QueryTaskTemplate {
 
+    /**
+     * Todo
+     * codeMap 처리
+     */
+
+
     @Override
     public void preTask(String tableName) {
         queryHeader = new StringBuilder("INSERT INTO " + tableName + " (");

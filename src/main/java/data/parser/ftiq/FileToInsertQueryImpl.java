@@ -10,14 +10,6 @@ import data.template.task.ftiq.TextToInsertQueryTask;
 
 public class FileToInsertQueryImpl extends QueryTemplate implements FileToInsertQuery {
 
-	/**
-	 * Todo
-	 * codeMap 처리
-	 * splitter, startWithLine
-	 * isFitst 처확인
-	 *
-	 */
-
 	public FileToInsertQueryImpl(FileToInsertQueryBuilder builder) {
 		this.readFilePath = builder.getReadFilePath();
 		this.writeFilePath = builder.getWriteFilePath();
